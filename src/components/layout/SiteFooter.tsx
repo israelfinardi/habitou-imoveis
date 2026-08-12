@@ -34,6 +34,8 @@ export function SiteFooter() {
             <li><Link href="/como-anunciar" className="hover:text-white">Como anunciar</Link></li>
             <li><Link href="/imobiliarias" className="hover:text-white">Imobiliárias e corretores</Link></li>
             <li><Link href="/blog" className="hover:text-white">Blog</Link></li>
+            <li><Link href="/guias" className="hover:text-white">Central de ajuda</Link></li>
+            <li><Link href="/planos" className="hover:text-white">Planos</Link></li>
             <li><Link href="/fale-conosco" className="hover:text-white">Fale conosco</Link></li>
           </ul>
         </div>

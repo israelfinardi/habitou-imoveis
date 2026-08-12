@@ -297,6 +297,111 @@ async function main() {
   }
 
   console.log(`Concluído: ${created} imóveis criados.`);
+
+  await seedArticles();
+}
+
+// ---------------------------------------------------------------------------
+// Blog e central de ajuda — conteúdo real extraído do site original
+// ---------------------------------------------------------------------------
+
+async function seedArticles() {
+  console.log("Criando artigos do blog e da central de ajuda...");
+
+  const blogPosts = [
+    {
+      slug: "seo-local-para-imobiliaria",
+      title: "SEO local para imobiliária: como aparecer no Google quando alguém busca imóvel no seu bairro",
+      excerpt: "SEO para imobiliária na prática: arquitetura de URLs, quando criar página de bairro, Perfil da Empresa, avaliações dentro da política e plano de 90 dias.",
+      category: "Marketing",
+      authorName: "Camila Duarte",
+      authorRole: "Especialista em SEO e conteúdo digital",
+      readMinutes: 9,
+    },
+    {
+      slug: "custos-de-comprar-um-imovel-sc",
+      title: "Custos de comprar um imóvel: ITBI, escritura, registro e o que mais entra na conta em SC",
+      excerpt: "Guia dos custos da compra em SC: como calcular o ITBI, quando a escritura é dispensada, emolumentos por faixa e as reduções que só valem se você pedir.",
+      category: "Comprar",
+      authorName: "Eduardo Lins",
+      authorRole: "Contador, especialista fiscal e tributário imobiliário",
+      readMinutes: 11,
+    },
+    {
+      slug: "lei-do-inquilinato-explicada",
+      title: "Lei do Inquilinato explicada: direitos e deveres de quem aluga e de quem loca",
+      excerpt: "Guia da Lei do Inquilinato: deveres de cada lado, prazo de 30 meses, multa proporcional, venda do imóvel, direito de preferência e quando cabe despejo.",
+      category: "Alugar",
+      authorName: "Patrícia Nogueira",
+      authorRole: "Advogada, especialista em direito imobiliário",
+      readMinutes: 9,
+    },
+    {
+      slug: "investir-em-imoveis-em-santa-catarina",
+      title: "Investir em imóveis em Santa Catarina: rentabilidade real, regiões e os erros que corroem o retorno",
+      excerpt: "Como calcular a rentabilidade real de um imóvel, o peso da vacância, cinco estratégias comparadas e os números de nove regiões de Santa Catarina.",
+      category: "Investir",
+      authorName: "Fernanda Coelho",
+      authorRole: "Analista de mercado imobiliário",
+      readMinutes: 10,
+    },
+    {
+      slug: "custo-por-lead-imobiliario",
+      title: "Custo por lead imobiliário: quanto você realmente paga e qual é o número saudável",
+      excerpt: "Como calcular o custo por lead imobiliário sem se enganar: as fórmulas de CPL e CAC, o teto que a sua comissão suporta e seis alavancas para baixá-lo.",
+      category: "CRM",
+      authorName: "Bruno Tavares",
+      authorRole: "Especialista em mídia paga e Meta Ads",
+      readMinutes: 8,
+    },
+    {
+      slug: "publicar-imoveis-no-instagram-automaticamente",
+      title: "Publicar imóveis no Instagram automaticamente: como sair de 2 posts por semana para 2 por dia",
+      excerpt: "Como publicar imóveis no Instagram automaticamente: o fluxo do cadastro ao post, o que a API oficial permite e a proporção que não derruba o seu alcance.",
+      category: "Marketing",
+      authorName: "Larissa Prado",
+      authorRole: "Especialista em marketing e redes sociais",
+      readMinutes: 8,
+    },
+    {
+      slug: "lgpd-para-imobiliarias",
+      title: "LGPD para imobiliárias: o guia prático de adequação (com checklist e modelos)",
+      excerpt: "Guia de LGPD para imobiliárias: base legal por finalidade, análise cadastral, documento por WhatsApp, prazos de resposta e o regime de pequeno porte.",
+      category: "Gestão",
+      authorName: "Patrícia Nogueira",
+      authorRole: "Advogada, especialista em direito imobiliário",
+      readMinutes: 12,
+    },
+  ];
+
+  for (const post of blogPosts) {
+    await prisma.article.upsert({
+      where: { slug: post.slug },
+      update: {},
+      create: { ...post, kind: "BLOG" },
+    });
+  }
+
+  const guides = [
+    {
+      slug: "como-configurar-dns-registro-br",
+      title: "Como configurar o DNS do seu domínio no Registro.br",
+      excerpt: "Passo a passo para apontar um domínio .com.br para o seu site, criando os registros CNAME e A no painel do Registro.br.",
+      category: "Site",
+      authorName: "Equipe Habitou Imóveis",
+      readMinutes: 5,
+    },
+  ];
+
+  for (const guide of guides) {
+    await prisma.article.upsert({
+      where: { slug: guide.slug },
+      update: {},
+      create: { ...guide, kind: "GUIDE" },
+    });
+  }
+
+  console.log(`${blogPosts.length} posts de blog e ${guides.length} guias criados.`);
 }
 
 let fallbackAdvertiserId: string | null = null;

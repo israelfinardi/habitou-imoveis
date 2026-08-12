@@ -454,6 +454,32 @@ model FeedSyncLog {
 // Diversos
 // ---------------------------------------------------------------------------
 
+// ---------------------------------------------------------------------------
+// Conteúdo (blog e central de ajuda)
+// ---------------------------------------------------------------------------
+
+enum ArticleKind {
+  BLOG
+  GUIDE
+}
+
+model Article {
+  id            String      @id @default(cuid())
+  kind          ArticleKind
+  slug          String      @unique
+  title         String
+  excerpt       String
+  content       String?     @db.Text
+  category      String
+  authorName    String
+  authorRole    String?
+  readMinutes   Int?
+  publishedAt   DateTime    @default(now())
+  createdAt     DateTime    @default(now())
+
+  @@index([kind, category])
+}
+
 model ContactMessage {
   id        String   @id @default(cuid())
   name      String
