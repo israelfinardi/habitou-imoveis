@@ -1,0 +1,467 @@
+// Habitou Imóveis — schema de dados
+// Modela usuários, imóveis, localização, imobiliárias, contratos, planos,
+// assinaturas e integração VRSync (feeds de sincronização).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------------------
+// Usuários e autenticação
+// ---------------------------------------------------------------------------
+
+enum UserRole {
+  USER          // visitante cadastrado
+  ADVERTISER    // anunciante (pessoa física anunciando)
+  OWNER         // proprietário
+  AGENT         // corretor
+  AGENCY_ADMIN  // administrador de imobiliária
+  ADMIN         // administrador da plataforma
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+  PENDING
+}
+
+model User {
+  id           String     @id @default(cuid())
+  firstName    String
+  lastName     String
+  email        String     @unique
+  phone        String?
+  passwordHash String
+  role         UserRole   @default(USER)
+  status       UserStatus @default(ACTIVE)
+  avatarUrl    String?
+  creci        String? // registro de corretor, quando aplicável
+
+  agencyId String?
+  agency   Agency? @relation(fields: [agencyId], references: [id])
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  lastLoginAt DateTime?
+
+  propertiesAdvertised Property[] @relation("PropertyAdvertiser")
+  propertiesOwned      Property[] @relation("PropertyOwner")
+  propertiesAgented    Property[] @relation("PropertyAgent")
+
+  favorites           Favorite[]
+  passwordResetTokens PasswordResetToken[]
+  subscriptions       Subscription[]
+
+  contractsAsOwner      Contract[] @relation("ContractOwner")
+  contractsAsAdvertiser Contract[] @relation("ContractAdvertiser")
+  contractsAsBuyer      Contract[] @relation("ContractBuyer")
+  contractsAsTenant     Contract[] @relation("ContractTenant")
+  contractsAsAgent      Contract[] @relation("ContractAgent")
+
+  contactMessages ContactMessage[]
+
+  @@index([agencyId])
+  @@index([role])
+}
+
+model PasswordResetToken {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId])
+}
+
+// ---------------------------------------------------------------------------
+// Localização
+// ---------------------------------------------------------------------------
+
+model City {
+  id          String  @id @default(cuid())
+  name        String
+  slug        String  @unique
+  state       String
+  stateCode   String
+  region      String?
+  country     String  @default("Brasil")
+  latitude    Float?
+  longitude   Float?
+  description String?
+  heroImageUrl String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  neighborhoods Neighborhood[]
+  properties    Property[]
+
+  @@index([state])
+}
+
+model Neighborhood {
+  id        String   @id @default(cuid())
+  cityId    String
+  city      City     @relation(fields: [cityId], references: [id], onDelete: Cascade)
+  name      String
+  slug      String
+  createdAt DateTime @default(now())
+
+  properties Property[]
+
+  @@unique([cityId, slug])
+  @@index([cityId])
+}
+
+// ---------------------------------------------------------------------------
+// Imobiliárias e planos
+// ---------------------------------------------------------------------------
+
+enum AgencyStatus {
+  ACTIVE
+  INACTIVE
+  PENDING
+}
+
+model Agency {
+  id          String       @id @default(cuid())
+  name        String
+  slug        String       @unique
+  cnpj        String?
+  email       String?
+  phone       String?
+  address     String?
+  zipCode     String?
+  city        String?
+  state       String?
+  logoUrl     String?
+  description String?
+  website     String?
+  status      AgencyStatus @default(ACTIVE)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  users      User[]
+  properties Property[]
+  feeds      Feed[]
+
+  subscriptions        Subscription[]
+  contractsAsAgency     Contract[]
+}
+
+enum BillingPeriod {
+  MONTHLY
+  YEARLY
+}
+
+model Plan {
+  id            String        @id @default(cuid())
+  name          String
+  slug          String        @unique
+  description   String?
+  price         Decimal       @db.Decimal(10, 2)
+  billingPeriod BillingPeriod @default(MONTHLY)
+  maxListings   Int?
+  features      Json?
+  active        Boolean       @default(true)
+  createdAt     DateTime      @default(now())
+
+  subscriptions Subscription[]
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  PENDING
+  CANCELED
+  EXPIRED
+}
+
+model Subscription {
+  id         String             @id @default(cuid())
+  userId     String?
+  user       User?              @relation(fields: [userId], references: [id])
+  agencyId   String?
+  agency     Agency?            @relation(fields: [agencyId], references: [id])
+  planId     String
+  plan       Plan               @relation(fields: [planId], references: [id])
+  status     SubscriptionStatus @default(PENDING)
+  startedAt  DateTime?
+  expiresAt  DateTime?
+  canceledAt DateTime?
+  externalId String? // identificador de gateway de pagamento futuro
+  createdAt  DateTime           @default(now())
+  updatedAt  DateTime           @updatedAt
+
+  @@index([userId])
+  @@index([agencyId])
+}
+
+// ---------------------------------------------------------------------------
+// Imóveis
+// ---------------------------------------------------------------------------
+
+enum ListingType {
+  SALE // venda / comprar
+  RENT // aluguel / alugar
+}
+
+enum PropertyType {
+  APARTMENT
+  HOUSE
+  LAND
+  COMMERCIAL_ROOM
+  STORE
+  WAREHOUSE
+  RURAL
+  BUILDING
+  OTHER
+}
+
+enum PropertyStatus {
+  DRAFT
+  PUBLISHED
+  PAUSED
+  ARCHIVED
+}
+
+enum PropertyOrigin {
+  MANUAL
+  VRSYNC
+}
+
+model Property {
+  id           String         @id @default(cuid())
+  code         String         @unique // código interno
+  externalCode String? // código externo (origem/feed)
+  origin       PropertyOrigin @default(MANUAL)
+  sourceFeedId String?
+  sourceFeed   Feed?          @relation(fields: [sourceFeedId], references: [id])
+
+  title       String
+  slug        String  @unique
+  description String? @db.Text
+
+  listingType  ListingType
+  propertyType PropertyType
+
+  priceSale Decimal? @db.Decimal(14, 2)
+  priceRent Decimal? @db.Decimal(14, 2)
+  condoFee  Decimal? @db.Decimal(14, 2)
+  iptu      Decimal? @db.Decimal(14, 2)
+
+  totalArea Float?
+  builtArea Float?
+  bedrooms  Int?
+  suites    Int?
+  bathrooms Int?
+  parkingSpaces Int?
+
+  features String[] @default([])
+
+  status      PropertyStatus @default(DRAFT)
+  publishedAt DateTime?
+  deactivatedAt DateTime?
+
+  cityId         String
+  city           City          @relation(fields: [cityId], references: [id])
+  neighborhoodId String?
+  neighborhood   Neighborhood? @relation(fields: [neighborhoodId], references: [id])
+  street         String?
+  number         String?
+  complement     String?
+  zipCode        String?
+  latitude       Float?
+  longitude      Float?
+
+  advertiserId String
+  advertiser   User    @relation("PropertyAdvertiser", fields: [advertiserId], references: [id])
+  ownerId      String?
+  owner        User?   @relation("PropertyOwner", fields: [ownerId], references: [id])
+  agentId      String?
+  agent        User?   @relation("PropertyAgent", fields: [agentId], references: [id])
+  agencyId     String?
+  agency       Agency? @relation(fields: [agencyId], references: [id])
+
+  images    PropertyImage[]
+  favorites Favorite[]
+  contracts Contract[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([cityId, listingType, propertyType, status])
+  @@index([neighborhoodId])
+  @@index([priceSale])
+  @@index([priceRent])
+  @@index([status, publishedAt])
+  @@index([advertiserId])
+  @@index([agencyId])
+  @@index([origin, sourceFeedId, externalCode])
+}
+
+model PropertyImage {
+  id         String         @id @default(cuid())
+  propertyId String
+  property   Property       @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  url        String
+  order      Int            @default(0)
+  isPrimary  Boolean        @default(false)
+  width      Int?
+  height     Int?
+  sizeBytes  Int?
+  origin     PropertyOrigin @default(MANUAL)
+  createdAt  DateTime       @default(now())
+
+  @@index([propertyId, order])
+}
+
+model Favorite {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  propertyId String
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+
+  @@unique([userId, propertyId])
+  @@index([propertyId])
+}
+
+// ---------------------------------------------------------------------------
+// Contratos
+// ---------------------------------------------------------------------------
+
+enum ContractType {
+  SALE
+  RENT
+}
+
+enum ContractStatus {
+  DRAFT
+  ACTIVE
+  FINISHED
+  CANCELED
+}
+
+model Contract {
+  id           String         @id @default(cuid())
+  propertyId   String
+  property     Property       @relation(fields: [propertyId], references: [id])
+  type         ContractType
+  status       ContractStatus @default(DRAFT)
+
+  ownerId      String?
+  owner        User?   @relation("ContractOwner", fields: [ownerId], references: [id])
+  advertiserId String?
+  advertiser   User?   @relation("ContractAdvertiser", fields: [advertiserId], references: [id])
+  buyerId      String?
+  buyer        User?   @relation("ContractBuyer", fields: [buyerId], references: [id])
+  tenantId     String?
+  tenant       User?   @relation("ContractTenant", fields: [tenantId], references: [id])
+  agentId      String?
+  agent        User?   @relation("ContractAgent", fields: [agentId], references: [id])
+  agencyId     String?
+  agency       Agency? @relation(fields: [agencyId], references: [id])
+
+  value       Decimal? @db.Decimal(14, 2)
+  startDate   DateTime?
+  endDate     DateTime?
+  documents   Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  history ContractHistoryEntry[]
+
+  @@index([propertyId])
+  @@index([status])
+}
+
+model ContractHistoryEntry {
+  id         String   @id @default(cuid())
+  contractId String
+  contract   Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  status     ContractStatus
+  note       String?
+  createdAt  DateTime @default(now())
+
+  @@index([contractId])
+}
+
+// ---------------------------------------------------------------------------
+// VRSync — feeds de integração
+// ---------------------------------------------------------------------------
+
+enum FeedStatus {
+  ACTIVE
+  INACTIVE
+  ERROR
+}
+
+enum FeedRunStatus {
+  RUNNING
+  SUCCESS
+  ERROR
+}
+
+model Feed {
+  id              String     @id @default(cuid())
+  agencyId        String
+  agency          Agency     @relation(fields: [agencyId], references: [id])
+  name            String
+  url             String
+  status          FeedStatus @default(ACTIVE)
+  frequencyMinutes Int       @default(1440)
+  lastSyncAt      DateTime?
+  nextSyncAt      DateTime?
+  lastRunStatus   FeedRunStatus?
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+
+  logs       FeedSyncLog[]
+  properties Property[]
+
+  @@index([agencyId])
+}
+
+model FeedSyncLog {
+  id           String        @id @default(cuid())
+  feedId       String
+  feed         Feed          @relation(fields: [feedId], references: [id], onDelete: Cascade)
+  startedAt    DateTime      @default(now())
+  finishedAt   DateTime?
+  status       FeedRunStatus @default(RUNNING)
+  totalFound   Int           @default(0)
+  totalCreated Int           @default(0)
+  totalUpdated Int           @default(0)
+  totalDeactivated Int       @default(0)
+  totalUnchanged Int         @default(0)
+  totalErrors  Int           @default(0)
+  errorMessage String?
+
+  @@index([feedId])
+}
+
+// ---------------------------------------------------------------------------
+// Diversos
+// ---------------------------------------------------------------------------
+
+model ContactMessage {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  phone     String?
+  subject   String?
+  message   String   @db.Text
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+}
