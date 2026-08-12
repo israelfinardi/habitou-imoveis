@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="100%" height="100%">
+  <defs>
+    <!-- Gradiente sutil para recriar a iluminação da imagem original -->
+    <linearGradient id="bg-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#D45F3A" />
+      <stop offset="100%" stop-color="#BE4C29" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Fundo com cantos arredondados -->
+  <rect x="10" y="10" width="180" height="180" rx="48" fill="url(#bg-grad)" />
+  
+  <!-- Silhueta da Casa perfeitamente simétrica -->
+  <path d="M 65 145 
+           L 65 105 
+           L 50 105 
+           L 65 90 
+           L 65 55 
+           L 85 55 
+           L 85 70 
+           L 100 55 
+           L 150 105 
+           L 135 105 
+           L 135 145 
+           L 115 145 
+           L 115 90 
+           L 100 75 
+           L 85 90 
+           L 85 145 Z" 
+        fill="#FFFFFF" 
+        stroke="#FFFFFF" 
+        stroke-width="1.5" 
+        stroke-linejoin="round" />
+</svg>
