@@ -3,6 +3,7 @@ import { Public_Sans, Sora } from "next/font/google";
 import "./globals.css";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
+import { CompareBar } from "@/components/compare/CompareBar";
 import { getCurrentUser } from "@/lib/auth/session";
 
 const publicSans = Public_Sans({
@@ -34,6 +35,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <SiteHeader user={user} />
         <main className="flex-1">{children}</main>
         <SiteFooter />
+        <CompareBar />
       </body>
     </html>
   );

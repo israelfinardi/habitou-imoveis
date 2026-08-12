@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
-import Link from "next/link";
 import { getPropertyBySlug, getSimilarProperties } from "@/server/services/property-service";
 import { getCurrentUser } from "@/lib/auth/session";
 import { isFavorite } from "@/server/services/favorite-service";
@@ -10,6 +9,7 @@ import { PropertyGallery } from "@/components/property/PropertyGallery";
 import { PropertyMapClient } from "@/components/property/PropertyMapClient";
 import { ContactCard } from "@/components/property/ContactCard";
 import { FavoriteButton } from "@/components/property/FavoriteButton";
+import { CompareToggle } from "@/components/compare/CompareToggle";
 import { PropertyGrid } from "@/components/property/PropertyGrid";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { listFavoriteIds } from "@/server/services/favorite-service";
@@ -110,6 +110,9 @@ export default async function PropertyDetailPage({ params }: { params: Promise<P
           </div>
 
           <p className="mt-4 text-3xl font-bold text-brand-primary">{formatCurrencyBRL(price ? Number(price) : null)}</p>
+          <div className="mt-3">
+            <CompareToggle propertyId={property.id} title={property.title} imageUrl={property.images[0]?.url} />
+          </div>
           {property.condoFee && <p className="text-sm text-brand-text-secondary">Condomínio: {formatCurrencyBRL(Number(property.condoFee))}</p>}
           {property.iptu && <p className="text-sm text-brand-text-secondary">IPTU: {formatCurrencyBRL(Number(property.iptu))}</p>}
 
@@ -172,12 +175,6 @@ export default async function PropertyDetailPage({ params }: { params: Promise<P
           <PropertyGrid items={similar} favoriteIds={favoriteIds} authenticated={!!user} />
         </div>
       )}
-
-      <p className="mt-8 text-center text-xs text-brand-text-secondary">
-        <Link href="/comparar" className="hover:underline">
-          Comparar este imóvel com outros
-        </Link>
-      </p>
     </div>
   );
 }

@@ -21,7 +21,7 @@ export const propertyDetailInclude = {
   agent: { select: { id: true, firstName: true, lastName: true, phone: true, email: true, avatarUrl: true, creci: true } },
 } satisfies Prisma.PropertyInclude;
 
-function buildWhere(params: PropertySearchParams, extra?: Prisma.PropertyWhereInput): Prisma.PropertyWhereInput {
+function buildWhere(params: Partial<PropertySearchParams>, extra?: Prisma.PropertyWhereInput): Prisma.PropertyWhereInput {
   const where: Prisma.PropertyWhereInput = {
     status: "PUBLISHED",
     ...extra,
@@ -72,7 +72,7 @@ function buildWhere(params: PropertySearchParams, extra?: Prisma.PropertyWhereIn
   return where;
 }
 
-function buildOrderBy(sort: PropertySearchParams["ordenar"], transacao?: string): Prisma.PropertyOrderByWithRelationInput[] {
+function buildOrderBy(sort: Partial<PropertySearchParams>["ordenar"], transacao?: string): Prisma.PropertyOrderByWithRelationInput[] {
   switch (sort) {
     case "menor-preco":
       return transacao === "alugar" ? [{ priceRent: "asc" }] : [{ priceSale: "asc" }];
@@ -87,7 +87,7 @@ function buildOrderBy(sort: PropertySearchParams["ordenar"], transacao?: string)
 }
 
 export async function listProperties(
-  params: PropertySearchParams,
+  params: Partial<PropertySearchParams>,
   extraWhere?: Prisma.PropertyWhereInput
 ) {
   const where = buildWhere(params, extraWhere);
