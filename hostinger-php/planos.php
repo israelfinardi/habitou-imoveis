@@ -16,8 +16,8 @@ $pageTitle = 'Planos';
 require __DIR__ . '/includes/header.php';
 ?>
 <div class="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
-  <h1 class="mb-2 text-center text-3xl font-bold">Planos</h1>
-  <p class="mb-2 text-center text-brand-text-secondary">Escolha o plano ideal para anunciar seus imóveis.</p>
+  <h1 class="mb-2 text-center text-3xl font-bold">Planos para anunciar mais imóveis</h1>
+  <p class="mx-auto mb-2 max-w-xl text-center text-brand-text-secondary">Escolha quantos imóveis você precisa anunciar ao mesmo tempo. Sem fidelidade — mude ou cancele quando quiser.</p>
   <?php if (!$user): ?>
     <p class="mb-10 text-center text-sm text-brand-text-secondary">Ainda não tem conta? <a href="<?= base_url('cadastro.php?tipo=imobiliaria') ?>" class="font-medium text-brand-primary hover:underline">Cadastre sua imobiliária</a> ou <a href="<?= base_url('cadastro.php?tipo=corretor') ?>" class="font-medium text-brand-primary hover:underline">seu perfil de corretor</a>.</p>
   <?php else: ?>
@@ -26,7 +26,10 @@ require __DIR__ . '/includes/header.php';
 
   <div class="grid grid-cols-1 gap-6 sm:grid-cols-3">
     <?php foreach ($plans as $plan): $isCurrent = $currentSubscription && $currentSubscription['plan_id'] == $plan['id']; $features = json_decode_safe($plan['features']); ?>
-      <div class="flex flex-col rounded-2xl border border-brand-border bg-white p-6">
+      <div class="relative flex flex-col rounded-2xl border <?= $isCurrent ? 'border-brand-primary' : 'border-brand-border' ?> bg-white p-6">
+        <?php if ($isCurrent): ?>
+          <span class="absolute -top-3 left-6 rounded-full bg-brand-primary px-3 py-1 text-xs font-semibold text-white">Seu plano atual</span>
+        <?php endif; ?>
         <h2 class="text-lg font-bold"><?= e($plan['name']) ?></h2>
         <p class="mt-1 text-sm text-brand-text-secondary"><?= e($plan['description']) ?></p>
         <p class="mt-4 text-3xl font-bold text-brand-primary"><?= format_currency_brl($plan['price']) ?><span class="text-sm font-normal text-brand-text-secondary">/mês</span></p>
@@ -44,11 +47,16 @@ require __DIR__ . '/includes/header.php';
         <?php else: ?>
           <form method="post" action="<?= base_url('actions/subscribe_action.php') ?>">
             <?= csrf_field() ?><input type="hidden" name="do" value="subscribe"><input type="hidden" name="plan_id" value="<?= $plan['id'] ?>">
-            <button class="w-full rounded-full bg-brand-primary py-2.5 text-sm font-semibold text-white hover:bg-brand-primary-hover">Assinar plano</button>
+            <button class="w-full rounded-full bg-brand-primary py-2.5 text-sm font-semibold text-white hover:bg-brand-primary-hover"><?= $currentSubscription ? 'Trocar para este plano' : 'Assinar plano' ?></button>
           </form>
         <?php endif; ?>
       </div>
     <?php endforeach; ?>
   </div>
+  <p class="mx-auto mt-8 max-w-2xl text-center text-xs text-brand-text-secondary">
+    Sem gateway de pagamento integrado nesta versão: ao assinar, seu pedido fica com status
+    "aguardando confirmação de pagamento" até o administrador confirmar manualmente o pagamento
+    em <code class="rounded bg-brand-bg-subtle px-1 py-0.5">/admin/assinaturas.php</code>.
+  </p>
 </div>
 <?php require __DIR__ . '/includes/footer.php'; ?>

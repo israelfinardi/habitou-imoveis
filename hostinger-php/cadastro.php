@@ -19,6 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $agencyName = trim($_POST['agencyName'] ?? '');
     $cnpj = trim($_POST['cnpj'] ?? '');
     $agencyPhone = trim($_POST['agencyPhone'] ?? '');
+    $agencyCity = trim($_POST['agencyCity'] ?? '');
 
     if (mb_strlen($firstName) < 2) $fieldErrors['firstName'] = 'Informe seu nome.';
     if (mb_strlen($lastName) < 2) $fieldErrors['lastName'] = 'Informe seu sobrenome.';
@@ -36,6 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'agencyName' => $agencyName,
                 'cnpj' => $cnpj,
                 'agencyPhone' => $agencyPhone,
+                'agencyCity' => $agencyCity,
             ]);
             login_user($userId);
             redirect(base_url($accountType === 'imobiliaria' ? 'imobiliaria/feeds.php?bemvindo=1' : 'minha-conta.php'));
@@ -113,6 +115,13 @@ require __DIR__ . '/includes/header.php';
             <label class="mb-1 block text-sm font-medium">Telefone comercial</label>
             <input name="agencyPhone" value="<?= e($_POST['agencyPhone'] ?? '') ?>" class="w-full rounded-lg border border-brand-border px-3 py-2 text-sm">
           </div>
+        </div>
+        <div class="mb-4">
+          <label class="mb-1 block text-sm font-medium">Cidade de atuação</label>
+          <input type="text" name="agencyCity" class="js-city-picker w-full rounded-lg border border-brand-border px-3 py-2 text-sm"
+                 list="cidades-datalist-imobiliaria" autocomplete="off"
+                 placeholder="Digite o nome da cidade..." value="<?= e($_POST['agencyCity'] ?? '') ?>">
+          <datalist id="cidades-datalist-imobiliaria"></datalist>
         </div>
         <p class="mb-4 -mt-2 text-xs text-brand-text-secondary">O perfil público da imobiliária fica em análise até a aprovação do administrador do site.</p>
       </div>

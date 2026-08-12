@@ -29,9 +29,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-$cityStmt = db()->prepare('SELECT slug FROM cities WHERE id = ?');
+$cityStmt = db()->prepare('SELECT name, state_code FROM cities WHERE id = ?');
 $cityStmt->execute([$property['city_id']]);
-$property['city_slug'] = $cityStmt->fetchColumn();
+$cityRow = $cityStmt->fetch();
+$property['city_label'] = $cityRow ? $cityRow['name'] . ' (' . $cityRow['state_code'] . ')' : '';
 if ($property['neighborhood_id']) {
     $nStmt = db()->prepare('SELECT name FROM neighborhoods WHERE id = ?');
     $nStmt->execute([$property['neighborhood_id']]);

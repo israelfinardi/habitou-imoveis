@@ -1,8 +1,13 @@
 <?php
 require_once __DIR__ . '/includes/bootstrap.php';
 require_once __DIR__ . '/includes/filters_form.php';
+require_once __DIR__ . '/includes/property_mutations.php';
 
-$result = list_properties($_GET);
+$params = $_GET;
+if (!empty($params['cidade_nome']) && empty($params['cidade'])) {
+    $params['cidade'] = resolve_city_slug($params['cidade_nome']) ?? '__nenhuma__';
+}
+$result = list_properties($params);
 $user = current_user();
 $favoriteIds = $user ? get_favorite_ids($user['id']) : [];
 

@@ -55,12 +55,11 @@ function render_property_form(array $defaults = [], array $errors = []): void
     <div class="grid grid-cols-2 gap-3">
       <div class="mb-4">
         <label class="mb-1 block text-sm font-medium">Cidade</label>
-        <select name="cidade" required class="w-full rounded-lg border border-brand-border px-3 py-2 text-sm">
-          <option value="">Selecione</option>
-          <?php foreach (FEATURED_CITIES as $c): ?>
-            <option value="<?= e($c['slug']) ?>" <?= ($defaults['city_slug'] ?? '') === $c['slug'] ? 'selected' : '' ?>><?= e($c['name']) ?></option>
-          <?php endforeach; ?>
-        </select>
+        <input type="text" name="cidade" class="js-city-picker w-full rounded-lg border border-brand-border px-3 py-2 text-sm"
+               list="cidades-datalist-imovel" autocomplete="off" required
+               placeholder="Digite o nome da cidade..." value="<?= $val('city_label') ?>">
+        <datalist id="cidades-datalist-imovel"></datalist>
+        <p class="mt-1 text-xs text-brand-text-secondary">Qualquer cidade do Brasil. Digite e escolha uma opção da lista (formato "Cidade (UF)").</p>
       </div>
       <div class="mb-4">
         <label class="mb-1 block text-sm font-medium">Bairro</label>

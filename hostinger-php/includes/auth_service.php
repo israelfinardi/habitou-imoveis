@@ -4,7 +4,7 @@ require_once __DIR__ . '/mailer.php';
 class AuthServiceError extends \RuntimeException {}
 
 /**
- * @param array{type?: string, creci?: string, agencyName?: string, cnpj?: string, agencyPhone?: string} $professional
+ * @param array{type?: string, creci?: string, agencyName?: string, cnpj?: string, agencyPhone?: string, agencyCity?: string} $professional
  *   type: '' (padrão, comprador/anunciante particular) | 'corretor' (AGENT autônomo) | 'imobiliaria' (AGENCY_ADMIN + nova agência)
  */
 function register_user(string $firstName, string $lastName, string $email, string $phone, string $password, array $professional = []): int
@@ -32,7 +32,7 @@ function register_user(string $firstName, string $lastName, string $email, strin
         if (mb_strlen($agencyName) < 3) {
             throw new AuthServiceError('Informe o nome da imobiliária.');
         }
-        $agencyId = create_pending_agency($agencyName, $professional['cnpj'] ?? '', $professional['agencyPhone'] ?? '', $email);
+        $agencyId = create_pending_agency($agencyName, $professional['cnpj'] ?? '', $professional['agencyPhone'] ?? '', $email, $professional['agencyCity'] ?? '');
         $role = 'AGENCY_ADMIN';
     }
 
@@ -43,7 +43,7 @@ function register_user(string $firstName, string $lastName, string $email, strin
 }
 
 /** Cria uma imobiliária com status PENDENTE — só aparece publicamente após aprovação do administrador em /admin/imobiliarias.php. */
-function create_pending_agency(string $name, string $cnpj, string $phone, string $email): int
+function create_pending_agency(string $name, string $cnpj, string $phone, string $email, string $cityLabel = ''): int
 {
     $pdo = db();
     $base = slugify($name);
@@ -57,8 +57,17 @@ function create_pending_agency(string $name, string $cnpj, string $phone, string
         }
         $slug = $base . '-' . $i++;
     }
-    $stmt = $pdo->prepare('INSERT INTO agencies (name, slug, cnpj, email, phone, status) VALUES (?,?,?,?,?,"PENDING")');
-    $stmt->execute([$name, $slug, $cnpj ?: null, $email, $phone ?: null]);
+
+    $city = null;
+    $state = null;
+    if (preg_match('/^(.+?)\s*\(([A-Za-z]{2})\)\s*$/u', trim($cityLabel), $m)) {
+        $city = trim($m[1]);
+        $uf = mb_strtoupper($m[2]);
+        $state = BRAZIL_STATES[$uf] ?? null;
+    }
+
+    $stmt = $pdo->prepare('INSERT INTO agencies (name, slug, cnpj, email, phone, city, state, status) VALUES (?,?,?,?,?,?,?,"PENDING")');
+    $stmt->execute([$name, $slug, $cnpj ?: null, $email, $phone ?: null, $city, $state]);
     return (int) $pdo->lastInsertId();
 }
 

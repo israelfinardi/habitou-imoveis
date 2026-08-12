@@ -68,6 +68,28 @@ depois de usado.
 
 Acesse `https://seudominio.com.br/` — o site já está no ar, com banco de dados real.
 
+## Apagar os dados de demonstração
+
+O instalador popula o banco com um catálogo de exemplo (imóveis, imobiliárias, cidades e
+bairros) só para você conferir que tudo funciona. Quando estiver pronto para colocar dados
+reais no ar, apague tudo de uma vez acessando (troque pelo seu domínio e pelo `AUTH_SECRET`):
+
+```
+https://seudominio.com.br/limpar-dados.php?token=SEU_AUTH_SECRET
+```
+
+A página mostra um aviso e o link exato de confirmação (com `&confirmar=sim`) — é preciso
+visitar esse segundo link pra realmente apagar. Isso remove todos os imóveis, imobiliárias,
+cidades, bairros, contratos, feeds VRSync e as contas de demonstração criadas pelo seed
+(imobiliárias parceiras de exemplo e o anunciante demo). **A conta `admin@habitou.com.br` e
+qualquer conta real que você já tenha criado não são apagadas.** Não pode ser desfeito —
+apague o arquivo `limpar-dados.php` do servidor depois de usar, assim como fez com o
+`instalar.php`.
+
+Depois de limpar, o cadastro de imóveis continua funcionando normalmente: qualquer cidade do
+Brasil pode ser escolhida no formulário (não é preciso recriar as cidades manualmente — elas
+são criadas automaticamente na primeira vez que alguém anuncia um imóvel nelas).
+
 ## Sincronização automática de feeds VRSync (opcional)
 
 No hPanel: **Avançado → Cron Jobs**, crie uma tarefa (ex.: a cada hora) executando:
@@ -99,7 +121,9 @@ admin/             painel administrativo
 feeds/vrsync.php   exportação pública do catálogo em XML (VRSync)
 cron/              scripts para agendamento (sincronização automática)
 uploads/           fotos enviadas pelos anunciantes (gravável pelo PHP)
-assets/            CSS/JS/imagens
+assets/            CSS/JS/imagens/dados (cidades-br.json)
+instalar.php       instalador web (apagar depois de usar)
+limpar-dados.php   apaga o catálogo de demonstração (apagar depois de usar)
 *.php (raiz)       páginas públicas (home, busca, imóvel, login, blog, etc.)
 ```
 
@@ -127,6 +151,22 @@ As páginas de listagem/filtros (`/imoveis.php` e `/cidade.php`) mostram um mapa
 vira uma tela cheia acionada pelo botão "Ver no mapa". Imóveis sem latitude/longitude próprias
 usam o centro da cidade como localização aproximada (mesmo comportamento já usado na página
 individual do imóvel).
+
+## Localização nacional (cadastro de imóvel)
+
+O campo "Cidade" do formulário de anúncio (`/anunciante/novo.php` e `/anunciante/editar.php`)
+não é mais uma lista fixa — é uma busca com todas as ~5.600 cidades do Brasil
+(`assets/data/cidades-br.json`). A cidade escolhida é criada no banco automaticamente na
+primeira vez que é usada (`get_or_create_city()`), então não é preciso cadastrar cidades
+manualmente em lugar nenhum. As 6 cidades em destaque de Santa Catarina continuam usando os
+mesmos endereços (`/cidade.php?slug=...`) de sempre, mesmo depois de rodar o `limpar-dados.php`.
+
+## Barra superior (busca de cidade, transação e filtros)
+
+O topo do site (presente em toda página) tem uma pílula de cidade com busca instantânea (mesma
+lista nacional de cidades), um seletor Todos/Comprar/Alugar e um atalho para os filtros —
+inspirados no layout que você enviou como referência. A paleta de cores também foi atualizada
+para acompanhar esse modelo (laranja `#D95D39`, azul-marinho `#1A2E44`).
 
 ## Testes de regressão
 

@@ -49,5 +49,8 @@
 
 <script>const APP_BASE = <?= json_encode(rtrim(base_url('/'), '/') . '/') ?>;</script>
 <script src="<?= base_url('assets/js/app.js') ?>"></script>
+<script src="<?= base_url('assets/js/cidades.js') ?>"></script>
+<script src="<?= base_url('assets/js/location-picker.js') ?>"></script>
+<script src="<?= base_url('assets/js/topbar.js') ?>"></script>
 </body>
 </html>

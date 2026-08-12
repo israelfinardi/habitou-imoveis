@@ -23,9 +23,68 @@ function get_city_id_by_slug(string $slug): ?int
     return $id ? (int) $id : null;
 }
 
+/**
+ * Recebe "Nome da Cidade (UF)" (formato do seletor de localização do
+ * cadastro, com todas as ~5.600 cidades do Brasil) e retorna o id da
+ * cidade, criando a linha em `cities` sob demanda se ainda não existir.
+ */
+function get_or_create_city(string $label): ?int
+{
+    $parsed = parse_city_label($label);
+    if (!$parsed) {
+        return null;
+    }
+    [$name, $uf, $slug] = $parsed;
+
+    $pdo = db();
+    $stmt = $pdo->prepare('SELECT id FROM cities WHERE slug = ?');
+    $stmt->execute([$slug]);
+    $id = $stmt->fetchColumn();
+    if ($id) {
+        return (int) $id;
+    }
+
+    $pdo->prepare('INSERT INTO cities (name, slug, state, state_code, region) VALUES (?,?,?,?,?)')
+        ->execute([$name, $slug, BRAZIL_STATES[$uf], $uf, BRAZIL_REGIONS[$uf] ?? null]);
+    return (int) $pdo->lastInsertId();
+}
+
+/**
+ * Só resolve o slug (sem tocar no banco) a partir de "Nome da Cidade (UF)" —
+ * usado pra filtrar a busca por uma cidade que ainda pode não ter nenhuma
+ * linha em `cities` (nesse caso o slug resolvido simplesmente não bate com
+ * nada e a busca retorna zero resultados, sem erro).
+ */
+function parse_city_label(string $label): ?array
+{
+    if (!preg_match('/^(.+?)\s*\(([A-Za-z]{2})\)\s*$/u', trim($label), $m)) {
+        return null;
+    }
+    $name = trim($m[1]);
+    $uf = mb_strtoupper($m[2]);
+    if ($name === '' || !isset(BRAZIL_STATES[$uf])) {
+        return null;
+    }
+
+    // Reaproveita o slug já usado pelas cidades em destaque de SC (sem sufixo de UF),
+    // pra não quebrar os links de navegação que já apontam pra eles.
+    foreach (FEATURED_CITIES as $fc) {
+        if ($fc['state_code'] === $uf && mb_strtolower($fc['name']) === mb_strtolower($name)) {
+            return [$name, $uf, $fc['slug']];
+        }
+    }
+    return [$name, $uf, slugify($name) . '-' . strtolower($uf)];
+}
+
+function resolve_city_slug(string $label): ?string
+{
+    $parsed = parse_city_label($label);
+    return $parsed ? $parsed[2] : null;
+}
+
 function create_property(array $input, array $actor): int
 {
-    $cityId = get_city_id_by_slug($input['cidade']);
+    $cityId = get_or_create_city($input['cidade']);
     if (!$cityId) {
         throw new \InvalidArgumentException('Cidade inválida.');
     }
@@ -65,7 +124,7 @@ function update_property(int $propertyId, array $input, array $actor): void
         throw new \RuntimeException('Você não pode editar este imóvel.');
     }
 
-    $cityId = get_city_id_by_slug($input['cidade']);
+    $cityId = get_or_create_city($input['cidade']);
     if (!$cityId) {
         throw new \InvalidArgumentException('Cidade inválida.');
     }

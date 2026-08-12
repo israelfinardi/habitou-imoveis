@@ -6,6 +6,21 @@ $slug = $_GET['slug'] ?? '';
 $stmt = db()->prepare('SELECT * FROM cities WHERE slug = ?');
 $stmt->execute([$slug]);
 $city = $stmt->fetch();
+
+// As cidades em destaque são páginas de marketing curadas — devem sempre existir,
+// mesmo que ainda não tenham nenhum imóvel cadastrado (ex.: banco recém-limpo).
+if (!$city) {
+    foreach (FEATURED_CITIES as $fc) {
+        if ($fc['slug'] === $slug) {
+            db()->prepare('INSERT INTO cities (name, slug, state, state_code, region, latitude, longitude) VALUES (?,?,?,?,?,?,?)')
+                ->execute([$fc['name'], $fc['slug'], $fc['state'], $fc['state_code'], 'Santa Catarina', $fc['lat'], $fc['lng']]);
+            $stmt->execute([$slug]);
+            $city = $stmt->fetch();
+            break;
+        }
+    }
+}
+
 if (!$city) {
     http_response_code(404);
     $pageTitle = 'Cidade não encontrada';
