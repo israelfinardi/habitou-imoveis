@@ -64,16 +64,17 @@ try {
     $stmtUsers->execute();
     $usersRemovidos = $stmtUsers->rowCount();
 
+    // Reinicia a contagem de id (equivalente ao AUTO_INCREMENT do MySQL).
+    $resetSeq = $pdo->prepare('DELETE FROM sqlite_sequence WHERE name = ?');
+    foreach (['properties', 'agencies', 'cities', 'neighborhoods', 'contracts'] as $tabela) {
+        $resetSeq->execute([$tabela]);
+    }
+
     $pdo->commit();
 } catch (\Throwable $e) {
     $pdo->rollBack();
     echo "Falha ao limpar: " . $e->getMessage() . "\n";
     exit;
-}
-
-// ALTER TABLE dá commit implícito no MySQL, por isso roda fora da transação acima.
-foreach (['properties', 'agencies', 'cities', 'neighborhoods', 'contracts'] as $tabela) {
-    $pdo->exec("ALTER TABLE {$tabela} AUTO_INCREMENT = 1");
 }
 
 printf("Imóveis removidos: %d\n", $antes['properties']);

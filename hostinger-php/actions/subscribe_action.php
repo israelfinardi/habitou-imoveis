@@ -17,7 +17,7 @@ if ($action === 'subscribe') {
     $stmt->execute([$subId]);
     $sub = $stmt->fetch();
     if ($sub && ($sub['user_id'] == $user['id'] || (!empty($sub['agency_id']) && $sub['agency_id'] == ($user['agency_id'] ?? null)) || $user['role'] === 'ADMIN')) {
-        $pdo->prepare('UPDATE subscriptions SET status = "CANCELED", canceled_at = NOW() WHERE id = ?')->execute([$subId]);
+        $pdo->prepare('UPDATE subscriptions SET status = "CANCELED", canceled_at = CURRENT_TIMESTAMP WHERE id = ?')->execute([$subId]);
     }
 }
 

@@ -1,16 +1,17 @@
--- Habitou Imóveis — schema MySQL/MariaDB (compatível com hospedagem
--- compartilhada, ex.: Hostinger). Equivalente funcional ao schema Prisma
--- usado na versão Next.js do projeto.
+-- Habitou Imóveis — schema SQLite (compatível com hospedagem compartilhada,
+-- ex.: Hostinger). Um único arquivo de banco, sem servidor separado nem
+-- credenciais — criado automaticamente pelo próprio site na primeira
+-- requisição. Equivalente funcional ao schema Prisma usado na versão
+-- Next.js do projeto.
 
-SET NAMES utf8mb4;
-SET FOREIGN_KEY_CHECKS = 0;
+PRAGMA foreign_keys = ON;
 
 -- ---------------------------------------------------------------------
 -- Usuários e autenticação
 -- ---------------------------------------------------------------------
 
 CREATE TABLE IF NOT EXISTS agencies (
-  id INT AUTO_INCREMENT PRIMARY KEY,
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
   name VARCHAR(255) NOT NULL,
   slug VARCHAR(255) NOT NULL UNIQUE,
   cnpj VARCHAR(32) NULL,
@@ -23,48 +24,48 @@ CREATE TABLE IF NOT EXISTS agencies (
   logo_url VARCHAR(500) NULL,
   description TEXT NULL,
   website VARCHAR(255) NULL,
-  status ENUM('ACTIVE','INACTIVE','PENDING') NOT NULL DEFAULT 'ACTIVE',
+  status TEXT NOT NULL DEFAULT 'ACTIVE',
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
 
 CREATE TABLE IF NOT EXISTS users (
-  id INT AUTO_INCREMENT PRIMARY KEY,
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
   first_name VARCHAR(120) NOT NULL,
   last_name VARCHAR(120) NOT NULL,
   email VARCHAR(255) NOT NULL UNIQUE,
   phone VARCHAR(32) NULL,
   password_hash VARCHAR(255) NOT NULL,
-  role ENUM('USER','ADVERTISER','OWNER','AGENT','AGENCY_ADMIN','ADMIN') NOT NULL DEFAULT 'USER',
-  status ENUM('ACTIVE','INACTIVE','SUSPENDED','PENDING') NOT NULL DEFAULT 'ACTIVE',
+  role TEXT NOT NULL DEFAULT 'USER',
+  status TEXT NOT NULL DEFAULT 'ACTIVE',
   avatar_url VARCHAR(500) NULL,
   creci VARCHAR(32) NULL,
-  agency_id INT NULL,
+  agency_id INTEGER NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   last_login_at DATETIME NULL,
-  INDEX (agency_id),
-  INDEX (role),
   CONSTRAINT fk_users_agency FOREIGN KEY (agency_id) REFERENCES agencies(id) ON DELETE SET NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+);
+CREATE INDEX IF NOT EXISTS idx_users_agency ON users (agency_id);
+CREATE INDEX IF NOT EXISTS idx_users_role ON users (role);
 
 CREATE TABLE IF NOT EXISTS password_reset_tokens (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  user_id INT NOT NULL,
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id INTEGER NOT NULL,
   token_hash CHAR(64) NOT NULL UNIQUE,
   expires_at DATETIME NOT NULL,
   used_at DATETIME NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  INDEX (user_id),
   CONSTRAINT fk_prt_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+);
+CREATE INDEX IF NOT EXISTS idx_prt_user ON password_reset_tokens (user_id);
 
 -- ---------------------------------------------------------------------
 -- Localização
 -- ---------------------------------------------------------------------
 
 CREATE TABLE IF NOT EXISTS cities (
-  id INT AUTO_INCREMENT PRIMARY KEY,
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
   name VARCHAR(120) NOT NULL,
   slug VARCHAR(160) NOT NULL UNIQUE,
   state VARCHAR(60) NOT NULL,
@@ -76,145 +77,136 @@ CREATE TABLE IF NOT EXISTS cities (
   description TEXT NULL,
   hero_image_url VARCHAR(500) NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  INDEX (state)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_cities_state ON cities (state);
 
 CREATE TABLE IF NOT EXISTS neighborhoods (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  city_id INT NOT NULL,
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  city_id INTEGER NOT NULL,
   name VARCHAR(160) NOT NULL,
   slug VARCHAR(180) NOT NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  UNIQUE KEY uniq_city_slug (city_id, slug),
+  CONSTRAINT uniq_city_slug UNIQUE (city_id, slug),
   CONSTRAINT fk_neighborhood_city FOREIGN KEY (city_id) REFERENCES cities(id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+);
 
 -- ---------------------------------------------------------------------
 -- Planos e assinaturas
 -- ---------------------------------------------------------------------
 
 CREATE TABLE IF NOT EXISTS plans (
-  id INT AUTO_INCREMENT PRIMARY KEY,
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
   name VARCHAR(120) NOT NULL,
   slug VARCHAR(160) NOT NULL UNIQUE,
   description TEXT NULL,
   price DECIMAL(10,2) NOT NULL,
-  billing_period ENUM('MONTHLY','YEARLY') NOT NULL DEFAULT 'MONTHLY',
-  max_listings INT NULL,
-  features JSON NULL,
-  active TINYINT(1) NOT NULL DEFAULT 1,
+  billing_period TEXT NOT NULL DEFAULT 'MONTHLY',
+  max_listings INTEGER NULL,
+  features TEXT NULL,
+  active INTEGER NOT NULL DEFAULT 1,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+);
 
 CREATE TABLE IF NOT EXISTS subscriptions (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  user_id INT NULL,
-  agency_id INT NULL,
-  plan_id INT NOT NULL,
-  status ENUM('ACTIVE','PENDING','CANCELED','EXPIRED') NOT NULL DEFAULT 'PENDING',
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id INTEGER NULL,
+  agency_id INTEGER NULL,
+  plan_id INTEGER NOT NULL,
+  status TEXT NOT NULL DEFAULT 'PENDING',
   started_at DATETIME NULL,
   expires_at DATETIME NULL,
   canceled_at DATETIME NULL,
   external_id VARCHAR(120) NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  INDEX (user_id),
-  INDEX (agency_id),
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT fk_sub_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL,
   CONSTRAINT fk_sub_agency FOREIGN KEY (agency_id) REFERENCES agencies(id) ON DELETE SET NULL,
   CONSTRAINT fk_sub_plan FOREIGN KEY (plan_id) REFERENCES plans(id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+);
+CREATE INDEX IF NOT EXISTS idx_sub_user ON subscriptions (user_id);
+CREATE INDEX IF NOT EXISTS idx_sub_agency ON subscriptions (agency_id);
 
 -- ---------------------------------------------------------------------
 -- VRSync — feeds (precisa existir antes de properties por causa da FK)
 -- ---------------------------------------------------------------------
 
 CREATE TABLE IF NOT EXISTS feeds (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  agency_id INT NOT NULL,
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  agency_id INTEGER NOT NULL,
   name VARCHAR(160) NOT NULL,
   url VARCHAR(500) NOT NULL,
-  status ENUM('ACTIVE','INACTIVE','ERROR') NOT NULL DEFAULT 'ACTIVE',
-  frequency_minutes INT NOT NULL DEFAULT 1440,
+  status TEXT NOT NULL DEFAULT 'ACTIVE',
+  frequency_minutes INTEGER NOT NULL DEFAULT 1440,
   last_sync_at DATETIME NULL,
   next_sync_at DATETIME NULL,
-  last_run_status ENUM('RUNNING','SUCCESS','ERROR') NULL,
+  last_run_status TEXT NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  INDEX (agency_id),
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT fk_feed_agency FOREIGN KEY (agency_id) REFERENCES agencies(id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+);
+CREATE INDEX IF NOT EXISTS idx_feed_agency ON feeds (agency_id);
 
 CREATE TABLE IF NOT EXISTS feed_sync_logs (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  feed_id INT NOT NULL,
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  feed_id INTEGER NOT NULL,
   started_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   finished_at DATETIME NULL,
-  status ENUM('RUNNING','SUCCESS','ERROR') NOT NULL DEFAULT 'RUNNING',
-  total_found INT NOT NULL DEFAULT 0,
-  total_created INT NOT NULL DEFAULT 0,
-  total_updated INT NOT NULL DEFAULT 0,
-  total_deactivated INT NOT NULL DEFAULT 0,
-  total_unchanged INT NOT NULL DEFAULT 0,
-  total_errors INT NOT NULL DEFAULT 0,
+  status TEXT NOT NULL DEFAULT 'RUNNING',
+  total_found INTEGER NOT NULL DEFAULT 0,
+  total_created INTEGER NOT NULL DEFAULT 0,
+  total_updated INTEGER NOT NULL DEFAULT 0,
+  total_deactivated INTEGER NOT NULL DEFAULT 0,
+  total_unchanged INTEGER NOT NULL DEFAULT 0,
+  total_errors INTEGER NOT NULL DEFAULT 0,
   error_message TEXT NULL,
-  INDEX (feed_id),
   CONSTRAINT fk_log_feed FOREIGN KEY (feed_id) REFERENCES feeds(id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+);
+CREATE INDEX IF NOT EXISTS idx_log_feed ON feed_sync_logs (feed_id);
 
 -- ---------------------------------------------------------------------
 -- Imóveis
 -- ---------------------------------------------------------------------
 
 CREATE TABLE IF NOT EXISTS properties (
-  id INT AUTO_INCREMENT PRIMARY KEY,
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
   code VARCHAR(32) NOT NULL UNIQUE,
   external_code VARCHAR(64) NULL,
-  origin ENUM('MANUAL','VRSYNC') NOT NULL DEFAULT 'MANUAL',
-  source_feed_id INT NULL,
+  origin TEXT NOT NULL DEFAULT 'MANUAL',
+  source_feed_id INTEGER NULL,
   title VARCHAR(255) NOT NULL,
   slug VARCHAR(255) NOT NULL UNIQUE,
   description TEXT NULL,
-  listing_type ENUM('SALE','RENT') NOT NULL,
-  property_type ENUM('APARTMENT','HOUSE','LAND','COMMERCIAL_ROOM','STORE','WAREHOUSE','RURAL','BUILDING','OTHER') NOT NULL,
+  listing_type TEXT NOT NULL,
+  property_type TEXT NOT NULL,
   price_sale DECIMAL(14,2) NULL,
   price_rent DECIMAL(14,2) NULL,
   condo_fee DECIMAL(14,2) NULL,
   iptu DECIMAL(14,2) NULL,
   total_area FLOAT NULL,
   built_area FLOAT NULL,
-  bedrooms INT NULL,
-  suites INT NULL,
-  bathrooms INT NULL,
-  parking_spaces INT NULL,
-  features JSON NULL,
-  status ENUM('DRAFT','PUBLISHED','PAUSED','ARCHIVED') NOT NULL DEFAULT 'DRAFT',
+  bedrooms INTEGER NULL,
+  suites INTEGER NULL,
+  bathrooms INTEGER NULL,
+  parking_spaces INTEGER NULL,
+  features TEXT NULL,
+  status TEXT NOT NULL DEFAULT 'DRAFT',
   published_at DATETIME NULL,
   deactivated_at DATETIME NULL,
-  city_id INT NOT NULL,
-  neighborhood_id INT NULL,
+  city_id INTEGER NOT NULL,
+  neighborhood_id INTEGER NULL,
   street VARCHAR(255) NULL,
   number VARCHAR(32) NULL,
   complement VARCHAR(120) NULL,
   zip_code VARCHAR(16) NULL,
   latitude DECIMAL(10,6) NULL,
   longitude DECIMAL(10,6) NULL,
-  advertiser_id INT NOT NULL,
-  owner_id INT NULL,
-  agent_id INT NULL,
-  agency_id INT NULL,
+  advertiser_id INTEGER NOT NULL,
+  owner_id INTEGER NULL,
+  agent_id INTEGER NULL,
+  agency_id INTEGER NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  FULLTEXT KEY ft_title_description (title, description),
-  INDEX idx_listing (city_id, listing_type, property_type, status),
-  INDEX (neighborhood_id),
-  INDEX (price_sale),
-  INDEX (price_rent),
-  INDEX (status, published_at),
-  INDEX (advertiser_id),
-  INDEX (agency_id),
-  INDEX idx_source (origin, source_feed_id, external_code),
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT fk_prop_city FOREIGN KEY (city_id) REFERENCES cities(id),
   CONSTRAINT fk_prop_neighborhood FOREIGN KEY (neighborhood_id) REFERENCES neighborhoods(id) ON DELETE SET NULL,
   CONSTRAINT fk_prop_advertiser FOREIGN KEY (advertiser_id) REFERENCES users(id),
@@ -222,57 +214,63 @@ CREATE TABLE IF NOT EXISTS properties (
   CONSTRAINT fk_prop_agent FOREIGN KEY (agent_id) REFERENCES users(id) ON DELETE SET NULL,
   CONSTRAINT fk_prop_agency FOREIGN KEY (agency_id) REFERENCES agencies(id) ON DELETE SET NULL,
   CONSTRAINT fk_prop_feed FOREIGN KEY (source_feed_id) REFERENCES feeds(id) ON DELETE SET NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+);
+CREATE INDEX IF NOT EXISTS idx_listing ON properties (city_id, listing_type, property_type, status);
+CREATE INDEX IF NOT EXISTS idx_prop_neighborhood ON properties (neighborhood_id);
+CREATE INDEX IF NOT EXISTS idx_prop_price_sale ON properties (price_sale);
+CREATE INDEX IF NOT EXISTS idx_prop_price_rent ON properties (price_rent);
+CREATE INDEX IF NOT EXISTS idx_prop_status_published ON properties (status, published_at);
+CREATE INDEX IF NOT EXISTS idx_prop_advertiser ON properties (advertiser_id);
+CREATE INDEX IF NOT EXISTS idx_prop_agency ON properties (agency_id);
+CREATE INDEX IF NOT EXISTS idx_prop_source ON properties (origin, source_feed_id, external_code);
 
 CREATE TABLE IF NOT EXISTS property_images (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  property_id INT NOT NULL,
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  property_id INTEGER NOT NULL,
   url VARCHAR(500) NOT NULL,
-  `order` INT NOT NULL DEFAULT 0,
-  is_primary TINYINT(1) NOT NULL DEFAULT 0,
-  width INT NULL,
-  height INT NULL,
-  size_bytes INT NULL,
-  origin ENUM('MANUAL','VRSYNC') NOT NULL DEFAULT 'MANUAL',
+  `order` INTEGER NOT NULL DEFAULT 0,
+  is_primary INTEGER NOT NULL DEFAULT 0,
+  width INTEGER NULL,
+  height INTEGER NULL,
+  size_bytes INTEGER NULL,
+  origin TEXT NOT NULL DEFAULT 'MANUAL',
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  INDEX (property_id, `order`),
   CONSTRAINT fk_img_property FOREIGN KEY (property_id) REFERENCES properties(id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+);
+CREATE INDEX IF NOT EXISTS idx_img_property_order ON property_images (property_id, `order`);
 
 CREATE TABLE IF NOT EXISTS favorites (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  user_id INT NOT NULL,
-  property_id INT NOT NULL,
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id INTEGER NOT NULL,
+  property_id INTEGER NOT NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  UNIQUE KEY uniq_user_property (user_id, property_id),
-  INDEX (property_id),
+  CONSTRAINT uniq_user_property UNIQUE (user_id, property_id),
   CONSTRAINT fk_fav_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
   CONSTRAINT fk_fav_property FOREIGN KEY (property_id) REFERENCES properties(id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+);
+CREATE INDEX IF NOT EXISTS idx_fav_property ON favorites (property_id);
 
 -- ---------------------------------------------------------------------
 -- Contratos
 -- ---------------------------------------------------------------------
 
 CREATE TABLE IF NOT EXISTS contracts (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  property_id INT NOT NULL,
-  type ENUM('SALE','RENT') NOT NULL,
-  status ENUM('DRAFT','ACTIVE','FINISHED','CANCELED') NOT NULL DEFAULT 'DRAFT',
-  owner_id INT NULL,
-  advertiser_id INT NULL,
-  buyer_id INT NULL,
-  tenant_id INT NULL,
-  agent_id INT NULL,
-  agency_id INT NULL,
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  property_id INTEGER NOT NULL,
+  type TEXT NOT NULL,
+  status TEXT NOT NULL DEFAULT 'DRAFT',
+  owner_id INTEGER NULL,
+  advertiser_id INTEGER NULL,
+  buyer_id INTEGER NULL,
+  tenant_id INTEGER NULL,
+  agent_id INTEGER NULL,
+  agency_id INTEGER NULL,
   value DECIMAL(14,2) NULL,
   start_date DATE NULL,
   end_date DATE NULL,
-  documents JSON NULL,
+  documents TEXT NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  INDEX (property_id),
-  INDEX (status),
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT fk_contract_property FOREIGN KEY (property_id) REFERENCES properties(id),
   CONSTRAINT fk_contract_owner FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE SET NULL,
   CONSTRAINT fk_contract_advertiser FOREIGN KEY (advertiser_id) REFERENCES users(id) ON DELETE SET NULL,
@@ -280,25 +278,27 @@ CREATE TABLE IF NOT EXISTS contracts (
   CONSTRAINT fk_contract_tenant FOREIGN KEY (tenant_id) REFERENCES users(id) ON DELETE SET NULL,
   CONSTRAINT fk_contract_agent FOREIGN KEY (agent_id) REFERENCES users(id) ON DELETE SET NULL,
   CONSTRAINT fk_contract_agency FOREIGN KEY (agency_id) REFERENCES agencies(id) ON DELETE SET NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+);
+CREATE INDEX IF NOT EXISTS idx_contract_property ON contracts (property_id);
+CREATE INDEX IF NOT EXISTS idx_contract_status ON contracts (status);
 
 CREATE TABLE IF NOT EXISTS contract_history (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  contract_id INT NOT NULL,
-  status ENUM('DRAFT','ACTIVE','FINISHED','CANCELED') NOT NULL,
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  contract_id INTEGER NOT NULL,
+  status TEXT NOT NULL,
   note TEXT NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  INDEX (contract_id),
   CONSTRAINT fk_history_contract FOREIGN KEY (contract_id) REFERENCES contracts(id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+);
+CREATE INDEX IF NOT EXISTS idx_history_contract ON contract_history (contract_id);
 
 -- ---------------------------------------------------------------------
 -- Conteúdo (blog / central de ajuda) e contato
 -- ---------------------------------------------------------------------
 
 CREATE TABLE IF NOT EXISTS articles (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  kind ENUM('BLOG','GUIDE') NOT NULL,
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  kind TEXT NOT NULL,
   slug VARCHAR(255) NOT NULL UNIQUE,
   title VARCHAR(255) NOT NULL,
   excerpt TEXT NOT NULL,
@@ -306,22 +306,20 @@ CREATE TABLE IF NOT EXISTS articles (
   category VARCHAR(120) NOT NULL,
   author_name VARCHAR(120) NOT NULL,
   author_role VARCHAR(160) NULL,
-  read_minutes INT NULL,
+  read_minutes INTEGER NULL,
   published_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  INDEX (kind, category)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_articles_kind_category ON articles (kind, category);
 
 CREATE TABLE IF NOT EXISTS contact_messages (
-  id INT AUTO_INCREMENT PRIMARY KEY,
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
   name VARCHAR(160) NOT NULL,
   email VARCHAR(255) NOT NULL,
   phone VARCHAR(32) NULL,
   subject VARCHAR(160) NULL,
   message TEXT NOT NULL,
-  user_id INT NULL,
+  user_id INTEGER NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT fk_contact_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
-SET FOREIGN_KEY_CHECKS = 1;
+);

@@ -165,9 +165,9 @@ function set_property_status(int $propertyId, string $action, array $actor): voi
     }
     $pdo = db();
     if ($status === 'PUBLISHED' && !$property['published_at']) {
-        $pdo->prepare('UPDATE properties SET status=?, published_at=NOW() WHERE id=?')->execute([$status, $propertyId]);
+        $pdo->prepare('UPDATE properties SET status=?, published_at=CURRENT_TIMESTAMP WHERE id=?')->execute([$status, $propertyId]);
     } elseif ($status === 'ARCHIVED') {
-        $pdo->prepare('UPDATE properties SET status=?, deactivated_at=NOW() WHERE id=?')->execute([$status, $propertyId]);
+        $pdo->prepare('UPDATE properties SET status=?, deactivated_at=CURRENT_TIMESTAMP WHERE id=?')->execute([$status, $propertyId]);
     } else {
         $pdo->prepare('UPDATE properties SET status=? WHERE id=?')->execute([$status, $propertyId]);
     }

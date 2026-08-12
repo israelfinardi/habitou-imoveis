@@ -26,6 +26,16 @@ require __DIR__ . '/../includes/header.php';
           <div class="rounded-xl border border-brand-border bg-white p-5"><p class="text-2xl font-bold"><?= $value ?></p><p class="text-sm text-brand-text-secondary"><?= e($label) ?></p></div>
         <?php endforeach; ?>
       </div>
+
+      <div class="mt-8 rounded-xl border border-brand-border bg-brand-bg-subtle p-5">
+        <h2 class="mb-2 text-sm font-semibold">Token de manutenção</h2>
+        <p class="mb-3 text-xs text-brand-text-secondary">
+          Gerado automaticamente na primeira vez que o site rodou. Use-o para apagar os dados de
+          demonstração em <code class="rounded bg-white px-1 py-0.5"><?= base_url('limpar-dados.php') ?>?token=...</code>
+          antes de colocar o catálogo real no ar.
+        </p>
+        <code class="block break-all rounded-lg border border-brand-border bg-white px-3 py-2 text-xs"><?= e(AUTH_SECRET) ?></code>
+      </div>
     </main>
   </div>
 </div>

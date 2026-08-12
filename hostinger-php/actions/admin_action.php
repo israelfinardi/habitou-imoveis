@@ -60,9 +60,9 @@ switch ($action) {
         $id = (int) $_POST['id'];
         $status = $_POST['status'];
         if ($status === 'ACTIVE') {
-            $pdo->prepare('UPDATE subscriptions SET status = ?, started_at = NOW() WHERE id = ?')->execute([$status, $id]);
+            $pdo->prepare('UPDATE subscriptions SET status = ?, started_at = CURRENT_TIMESTAMP WHERE id = ?')->execute([$status, $id]);
         } elseif ($status === 'CANCELED') {
-            $pdo->prepare('UPDATE subscriptions SET status = ?, canceled_at = NOW() WHERE id = ?')->execute([$status, $id]);
+            $pdo->prepare('UPDATE subscriptions SET status = ?, canceled_at = CURRENT_TIMESTAMP WHERE id = ?')->execute([$status, $id]);
         } else {
             $pdo->prepare('UPDATE subscriptions SET status = ? WHERE id = ?')->execute([$status, $id]);
         }

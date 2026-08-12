@@ -24,7 +24,7 @@ if (!$isCli) {
     header('Content-Type: application/json');
 }
 
-$stmt = db()->query('SELECT id, name FROM feeds WHERE status = "ACTIVE" AND (next_sync_at IS NULL OR next_sync_at <= NOW())');
+$stmt = db()->query('SELECT id, name FROM feeds WHERE status = "ACTIVE" AND (next_sync_at IS NULL OR next_sync_at <= CURRENT_TIMESTAMP)');
 $feeds = $stmt->fetchAll();
 
 $results = [];

@@ -56,7 +56,7 @@ function vrsync_ensure_feed_advertiser(int $agencyId): int
     $agency = $agStmt->fetch();
     $email = 'vrsync+' . $agency['slug'] . '@habitou.com.br';
     $pdo->prepare('INSERT INTO users (first_name, last_name, email, password_hash, role, status, agency_id) VALUES (?,?,?,?,"AGENCY_ADMIN","ACTIVE",?)
-        ON DUPLICATE KEY UPDATE agency_id = VALUES(agency_id)')
+        ON CONFLICT(email) DO UPDATE SET agency_id = excluded.agency_id')
         ->execute([explode(' ', $agency['name'])[0] ?: 'Imobiliária', 'VRSync', $email, password_hash(bin2hex(random_bytes(16)), PASSWORD_BCRYPT), $agencyId]);
     $stmt->execute([$agencyId]);
     return (int) $stmt->fetchColumn();
@@ -140,7 +140,7 @@ function run_feed_sync(int $feedId): array
                         (code, external_code, origin, source_feed_id, title, slug, description, listing_type, property_type,
                          price_sale, price_rent, condo_fee, iptu, total_area, built_area, bedrooms, suites, bathrooms, parking_spaces,
                          features, status, published_at, city_id, neighborhood_id, street, number, zip_code, latitude, longitude, advertiser_id, agency_id)
-                        VALUES (?,?,"VRSYNC",?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,NOW(),?,?,?,?,?,?,?,?,?)');
+                        VALUES (?,?,"VRSYNC",?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,CURRENT_TIMESTAMP,?,?,?,?,?,?,?,?,?)');
                     $ins->execute([
                         $code, $listing['externalId'], $feedId, $listing['title'], $slug, $listing['description'],
                         $listing['listingType'], $listing['propertyType'], $listing['priceSale'], $listing['priceRent'],
@@ -171,7 +171,7 @@ function run_feed_sync(int $feedId): array
             $staleIds = $staleStmt->fetchAll(PDO::FETCH_COLUMN);
             if ($staleIds) {
                 $ph = implode(',', array_fill(0, count($staleIds), '?'));
-                $pdo->prepare("UPDATE properties SET status = 'ARCHIVED', deactivated_at = NOW() WHERE id IN ($ph)")->execute($staleIds);
+                $pdo->prepare("UPDATE properties SET status = 'ARCHIVED', deactivated_at = CURRENT_TIMESTAMP WHERE id IN ($ph)")->execute($staleIds);
                 $totalDeactivated = count($staleIds);
             }
         }
@@ -180,15 +180,16 @@ function run_feed_sync(int $feedId): array
         $finalStatus = ($totalErrors > 0 && $totalCreated === 0 && $totalUpdated === 0) ? 'ERROR' : 'SUCCESS';
         $errorMessage = implode(' | ', array_map(fn($i) => $i['message'], array_slice($issues, 0, 5))) ?: null;
 
-        $pdo->prepare('UPDATE feed_sync_logs SET finished_at = NOW(), status = ?, total_found = ?, total_created = ?, total_updated = ?, total_unchanged = ?, total_deactivated = ?, total_errors = ?, error_message = ? WHERE id = ?')
+        $pdo->prepare('UPDATE feed_sync_logs SET finished_at = CURRENT_TIMESTAMP, status = ?, total_found = ?, total_created = ?, total_updated = ?, total_unchanged = ?, total_deactivated = ?, total_errors = ?, error_message = ? WHERE id = ?')
             ->execute([$finalStatus, $totalFound, $totalCreated, $totalUpdated, $totalUnchanged, $totalDeactivated, $totalErrors, $errorMessage, $logId]);
 
-        $pdo->prepare('UPDATE feeds SET last_sync_at = NOW(), next_sync_at = DATE_ADD(NOW(), INTERVAL ? MINUTE), last_run_status = ? WHERE id = ?')
-            ->execute([$feed['frequency_minutes'], $finalStatus, $feedId]);
+        $nextSyncAt = date('Y-m-d H:i:s', strtotime('+' . (int) $feed['frequency_minutes'] . ' minutes'));
+        $pdo->prepare('UPDATE feeds SET last_sync_at = CURRENT_TIMESTAMP, next_sync_at = ?, last_run_status = ? WHERE id = ?')
+            ->execute([$nextSyncAt, $finalStatus, $feedId]);
     } catch (\Throwable $e) {
-        $pdo->prepare('UPDATE feed_sync_logs SET finished_at = NOW(), status = "ERROR", error_message = ?, total_errors = total_errors + 1 WHERE id = ?')
+        $pdo->prepare('UPDATE feed_sync_logs SET finished_at = CURRENT_TIMESTAMP, status = "ERROR", error_message = ?, total_errors = total_errors + 1 WHERE id = ?')
             ->execute([$e->getMessage(), $logId]);
-        $pdo->prepare('UPDATE feeds SET last_sync_at = NOW(), last_run_status = "ERROR" WHERE id = ?')->execute([$feedId]);
+        $pdo->prepare('UPDATE feeds SET last_sync_at = CURRENT_TIMESTAMP, last_run_status = "ERROR" WHERE id = ?')->execute([$feedId]);
     }
 
     $result = $pdo->prepare('SELECT * FROM feed_sync_logs WHERE id = ?');

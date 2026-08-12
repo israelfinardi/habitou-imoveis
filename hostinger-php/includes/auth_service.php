@@ -86,7 +86,7 @@ function authenticate_user(string $email, string $password): array
     if (!password_verify($password, $user['password_hash'])) {
         throw new AuthServiceError('E-mail ou senha inválidos.');
     }
-    $pdo->prepare('UPDATE users SET last_login_at = NOW() WHERE id = ?')->execute([$user['id']]);
+    $pdo->prepare('UPDATE users SET last_login_at = CURRENT_TIMESTAMP WHERE id = ?')->execute([$user['id']]);
     return $user;
 }
 
@@ -131,7 +131,7 @@ function reset_password(string $rawToken, string $newPassword): void
     $hash = password_hash($newPassword, PASSWORD_BCRYPT);
     $pdo->beginTransaction();
     $pdo->prepare('UPDATE users SET password_hash = ? WHERE id = ?')->execute([$hash, $token['user_id']]);
-    $pdo->prepare('UPDATE password_reset_tokens SET used_at = NOW() WHERE id = ?')->execute([$token['id']]);
+    $pdo->prepare('UPDATE password_reset_tokens SET used_at = CURRENT_TIMESTAMP WHERE id = ?')->execute([$token['id']]);
     $pdo->commit();
 }
 
