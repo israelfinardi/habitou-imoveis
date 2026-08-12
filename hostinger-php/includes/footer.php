@@ -1,40 +1,40 @@
 </main>
 
-<footer class="border-t border-brand-border bg-brand-navy text-white/80">
-  <div class="mx-auto grid max-w-7xl grid-cols-2 gap-8 px-4 py-12 sm:px-6 md:grid-cols-4 lg:px-8">
+<footer class="border-t border-brand-border bg-brand-bg-subtle text-brand-text">
+  <div class="mx-auto grid max-w-7xl grid-cols-2 gap-8 px-4 py-10 sm:px-6 md:grid-cols-4 lg:px-8">
     <div class="col-span-2 md:col-span-1">
-      <p class="mb-3 text-lg font-bold text-white">Habitou Imóveis</p>
-      <p class="text-sm text-white/60">26 anos conectando pessoas aos melhores imóveis de Santa Catarina.</p>
+      <p class="mb-3 text-base font-bold text-brand-text">Habitou Imóveis</p>
+      <p class="text-sm text-brand-text-secondary">26 anos conectando pessoas aos melhores imóveis de Santa Catarina.</p>
     </div>
     <div>
-      <p class="mb-3 text-sm font-semibold text-white">Cidades</p>
-      <ul class="space-y-2 text-sm text-white/60">
+      <p class="mb-3 text-xs font-semibold uppercase tracking-wide text-brand-text">Cidades</p>
+      <ul class="space-y-2.5 text-sm text-brand-text-secondary">
         <?php foreach (FEATURED_CITIES as $c): ?>
-          <li><a href="<?= base_url('cidade.php?slug=' . $c['slug']) ?>" class="hover:text-white"><?= e($c['name']) ?></a></li>
+          <li><a href="<?= base_url('cidade.php?slug=' . $c['slug']) ?>" class="hover:underline"><?= e($c['name']) ?></a></li>
         <?php endforeach; ?>
       </ul>
     </div>
     <div>
-      <p class="mb-3 text-sm font-semibold text-white">Institucional</p>
-      <ul class="space-y-2 text-sm text-white/60">
-        <li><a href="<?= base_url('quem-somos.php') ?>" class="hover:text-white">Quem somos</a></li>
-        <li><a href="<?= base_url('como-anunciar.php') ?>" class="hover:text-white">Como anunciar</a></li>
-        <li><a href="<?= base_url('imobiliarias.php') ?>" class="hover:text-white">Imobiliárias e corretores</a></li>
-        <li><a href="<?= base_url('blog.php') ?>" class="hover:text-white">Blog</a></li>
-        <li><a href="<?= base_url('guias.php') ?>" class="hover:text-white">Central de ajuda</a></li>
-        <li><a href="<?= base_url('planos.php') ?>" class="hover:text-white">Planos</a></li>
-        <li><a href="<?= base_url('fale-conosco.php') ?>" class="hover:text-white">Fale conosco</a></li>
+      <p class="mb-3 text-xs font-semibold uppercase tracking-wide text-brand-text">Institucional</p>
+      <ul class="space-y-2.5 text-sm text-brand-text-secondary">
+        <li><a href="<?= base_url('quem-somos.php') ?>" class="hover:underline">Quem somos</a></li>
+        <li><a href="<?= base_url('como-anunciar.php') ?>" class="hover:underline">Como anunciar</a></li>
+        <li><a href="<?= base_url('imobiliarias.php') ?>" class="hover:underline">Imobiliárias e corretores</a></li>
+        <li><a href="<?= base_url('blog.php') ?>" class="hover:underline">Blog</a></li>
+        <li><a href="<?= base_url('guias.php') ?>" class="hover:underline">Central de ajuda</a></li>
+        <li><a href="<?= base_url('planos.php') ?>" class="hover:underline">Planos</a></li>
+        <li><a href="<?= base_url('fale-conosco.php') ?>" class="hover:underline">Fale conosco</a></li>
       </ul>
     </div>
     <div>
-      <p class="mb-3 text-sm font-semibold text-white">Legal</p>
-      <ul class="space-y-2 text-sm text-white/60">
-        <li><a href="<?= base_url('termos-de-uso.php') ?>" class="hover:text-white">Termos de uso</a></li>
-        <li><a href="<?= base_url('politica-de-privacidade.php') ?>" class="hover:text-white">Política de privacidade</a></li>
+      <p class="mb-3 text-xs font-semibold uppercase tracking-wide text-brand-text">Legal</p>
+      <ul class="space-y-2.5 text-sm text-brand-text-secondary">
+        <li><a href="<?= base_url('termos-de-uso.php') ?>" class="hover:underline">Termos de uso</a></li>
+        <li><a href="<?= base_url('politica-de-privacidade.php') ?>" class="hover:underline">Política de privacidade</a></li>
       </ul>
     </div>
   </div>
-  <div class="border-t border-white/10 px-4 py-4 text-center text-xs text-white/50">
+  <div class="border-t border-brand-border px-4 py-4 text-center text-xs text-brand-text-secondary">
     &copy; <?= date('Y') ?> Habitou Imóveis. Todos os direitos reservados.
   </div>
 </footer>

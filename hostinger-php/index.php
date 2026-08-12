@@ -12,32 +12,33 @@ $pageDescription = 'Encontre apartamentos, casas e terrenos para comprar ou alug
 require __DIR__ . '/includes/header.php';
 ?>
 
-<section class="relative bg-brand-navy py-16 sm:py-24">
+<section class="border-b border-brand-border bg-white py-10 sm:py-14">
   <div class="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
-    <h1 class="text-3xl font-bold text-white sm:text-4xl">Encontre o seu imóvel em Santa Catarina</h1>
-    <p class="mx-auto mt-3 max-w-xl text-white/70">26 anos conectando pessoas aos melhores apartamentos, casas e terrenos do estado.</p>
+    <h1 class="text-2xl font-extrabold tracking-tight text-brand-text sm:text-4xl">Encontre o seu imóvel em Santa Catarina</h1>
+    <p class="mx-auto mt-3 max-w-xl text-brand-text-secondary">26 anos conectando pessoas aos melhores apartamentos, casas e terrenos do estado.</p>
 
-    <form action="<?= base_url('imoveis.php') ?>" method="get" class="mx-auto mt-8 flex max-w-3xl flex-col gap-3 rounded-2xl bg-white p-4 shadow-lg sm:flex-row">
-      <select name="transacao" class="rounded-lg border border-brand-border px-3 py-2.5 text-sm">
+    <form action="<?= base_url('imoveis.php') ?>" method="get" class="mx-auto mt-8 flex max-w-3xl flex-col gap-3 rounded-2xl border border-brand-border bg-white p-4 shadow-lg sm:flex-row lg:hidden">
+      <select name="transacao" class="rounded-xl border border-brand-border px-3 py-2.5 text-sm">
         <option value="comprar">Comprar</option>
         <option value="alugar">Alugar</option>
       </select>
-      <select name="cidade" class="rounded-lg border border-brand-border px-3 py-2.5 text-sm">
+      <select name="cidade" class="rounded-xl border border-brand-border px-3 py-2.5 text-sm">
         <option value="">Todas as cidades</option>
         <?php foreach (FEATURED_CITIES as $c): ?>
           <option value="<?= e($c['slug']) ?>"><?= e($c['name']) ?></option>
         <?php endforeach; ?>
       </select>
-      <select name="tipo" class="rounded-lg border border-brand-border px-3 py-2.5 text-sm">
+      <select name="tipo" class="rounded-xl border border-brand-border px-3 py-2.5 text-sm">
         <option value="">Qualquer tipo</option>
         <?php foreach (PROPERTY_TYPE_SLUG as $type => $slug): ?>
           <option value="<?= e($slug) ?>"><?= e(PROPERTY_TYPE_LABEL[$type]) ?></option>
         <?php endforeach; ?>
       </select>
-      <button type="submit" class="rounded-lg bg-brand-primary px-6 py-2.5 text-sm font-semibold text-white hover:bg-brand-primary-hover">Buscar imóveis</button>
+      <button type="submit" class="rounded-full bg-brand-primary px-6 py-2.5 text-sm font-semibold text-white hover:bg-brand-primary-hover">Buscar imóveis</button>
     </form>
   </div>
 </section>
+<?php render_category_pills(); ?>
 
 <section class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
   <h2 class="mb-2 text-xl font-bold">Cidades em destaque</h2>

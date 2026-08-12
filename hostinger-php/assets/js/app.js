@@ -16,7 +16,10 @@ document.addEventListener('click', function (e) {
         return;
       }
       btn.classList.toggle('is-favorite', data.favorite);
-      btn.querySelector('svg').setAttribute('fill', data.favorite ? '#c1502e' : 'none');
+      const isOverlay = btn.classList.contains('js-favorite-overlay');
+      const svg = btn.querySelector('svg');
+      svg.setAttribute('fill', data.favorite ? '#FF385C' : (isOverlay ? 'rgba(0,0,0,.5)' : 'none'));
+      svg.setAttribute('stroke', data.favorite ? (isOverlay ? '#fff' : '#FF385C') : (isOverlay ? '#fff' : '#717171'));
     });
 });
 

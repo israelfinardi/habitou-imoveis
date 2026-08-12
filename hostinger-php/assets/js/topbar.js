@@ -65,18 +65,28 @@
     });
   }
 
-  // --- Segmentado Todos / Comprar / Alugar ------------------------------
-  document.querySelectorAll('.sp-seg').forEach(function (seg) {
+  // --- Segmentado Todos / Comprar / Alugar + botão de busca -----------------
+  var activeTransacao = '';
+  var segs = document.querySelectorAll('.sp-seg');
+  segs.forEach(function (seg) {
     seg.addEventListener('click', function (e) {
       e.preventDefault();
-      var transacao = seg.dataset.transacao || '';
-      var params = new URLSearchParams();
-      if (transacao) params.set('transacao', transacao);
-      if (selectedCity) params.set('cidade_nome', selectedCity);
-      var qs = params.toString();
-      window.location.href = APP_BASE + 'imoveis.php' + (qs ? '?' + qs : '');
+      activeTransacao = seg.dataset.transacao || '';
+      segs.forEach(function (s) { s.classList.toggle('on', s === seg); });
     });
   });
+
+  function irParaBusca() {
+    var params = new URLSearchParams();
+    if (activeTransacao) params.set('transacao', activeTransacao);
+    if (selectedCity) params.set('cidade_nome', selectedCity);
+    var qs = params.toString();
+    window.location.href = APP_BASE + 'imoveis.php' + (qs ? '?' + qs : '');
+  }
+  var searchBtn = document.getElementById('airbnb-bar-search-btn');
+  if (searchBtn) {
+    searchBtn.addEventListener('click', irParaBusca);
+  }
 
   // --- Menu da conta -------------------------------------------------------
   var userBtn = document.getElementById('nav-user-btn');

@@ -14,6 +14,8 @@ $favoriteIds = $user ? get_favorite_ids($user['id']) : [];
 $pageTitle = 'Busca de imóveis';
 $pageDescription = 'Busque apartamentos, casas e terrenos para comprar ou alugar em Santa Catarina.';
 require __DIR__ . '/includes/header.php';
+$activeType = !empty($_GET['tipo']) ? array_search($_GET['tipo'], PROPERTY_TYPE_SLUG, true) : null;
+render_category_pills($activeType ?: null);
 ?>
 <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
   <h1 class="mb-1 text-2xl font-bold">Busca de imóveis</h1>

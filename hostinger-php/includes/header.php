@@ -20,73 +20,78 @@ $__pageDescription = $pageDescription ?? 'Encontre apartamentos, casas e terreno
       extend: {
         colors: {
           brand: {
-            primary: '#D95D39',
-            'primary-hover': '#BF4C29',
-            dark: '#BF4C29',
-            light: '#e2765a',
-            text: '#1b1b1b',
-            'text-secondary': '#6a6a6a',
-            border: '#dddddd',
-            'bg-subtle': '#F8F6F4',
-            green: '#00bc7d',
-            'green-hover': '#00a36c',
-            navy: '#1A2E44',
+            primary: '#FF385C',
+            'primary-hover': '#E31C5F',
+            dark: '#E31C5F',
+            light: '#FF7085',
+            text: '#222222',
+            'text-secondary': '#717171',
+            border: '#DDDDDD',
+            'bg-subtle': '#F7F7F7',
+            green: '#25D366',
+            'green-hover': '#1DA851',
+            navy: '#222222',
           },
+        },
+        fontFamily: {
+          sans: ['Inter', 'system-ui', 'sans-serif'],
         },
       },
     },
   };
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-body{font-family:'Public Sans',Arial,sans-serif}
+body{font-family:'Inter',Arial,sans-serif}
 .price-pin{background:transparent;border:0}
 .price-pin-label{
   display:inline-block;white-space:nowrap;transform:translate(-50%,-100%);
-  background:#fff;color:#2b2b2b;border:1px solid #e5e5ea;border-radius:9999px;
+  background:#fff;color:#222222;border:1px solid #DDDDDD;border-radius:9999px;
   padding:5px 11px;font-size:12px;font-weight:700;box-shadow:0 1px 5px rgba(0,0,0,.18);
   cursor:pointer;
 }
-.price-pin-label.active,.price-pin-label:hover{background:#c1502e;color:#fff;border-color:#c1502e;z-index:1000!important}
+.price-pin-label.active,.price-pin-label:hover{background:#FF385C;color:#fff;border-color:#FF385C;z-index:1000!important}
 .map-pin-popup .leaflet-popup-content-wrapper{padding:0;border-radius:12px;overflow:hidden}
 .map-pin-popup .leaflet-popup-content{margin:0;width:100%!important}
 
-/* --- Barra superior: pílulas de busca (cidade / transação / filtros) --- */
-.search-pill{display:flex;align-items:center;background:#fff;border:1px solid #dddddd;border-radius:999px;box-shadow:0 1px 4px rgba(0,0,0,.08);padding:6px;gap:2px}
-.search-pill:hover{box-shadow:0 2px 10px rgba(0,0,0,.14)}
-.sp-seg{border:0;background:0 0;padding:9px 16px;border-radius:999px;cursor:pointer;font-weight:600;font-size:13.5px;color:#6a6a6a;transition:.16s;white-space:nowrap;text-decoration:none;display:inline-block}
-.sp-seg:hover{color:#1b1b1b}
-.sp-seg.on{background:#F8F6F4;color:#1b1b1b;font-weight:700}
+/* --- Barra de busca única estilo Airbnb (cidade | transação | botão) --- */
+.airbnb-bar{display:flex;align-items:center;background:#fff;border:1px solid #DDDDDD;border-radius:999px;box-shadow:0 1px 2px rgba(0,0,0,.08);transition:box-shadow .2s;padding:6px}
+.airbnb-bar:hover,.airbnb-bar:focus-within{box-shadow:0 3px 12px rgba(0,0,0,.16)}
 .cidade-pill{position:relative;flex:none}
-.cidade-pill-btn{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #dddddd;border-radius:999px;padding:10px 18px;font-weight:600;font-size:14px;color:#1b1b1b;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.08);transition:box-shadow .15s}
-.cidade-pill-btn:hover{box-shadow:0 2px 8px rgba(0,0,0,.14)}
-.cidade-pill-btn svg{width:16px;height:16px;color:#D95D39;flex:none}
-.cidade-pill.on .cidade-pill-btn{box-shadow:0 0 0 2px #1b1b1b}
+.cidade-pill-btn{display:flex;align-items:center;gap:8px;background:0 0;border:0;border-radius:999px;padding:10px 20px;font-weight:600;font-size:14px;color:#222222;cursor:pointer}
+.cidade-pill-btn:hover{background:#F7F7F7}
+.cidade-pill-btn svg{width:16px;height:16px;color:#717171;flex:none}
+.cidade-pill.on .cidade-pill-btn{background:#EBEBEB}
 .cidade-pill.on .cidade-dropdown{display:block}
-.cidade-dropdown{display:none;position:absolute;top:calc(100% + 10px);left:0;width:320px;max-width:88vw;background:#fff;border-radius:18px;box-shadow:0 30px 70px -30px rgba(26,46,68,.4);border:1px solid #ebebeb;padding:14px;z-index:220}
-.cidade-dropdown input{width:100%;border:1px solid #dddddd;border-radius:10px;padding:11px 14px;font-size:14.5px;box-sizing:border-box}
-.cidade-dropdown input:focus{outline:2px solid #D95D39;outline-offset:1px}
+.cidade-dropdown{display:none;position:absolute;top:calc(100% + 10px);left:0;width:320px;max-width:88vw;background:#fff;border-radius:18px;box-shadow:0 30px 70px -30px rgba(0,0,0,.5);border:1px solid #EBEBEB;padding:14px;z-index:220}
+.cidade-dropdown input{width:100%;border:1px solid #DDDDDD;border-radius:10px;padding:11px 14px;font-size:14.5px;box-sizing:border-box}
+.cidade-dropdown input:focus{outline:2px solid #222222;outline-offset:1px}
 .cidade-sugestoes{margin-top:8px;max-height:320px;overflow-y:auto}
 .cidade-sugestao{display:flex;align-items:center;gap:12px;padding:10px 8px;border-radius:10px;cursor:pointer;font-size:14.5px}
-.cidade-sugestao:hover{background:#F8F6F4}
-.cidade-sugestao .ic{width:34px;height:34px;border-radius:10px;background:#F1ECE8;display:flex;align-items:center;justify-content:center;flex:none}
-.cidade-sugestao .ic svg{width:16px;height:16px;color:#6a6a6a}
+.cidade-sugestao:hover{background:#F7F7F7}
+.cidade-sugestao .ic{width:34px;height:34px;border-radius:50%;background:#F7F7F7;display:flex;align-items:center;justify-content:center;flex:none}
+.cidade-sugestao .ic svg{width:16px;height:16px;color:#717171}
 .cidade-sugestao b{font-weight:700}
-.cidade-sugestao-vazio{color:#6a6a6a;font-size:13.5px;padding:10px 8px}
-.filtros-pill-btn{display:inline-flex;align-items:center;gap:8px;border:1px solid #dddddd;border-radius:999px;padding:10px 16px;font-size:13.5px;font-weight:700;cursor:pointer;white-space:nowrap;background:#fff;transition:.16s;text-decoration:none;color:#1b1b1b;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.cidade-sugestao-vazio{color:#717171;font-size:13.5px;padding:10px 8px}
+.airbnb-bar-divider{width:1px;height:24px;background:#DDDDDD;flex:none}
+.sp-seg{border:0;background:0 0;padding:10px 16px;border-radius:999px;cursor:pointer;font-weight:600;font-size:14px;color:#222222;transition:.16s;white-space:nowrap;text-decoration:none;display:inline-block}
+.sp-seg:hover{background:#F7F7F7}
+.sp-seg.on{background:#EBEBEB;font-weight:700}
+.airbnb-bar-btn{display:flex;align-items:center;justify-content:center;width:40px;height:40px;margin-left:4px;border-radius:999px;background:#FF385C;color:#fff;border:0;cursor:pointer;flex:none;transition:background .16s}
+.airbnb-bar-btn:hover{background:#E31C5F}
+.airbnb-bar-btn svg{width:16px;height:16px}
+.filtros-pill-btn{display:inline-flex;align-items:center;gap:8px;border:1px solid #DDDDDD;border-radius:999px;padding:10px 16px;font-size:13.5px;font-weight:700;cursor:pointer;white-space:nowrap;background:#fff;transition:.16s;text-decoration:none;color:#222222;box-shadow:0 1px 4px rgba(0,0,0,.08)}
 .filtros-pill-btn:hover{box-shadow:0 2px 10px rgba(0,0,0,.14)}
 .filtros-pill-btn svg{width:16px;height:16px;flex:none}
-.nav-user-btn{display:flex;align-items:center;gap:10px;border:1px solid #dddddd;border-radius:999px;padding:6px 6px 6px 13px;background:#fff;cursor:pointer;transition:box-shadow .16s,border-color .16s}
-.nav-user-btn:hover{box-shadow:0 2px 10px rgba(0,0,0,.16);border-color:#ebebeb}
-.nav-user-menu{position:absolute;top:calc(100% + 10px);right:0;background:#fff;border:1px solid #ebebeb;border-radius:14px;box-shadow:0 10px 32px rgba(0,0,0,.18);min-width:220px;padding:8px;display:none;z-index:200}
+.nav-user-btn{display:flex;align-items:center;gap:10px;border:1px solid #DDDDDD;border-radius:999px;padding:6px 6px 6px 13px;background:#fff;cursor:pointer;transition:box-shadow .16s,border-color .16s}
+.nav-user-btn:hover{box-shadow:0 2px 10px rgba(0,0,0,.16);border-color:#EBEBEB}
+.nav-user-menu{position:absolute;top:calc(100% + 10px);right:0;background:#fff;border:1px solid #EBEBEB;border-radius:14px;box-shadow:0 10px 32px rgba(0,0,0,.18);min-width:220px;padding:8px;display:none;z-index:200}
 .nav-user-menu.on{display:block}
-.nav-user-menu a{display:block;padding:9px 12px;border-radius:8px;font-size:14px;font-weight:600;color:#1b1b1b;text-decoration:none}
-.nav-user-menu a:hover{background:#F8F6F4}
-@media (max-width: 1023px){
-  .cidade-pill,.search-pill{display:none}
-  .filtros-pill-btn{padding:8px 12px;font-size:12.5px}
-}
+.nav-user-menu a{display:block;padding:9px 12px;border-radius:8px;font-size:14px;font-weight:600;color:#222222;text-decoration:none}
+.nav-user-menu a:hover{background:#F7F7F7}
+.scrollbar-none{scrollbar-width:none}
+.scrollbar-none::-webkit-scrollbar{display:none}
 </style>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 </head>
@@ -100,21 +105,27 @@ body{font-family:'Public Sans',Arial,sans-serif}
     </a>
 
     <div class="hidden flex-1 items-center justify-center gap-3 lg:flex">
-      <div class="cidade-pill" id="cidade-pill">
-        <button type="button" class="cidade-pill-btn" id="cidade-pill-btn">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.1-7-11a7 7 0 0 1 14 0c0 4.9-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
-          <span id="cidade-pill-label">Cidade</span>
-        </button>
-        <div class="cidade-dropdown" id="cidade-dropdown">
-          <input type="text" id="cidade-busca-input" placeholder="Digite o nome da cidade..." autocomplete="off">
-          <div class="cidade-sugestoes" id="cidade-sugestoes"></div>
+      <div class="airbnb-bar">
+        <div class="cidade-pill" id="cidade-pill">
+          <button type="button" class="cidade-pill-btn" id="cidade-pill-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.1-7-11a7 7 0 0 1 14 0c0 4.9-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
+            <span id="cidade-pill-label">Cidade</span>
+          </button>
+          <div class="cidade-dropdown" id="cidade-dropdown">
+            <input type="text" id="cidade-busca-input" placeholder="Digite o nome da cidade..." autocomplete="off">
+            <div class="cidade-sugestoes" id="cidade-sugestoes"></div>
+          </div>
         </div>
-      </div>
 
-      <div class="search-pill">
+        <span class="airbnb-bar-divider"></span>
+
         <a href="#" class="sp-seg on" data-transacao="">Todos</a>
         <a href="#" class="sp-seg" data-transacao="comprar">Comprar</a>
         <a href="#" class="sp-seg" data-transacao="alugar">Alugar</a>
+
+        <button type="button" class="airbnb-bar-btn" id="airbnb-bar-search-btn" aria-label="Buscar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>
+        </button>
       </div>
 
       <a href="<?= base_url('imoveis.php') ?>" class="filtros-pill-btn">
@@ -150,7 +161,7 @@ body{font-family:'Public Sans',Arial,sans-serif}
       <?php endif; ?>
     </div>
 
-    <a href="<?= base_url('imoveis.php') ?>" class="filtros-pill-btn lg:hidden">
+    <a href="<?= base_url('imoveis.php') ?>" class="filtros-pill-btn lg:!hidden">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
       <span>Filtros</span>
     </a>
