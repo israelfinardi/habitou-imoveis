@@ -113,10 +113,26 @@ assets/            CSS/JS/imagens
 - Permissões: um anunciante só edita seus próprios imóveis; imobiliária só edita imóveis da
   própria equipe; administrador tem acesso total.
 
+## Cadastro de corretores e imobiliárias
+
+Em `/cadastro.php` a pessoa escolhe o tipo de conta: comprador/anunciante, corretor autônomo
+(CRECI) ou imobiliária. Ao se cadastrar como imobiliária, o sistema já cria a conta ativa
+(pode anunciar e configurar feeds VRSync na hora), mas o **perfil público** da imobiliária
+fica com status `PENDING` até o administrador aprovar em `/admin/imobiliarias.php`.
+
+## Mapa interativo na busca
+
+As páginas de listagem/filtros (`/imoveis.php` e `/cidade.php`) mostram um mapa lateral
+(Leaflet) com pinos de preço, sincronizado por hover com os cards da lista — no celular ele
+vira uma tela cheia acionada pelo botão "Ver no mapa". Imóveis sem latitude/longitude próprias
+usam o centro da cidade como localização aproximada (mesmo comportamento já usado na página
+individual do imóvel).
+
 ## Testes de regressão
 
-Este pacote foi testado localmente (PHP 8.4 + MariaDB) cobrindo: cadastro, login, listagem
-com filtros reais no banco, página de imóvel com galeria/mapa, favoritos, criação e
+Este pacote foi testado localmente (PHP 8.4 + MariaDB) cobrindo: cadastro (incluindo corretor
+e imobiliária, com aprovação de imobiliária pelo admin), login, listagem com filtros reais no
+banco e mapa interativo lateral, página de imóvel com galeria/mapa, favoritos, criação e
 publicação de imóvel pelo anunciante, upload de fotos, VRSync (importação com deduplicação,
 exportação, roundtrip completo), painel administrativo e formulário de contato — todos
 funcionando ponta a ponta antes do empacotamento.
