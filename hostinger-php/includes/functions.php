@@ -25,6 +25,24 @@ function format_currency_brl($value): string
     return 'R$ ' . number_format((float) $value, 0, ',', '.');
 }
 
+function format_price_short($value, bool $isRent = false): string
+{
+    if ($value === null || $value === '') {
+        return 'Consulte';
+    }
+    $value = (float) $value;
+    if ($isRent) {
+        return 'R$ ' . number_format($value, 0, ',', '.') . '/mês';
+    }
+    if ($value >= 1000000) {
+        return 'R$ ' . number_format($value / 1000000, 1, ',', '.') . ' mi';
+    }
+    if ($value >= 1000) {
+        return 'R$ ' . number_format($value / 1000, 0, ',', '.') . ' mil';
+    }
+    return 'R$ ' . number_format($value, 0, ',', '.');
+}
+
 function format_area($value): string
 {
     if (!$value) {

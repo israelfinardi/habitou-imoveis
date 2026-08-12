@@ -16,7 +16,7 @@ require __DIR__ . '/includes/header.php';
 
   <div class="mb-6"><?php render_filters_form(base_url('imoveis.php'), $_GET, true); ?></div>
 
-  <?php render_property_grid($result['items'], $favoriteIds); ?>
+  <?php render_property_results($result['items'], $favoriteIds); ?>
 
   <?php
   $baseQuery = 'imoveis.php?' . http_build_query(array_diff_key($_GET, ['pagina' => '']));

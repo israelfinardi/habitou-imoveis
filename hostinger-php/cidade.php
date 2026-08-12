@@ -40,7 +40,7 @@ if ($hasFilters) {
       <h1 class="mb-4 text-2xl font-bold">Imóveis em <?= e($city['name']) ?></h1>
       <p class="mb-4 text-sm text-brand-text-secondary"><?= $result['total'] ?> imóve<?= $result['total'] === 1 ? 'l encontrado' : 'is encontrados' ?></p>
       <div class="mb-6"><?php render_filters_form(base_url('cidade.php?slug=' . $city['slug']), $_GET, false, $neighborhoods); ?></div>
-      <?php render_property_grid($result['items'], $favoriteIds); ?>
+      <?php render_property_results($result['items'], $favoriteIds); ?>
       <?php
       $baseQuery = 'cidade.php?' . http_build_query(array_diff_key($_GET, ['pagina' => '']));
       render_pagination($result['page'], $result['total_pages'], base_url($baseQuery));

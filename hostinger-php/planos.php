@@ -17,7 +17,12 @@ require __DIR__ . '/includes/header.php';
 ?>
 <div class="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
   <h1 class="mb-2 text-center text-3xl font-bold">Planos</h1>
-  <p class="mb-10 text-center text-brand-text-secondary">Escolha o plano ideal para anunciar seus imóveis.</p>
+  <p class="mb-2 text-center text-brand-text-secondary">Escolha o plano ideal para anunciar seus imóveis.</p>
+  <?php if (!$user): ?>
+    <p class="mb-10 text-center text-sm text-brand-text-secondary">Ainda não tem conta? <a href="<?= base_url('cadastro.php?tipo=imobiliaria') ?>" class="font-medium text-brand-primary hover:underline">Cadastre sua imobiliária</a> ou <a href="<?= base_url('cadastro.php?tipo=corretor') ?>" class="font-medium text-brand-primary hover:underline">seu perfil de corretor</a>.</p>
+  <?php else: ?>
+    <div class="mb-10"></div>
+  <?php endif; ?>
 
   <div class="grid grid-cols-1 gap-6 sm:grid-cols-3">
     <?php foreach ($plans as $plan): $isCurrent = $currentSubscription && $currentSubscription['plan_id'] == $plan['id']; $features = json_decode_safe($plan['features']); ?>

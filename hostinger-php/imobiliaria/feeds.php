@@ -30,7 +30,13 @@ require __DIR__ . '/../includes/header.php';
       </nav>
     </aside>
     <main>
-      <h1 class="mb-6 text-2xl font-bold">Feeds VRSync</h1>
+      <h1 class="mb-2 text-2xl font-bold">Feeds VRSync</h1>
+      <?php if (!empty($_GET['bemvindo'])): ?>
+        <p class="mb-6 rounded-lg bg-brand-bg-subtle px-4 py-3 text-sm text-brand-text-secondary">
+          Cadastro de imobiliária recebido! Sua conta já está ativa e você pode anunciar imóveis e configurar feeds VRSync.
+          O perfil público da sua imobiliária fica em análise e é liberado assim que o administrador do site aprovar o cadastro.
+        </p>
+      <?php endif; ?>
 
       <?php if ($user['agency_id']): ?>
       <div class="mb-8 rounded-xl border border-brand-border bg-white p-5">

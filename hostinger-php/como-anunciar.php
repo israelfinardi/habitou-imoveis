@@ -23,7 +23,11 @@ require __DIR__ . '/includes/header.php';
     <p class="text-sm font-semibold uppercase tracking-wide text-white/60">Para corretores e imobiliárias</p>
     <h1 class="mt-2 text-3xl font-bold sm:text-4xl">Anuncie no Habitou Imóveis e receba leads qualificados</h1>
     <p class="mt-4 text-white/70">O portal imobiliário com maior presença em Santa Catarina. Mais de 26 anos conectando corretores e imobiliárias a compradores e locatários em todo o estado.</p>
-    <a href="<?= base_url('planos.php') ?>" class="mt-6 inline-block rounded-full bg-brand-primary px-6 py-3 text-sm font-semibold text-white hover:bg-brand-primary-hover">Ver planos e anunciar</a>
+    <div class="mt-6 flex flex-wrap justify-center gap-3">
+      <a href="<?= base_url('planos.php') ?>" class="inline-block rounded-full bg-brand-primary px-6 py-3 text-sm font-semibold text-white hover:bg-brand-primary-hover">Ver planos e anunciar</a>
+      <a href="<?= base_url('cadastro.php?tipo=imobiliaria') ?>" class="inline-block rounded-full border border-white/30 px-6 py-3 text-sm font-semibold text-white hover:border-white">Cadastrar imobiliária</a>
+      <a href="<?= base_url('cadastro.php?tipo=corretor') ?>" class="inline-block rounded-full border border-white/30 px-6 py-3 text-sm font-semibold text-white hover:border-white">Cadastrar como corretor</a>
+    </div>
   </div>
 </div>
 <div class="mx-auto max-w-6xl px-4 py-14 sm:px-6 lg:px-8">

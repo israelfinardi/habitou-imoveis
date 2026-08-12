@@ -3,7 +3,11 @@ require_once __DIR__ . '/mailer.php';
 
 class AuthServiceError extends \RuntimeException {}
 
-function register_user(string $firstName, string $lastName, string $email, string $phone, string $password): int
+/**
+ * @param array{type?: string, creci?: string, agencyName?: string, cnpj?: string, agencyPhone?: string} $professional
+ *   type: '' (padrão, comprador/anunciante particular) | 'corretor' (AGENT autônomo) | 'imobiliaria' (AGENCY_ADMIN + nova agência)
+ */
+function register_user(string $firstName, string $lastName, string $email, string $phone, string $password, array $professional = []): int
 {
     $pdo = db();
     $stmt = $pdo->prepare('SELECT id FROM users WHERE email = ?');
@@ -12,9 +16,49 @@ function register_user(string $firstName, string $lastName, string $email, strin
         throw new AuthServiceError('Este e-mail já está cadastrado.');
     }
 
+    $type = $professional['type'] ?? '';
+    $role = 'USER';
+    $creci = null;
+    $agencyId = null;
+
+    if ($type === 'corretor') {
+        $creci = trim((string) ($professional['creci'] ?? ''));
+        if ($creci === '') {
+            throw new AuthServiceError('Informe seu número de CRECI.');
+        }
+        $role = 'AGENT';
+    } elseif ($type === 'imobiliaria') {
+        $agencyName = trim((string) ($professional['agencyName'] ?? ''));
+        if (mb_strlen($agencyName) < 3) {
+            throw new AuthServiceError('Informe o nome da imobiliária.');
+        }
+        $agencyId = create_pending_agency($agencyName, $professional['cnpj'] ?? '', $professional['agencyPhone'] ?? '', $email);
+        $role = 'AGENCY_ADMIN';
+    }
+
     $hash = password_hash($password, PASSWORD_BCRYPT);
-    $stmt = $pdo->prepare('INSERT INTO users (first_name, last_name, email, phone, password_hash, role, status) VALUES (?,?,?,?,?,"USER","ACTIVE")');
-    $stmt->execute([$firstName, $lastName, $email, $phone ?: null, $hash]);
+    $stmt = $pdo->prepare('INSERT INTO users (first_name, last_name, email, phone, password_hash, role, status, creci, agency_id) VALUES (?,?,?,?,?,?,"ACTIVE",?,?)');
+    $stmt->execute([$firstName, $lastName, $email, $phone ?: null, $hash, $role, $creci, $agencyId]);
+    return (int) $pdo->lastInsertId();
+}
+
+/** Cria uma imobiliária com status PENDENTE — só aparece publicamente após aprovação do administrador em /admin/imobiliarias.php. */
+function create_pending_agency(string $name, string $cnpj, string $phone, string $email): int
+{
+    $pdo = db();
+    $base = slugify($name);
+    $slug = $base;
+    $i = 2;
+    while (true) {
+        $stmt = $pdo->prepare('SELECT id FROM agencies WHERE slug = ?');
+        $stmt->execute([$slug]);
+        if (!$stmt->fetchColumn()) {
+            break;
+        }
+        $slug = $base . '-' . $i++;
+    }
+    $stmt = $pdo->prepare('INSERT INTO agencies (name, slug, cnpj, email, phone, status) VALUES (?,?,?,?,?,"PENDING")');
+    $stmt->execute([$name, $slug, $cnpj ?: null, $email, $phone ?: null]);
     return (int) $pdo->lastInsertId();
 }
 

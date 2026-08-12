@@ -39,7 +39,19 @@ $__pageDescription = $pageDescription ?? 'Encontre apartamentos, casas e terreno
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<style>body{font-family:'Public Sans',Arial,sans-serif}</style>
+<style>
+body{font-family:'Public Sans',Arial,sans-serif}
+.price-pin{background:transparent;border:0}
+.price-pin-label{
+  display:inline-block;white-space:nowrap;transform:translate(-50%,-100%);
+  background:#fff;color:#2b2b2b;border:1px solid #e5e5ea;border-radius:9999px;
+  padding:5px 11px;font-size:12px;font-weight:700;box-shadow:0 1px 5px rgba(0,0,0,.18);
+  cursor:pointer;
+}
+.price-pin-label.active,.price-pin-label:hover{background:#c1502e;color:#fff;border-color:#c1502e;z-index:1000!important}
+.map-pin-popup .leaflet-popup-content-wrapper{padding:0;border-radius:12px;overflow:hidden}
+.map-pin-popup .leaflet-popup-content{margin:0;width:100%!important}
+</style>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 </head>
 <body class="flex min-h-screen flex-col bg-white text-brand-text">

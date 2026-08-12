@@ -90,7 +90,8 @@ function build_property_order(?string $sort, ?string $transacao): string
 const PROPERTY_LIST_SELECT = "
     p.id, p.code, p.title, p.slug, p.listing_type, p.property_type, p.price_sale, p.price_rent,
     p.total_area, p.bedrooms, p.suites, p.bathrooms, p.parking_spaces, p.published_at,
-    c.name AS city_name, c.slug AS city_slug, c.state_code,
+    p.latitude, p.longitude,
+    c.name AS city_name, c.slug AS city_slug, c.state_code, c.latitude AS city_lat, c.longitude AS city_lng,
     n.name AS neighborhood_name, n.slug AS neighborhood_slug,
     ag.name AS agency_name, ag.slug AS agency_slug
 ";

@@ -31,8 +31,13 @@ $pageDescription = 'Conheça as imobiliárias parceiras Habitou Imóveis em Sant
 require __DIR__ . '/includes/header.php';
 ?>
 <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-  <h1 class="mb-1 text-2xl font-bold">Imobiliárias e corretores</h1>
-  <p class="mb-6 text-sm text-brand-text-secondary"><?= $total ?> imobiliárias parceiras</p>
+  <div class="mb-6 flex flex-wrap items-start justify-between gap-4">
+    <div>
+      <h1 class="mb-1 text-2xl font-bold">Imobiliárias e corretores</h1>
+      <p class="text-sm text-brand-text-secondary"><?= $total ?> imobiliárias parceiras</p>
+    </div>
+    <a href="<?= base_url('cadastro.php?tipo=imobiliaria') ?>" class="shrink-0 rounded-full bg-brand-primary px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-primary-hover">Cadastrar minha imobiliária</a>
+  </div>
 
   <form class="mb-6 max-w-sm">
     <input type="search" name="q" value="<?= e($q) ?>" placeholder="Buscar imobiliária..." class="w-full rounded-lg border border-brand-border px-3 py-2 text-sm">

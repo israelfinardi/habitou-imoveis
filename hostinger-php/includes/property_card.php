@@ -4,7 +4,7 @@ function render_property_card(array $p, bool $isFavorite = false): void
     $price = $p['listing_type'] === 'RENT' ? ($p['price_rent'] ?? null) : ($p['price_sale'] ?? null);
     $href = property_href($p);
     ?>
-    <article class="group overflow-hidden rounded-xl border border-brand-border bg-white transition hover:shadow-md">
+    <article data-property-id="<?= (int) $p['id'] ?>" class="group overflow-hidden rounded-xl border border-brand-border bg-white transition hover:shadow-md">
       <a href="<?= e($href) ?>" class="relative block aspect-[4/3] w-full overflow-hidden bg-brand-bg-subtle">
         <?php if (!empty($p['image_url'])): ?>
           <img src="<?= e($p['image_url']) ?>" alt="<?= e($p['title']) ?>" loading="lazy" class="h-full w-full object-cover transition duration-300 group-hover:scale-105">
@@ -38,17 +38,72 @@ function render_property_card(array $p, bool $isFavorite = false): void
     <?php
 }
 
-function render_property_grid(array $items, array $favoriteIds = [], string $emptyMessage = 'Nenhum imóvel encontrado com esses filtros.'): void
+function render_property_grid(array $items, array $favoriteIds = [], string $emptyMessage = 'Nenhum imóvel encontrado com esses filtros.', ?string $gridId = null, bool $threeCols = true): void
 {
     if (empty($items)) {
         echo '<div class="rounded-xl border border-dashed border-brand-border p-12 text-center text-brand-text-secondary">' . e($emptyMessage) . '</div>';
         return;
     }
-    echo '<div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">';
+    $idAttr = $gridId ? ' id="' . e($gridId) . '"' : '';
+    $cols = $threeCols ? 'sm:grid-cols-2 lg:grid-cols-3' : 'sm:grid-cols-2';
+    echo '<div' . $idAttr . ' class="grid grid-cols-1 gap-5 ' . $cols . '">';
     foreach ($items as $p) {
         render_property_card($p, in_array((int) $p['id'], $favoriteIds, true));
     }
     echo '</div>';
+}
+
+/**
+ * Grade de resultados com mapa interativo lateral (estilo Airbnb): pins com
+ * preço, sincronizados por hover com os cards, sticky no desktop e em
+ * tela cheia (via botão "Ver no mapa") no celular.
+ */
+function render_property_results(array $items, array $favoriteIds = [], string $emptyMessage = 'Nenhum imóvel encontrado com esses filtros.'): void
+{
+    $pins = [];
+    foreach ($items as $p) {
+        $lat = $p['latitude'] ?: ($p['city_lat'] ?? null);
+        $lng = $p['longitude'] ?: ($p['city_lng'] ?? null);
+        if (!$lat || !$lng) {
+            continue;
+        }
+        $price = $p['listing_type'] === 'RENT' ? ($p['price_rent'] ?? null) : ($p['price_sale'] ?? null);
+        $meta = trim((!empty($p['neighborhood_name']) ? $p['neighborhood_name'] . ', ' : '') . $p['city_name']);
+        $pins[] = [
+            'id' => (int) $p['id'],
+            'lat' => (float) $lat,
+            'lng' => (float) $lng,
+            'label' => format_price_short($price, $p['listing_type'] === 'RENT'),
+            'title' => $p['title'],
+            'meta' => $meta,
+            'image' => $p['image_url'] ?? null,
+            'href' => property_href($p),
+        ];
+    }
+    ?>
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-5">
+      <div class="lg:col-span-3">
+        <?php render_property_grid($items, $favoriteIds, $emptyMessage, 'results-grid', false); ?>
+      </div>
+      <?php if ($pins): ?>
+        <div class="lg:col-span-2">
+          <button type="button" id="map-toggle-btn" class="mb-3 flex items-center gap-2 rounded-full border border-brand-border px-4 py-2 text-sm font-semibold hover:border-brand-primary lg:hidden">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 20l-6-3V4l6 3 6-3 6 3v13l-6-3-6 3z"/><path d="M9 4v13M15 7v13"/></svg>
+            Ver no mapa
+          </button>
+          <div id="results-map-wrap" class="hidden overflow-hidden rounded-xl border border-brand-border lg:sticky lg:top-24 lg:block" style="height:70vh">
+            <button type="button" id="map-close-btn" class="absolute right-3 top-3 z-[1000] hidden h-9 w-9 items-center justify-center rounded-full bg-white shadow lg:hidden" aria-label="Fechar mapa">&times;</button>
+            <div id="results-map" class="w-full" style="height:100%"></div>
+          </div>
+        </div>
+      <?php endif; ?>
+    </div>
+    <?php if ($pins): ?>
+      <script>window.__RESULTS_MAP_PINS = <?= json_encode($pins, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;</script>
+      <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+      <script src="<?= base_url('assets/js/results-map.js') ?>"></script>
+    <?php endif; ?>
+    <?php
 }
 
 function render_pagination(int $page, int $totalPages, string $baseQuery): void
