@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /anunciante/
+Disallow: /imobiliaria/
+Disallow: /minha-conta*
+Disallow: /actions/
+Disallow: /config/
+Disallow: /includes/
+Disallow: /cron/
+
+Sitemap: /sitemap.php

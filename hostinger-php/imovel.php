@@ -1,0 +1,189 @@
+<?php
+require_once __DIR__ . '/includes/bootstrap.php';
+
+$slug = $_GET['slug'] ?? '';
+$property = get_property_by_slug($slug);
+if (!$property || $property['status'] !== 'PUBLISHED') {
+    http_response_code(404);
+    $pageTitle = 'Imóvel não encontrado';
+    require __DIR__ . '/includes/header.php';
+    echo '<div class="mx-auto max-w-3xl px-4 py-20 text-center"><h1 class="text-2xl font-bold">Imóvel não encontrado</h1><p class="mt-2 text-brand-text-secondary">Ele pode ter sido removido ou pausado pelo anunciante.</p></div>';
+    require __DIR__ . '/includes/footer.php';
+    exit;
+}
+
+$user = current_user();
+$isFavorite = false;
+if ($user) {
+    $stmt = db()->prepare('SELECT 1 FROM favorites WHERE user_id = ? AND property_id = ?');
+    $stmt->execute([$user['id'], $property['id']]);
+    $isFavorite = (bool) $stmt->fetchColumn();
+}
+$favoriteIds = $user ? get_favorite_ids($user['id']) : [];
+$similar = get_similar_properties($property);
+
+$price = $property['listing_type'] === 'RENT' ? $property['price_rent'] : $property['price_sale'];
+$lat = $property['latitude'] ?: $property['city_lat'];
+$lng = $property['longitude'] ?: $property['city_lng'];
+$approximateLocation = !$property['latitude'] || !$property['longitude'];
+
+$canonical = base_url('imovel.php?slug=' . $property['slug']);
+$pageTitle = $property['title'];
+$pageDescription = $property['description'] ? mb_substr(strip_tags($property['description']), 0, 155) : $property['title'];
+require __DIR__ . '/includes/header.php';
+
+$jsonLd = [
+    '@context' => 'https://schema.org',
+    '@type' => 'RealEstateListing',
+    'name' => $property['title'],
+    'description' => $property['description'],
+    'url' => $canonical,
+    'image' => array_column($property['images'], 'url'),
+    'address' => [
+        '@type' => 'PostalAddress',
+        'addressLocality' => $property['city_name'],
+        'addressRegion' => $property['state_code'],
+        'addressCountry' => 'BR',
+        'streetAddress' => $property['street'],
+        'postalCode' => $property['zip_code'],
+    ],
+];
+if ($price) {
+    $jsonLd['offers'] = ['@type' => 'Offer', 'price' => (float) $price, 'priceCurrency' => 'BRL'];
+}
+?>
+<script type="application/ld+json"><?= json_encode($jsonLd, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?></script>
+
+<div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+  <nav class="mb-4 text-sm text-brand-text-secondary">
+    <a href="<?= base_url('/') ?>" class="hover:text-brand-primary">Início</a> /
+    <a href="<?= base_url('cidade.php?slug=' . $property['city_slug']) ?>" class="hover:text-brand-primary"><?= e($property['city_name']) ?></a> /
+    <a href="<?= base_url('cidade.php?slug=' . $property['city_slug'] . '&transacao=' . LISTING_TYPE_SLUG[$property['listing_type']]) ?>" class="hover:text-brand-primary"><?= e(LISTING_TYPE_LABEL[$property['listing_type']]) ?></a> /
+    <span><?= e($property['title']) ?></span>
+  </nav>
+
+  <div class="grid grid-cols-1 gap-8 lg:grid-cols-3">
+    <div class="lg:col-span-2">
+      <?php $images = $property['images']; ?>
+      <div class="js-gallery">
+        <div class="relative aspect-[16/10] w-full overflow-hidden rounded-xl bg-brand-bg-subtle js-gallery-main">
+          <?php if ($images): ?>
+            <img src="<?= e($images[0]['url']) ?>" alt="<?= e($property['title']) ?>" class="h-full w-full object-cover">
+          <?php else: ?>
+            <div class="flex h-full items-center justify-center text-brand-text-secondary">Sem fotos</div>
+          <?php endif; ?>
+          <?php if (count($images) > 1): ?>
+            <span class="js-gallery-counter absolute bottom-3 right-3 rounded-full bg-black/60 px-2 py-1 text-xs text-white">1 / <?= count($images) ?></span>
+          <?php endif; ?>
+        </div>
+        <?php if (count($images) > 1): ?>
+          <div class="mt-3 flex gap-2 overflow-x-auto pb-1">
+            <?php foreach ($images as $idx => $img): ?>
+              <button type="button" class="js-gallery-thumb relative h-16 w-24 shrink-0 overflow-hidden rounded-lg border-2 <?= $idx === 0 ? 'border-brand-primary' : 'border-transparent' ?>" data-full="<?= e($img['url']) ?>">
+                <img src="<?= e($img['url']) ?>" loading="lazy" class="h-full w-full object-cover" alt="">
+              </button>
+            <?php endforeach; ?>
+          </div>
+        <?php endif; ?>
+      </div>
+
+      <div class="mt-6 flex items-start justify-between gap-4">
+        <div>
+          <h1 class="text-2xl font-bold"><?= e($property['title']) ?></h1>
+          <p class="mt-1 text-sm text-brand-text-secondary">
+            <?= !empty($property['neighborhood_name']) ? e($property['neighborhood_name']) . ', ' : '' ?><?= e($property['city_name']) ?> — <?= e($property['state_code']) ?>
+            <?= !empty($property['street']) ? ' · ' . e($property['street']) : '' ?>
+          </p>
+        </div>
+        <button type="button" class="js-favorite-btn <?= $isFavorite ? 'is-favorite' : '' ?> flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white shadow ring-1 ring-brand-border" data-property-id="<?= (int) $property['id'] ?>" aria-label="Favoritar">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="<?= $isFavorite ? '#c1502e' : 'none' ?>" stroke="<?= $isFavorite ? '#c1502e' : '#585b62' ?>" stroke-width="2"><path d="M12 21s-7.5-4.6-10-9.3C.4 8.1 2 4.5 5.6 4c2-.3 3.8.6 6.4 3 2.6-2.4 4.4-3.3 6.4-3 3.6.5 5.2 4.1 3.6 7.7C19.5 16.4 12 21 12 21z"/></svg>
+        </button>
+      </div>
+
+      <p class="mt-4 text-3xl font-bold text-brand-primary"><?= format_currency_brl($price) ?></p>
+      <div class="mt-3">
+        <button type="button" class="js-compare-toggle rounded-full border border-brand-border px-4 py-2.5 text-sm font-semibold hover:border-brand-primary" data-id="<?= (int) $property['id'] ?>" data-title="<?= e($property['title']) ?>" data-image="<?= e($images[0]['url'] ?? '') ?>">Adicionar à comparação</button>
+      </div>
+      <?php if ($property['condo_fee']): ?><p class="mt-2 text-sm text-brand-text-secondary">Condomínio: <?= format_currency_brl($property['condo_fee']) ?></p><?php endif; ?>
+      <?php if ($property['iptu']): ?><p class="text-sm text-brand-text-secondary">IPTU: <?= format_currency_brl($property['iptu']) ?></p><?php endif; ?>
+
+      <div class="mt-6 grid grid-cols-2 gap-4 rounded-xl border border-brand-border p-4 sm:grid-cols-4">
+        <div><p class="text-xs text-brand-text-secondary">Área total</p><p class="text-sm font-semibold"><?= $property['total_area'] ? format_area($property['total_area']) : '—' ?></p></div>
+        <div><p class="text-xs text-brand-text-secondary">Quartos</p><p class="text-sm font-semibold"><?= $property['bedrooms'] ?? '—' ?></p></div>
+        <div><p class="text-xs text-brand-text-secondary">Suítes</p><p class="text-sm font-semibold"><?= $property['suites'] ?? '—' ?></p></div>
+        <div><p class="text-xs text-brand-text-secondary">Banheiros</p><p class="text-sm font-semibold"><?= $property['bathrooms'] ?? '—' ?></p></div>
+        <div><p class="text-xs text-brand-text-secondary">Vagas</p><p class="text-sm font-semibold"><?= $property['parking_spaces'] ?? '—' ?></p></div>
+        <div><p class="text-xs text-brand-text-secondary">Tipo</p><p class="text-sm font-semibold"><?= e(PROPERTY_TYPE_LABEL[$property['property_type']]) ?></p></div>
+        <div><p class="text-xs text-brand-text-secondary">Código</p><p class="text-sm font-semibold"><?= e($property['code']) ?></p></div>
+        <div><p class="text-xs text-brand-text-secondary">Publicado</p><p class="text-sm font-semibold"><?= format_date($property['published_at']) ?></p></div>
+      </div>
+
+      <?php if ($property['description']): ?>
+        <div class="mt-6">
+          <h2 class="mb-2 text-lg font-bold">Descrição</h2>
+          <p class="whitespace-pre-line text-sm leading-relaxed text-brand-text-secondary"><?= nl2br(e($property['description'])) ?></p>
+        </div>
+      <?php endif; ?>
+
+      <?php if (!empty($property['features'])): ?>
+        <div class="mt-6">
+          <h2 class="mb-2 text-lg font-bold">Características</h2>
+          <div class="flex flex-wrap gap-2">
+            <?php foreach ($property['features'] as $f): ?>
+              <span class="rounded-full bg-brand-bg-subtle px-3 py-1 text-xs"><?= e($f) ?></span>
+            <?php endforeach; ?>
+          </div>
+        </div>
+      <?php endif; ?>
+
+      <?php if ($lat && $lng): ?>
+        <div class="mt-6">
+          <h2 class="mb-2 text-lg font-bold">Localização</h2>
+          <?php if ($approximateLocation): ?>
+            <p class="mb-2 text-xs text-brand-text-secondary">Localização aproximada (centro de <?= e($property['city_name']) ?>).</p>
+          <?php endif; ?>
+          <div id="map" class="h-72 w-full rounded-xl"></div>
+          <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+          <script>
+            var map = L.map('map').setView([<?= (float) $lat ?>, <?= (float) $lng ?>], 15);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap contributors' }).addTo(map);
+            L.marker([<?= (float) $lat ?>, <?= (float) $lng ?>]).addTo(map).bindPopup(<?= json_encode($property['title'], JSON_UNESCAPED_UNICODE) ?>);
+          </script>
+        </div>
+      <?php endif; ?>
+    </div>
+
+    <div class="lg:col-span-1">
+      <div class="sticky top-24 rounded-xl border border-brand-border bg-white p-5">
+        <?php
+        $contactName = !empty($property['agent_first_name'])
+            ? $property['agent_first_name'] . ' ' . $property['agent_last_name']
+            : (!empty($property['agency_name']) ? $property['agency_name'] : $property['advertiser_first_name'] . ' ' . $property['advertiser_last_name']);
+        $phone = $property['agent_phone'] ?: ($property['agency_phone'] ?: $property['advertiser_phone']);
+        $whatsapp = $phone ? preg_replace('/\D/', '', $phone) : null;
+        ?>
+        <p class="text-xs font-semibold uppercase text-brand-text-secondary">Anunciado por</p>
+        <p class="mt-1 text-lg font-bold"><?= e($contactName) ?></p>
+        <?php if (!empty($property['agent_creci'])): ?><p class="text-xs text-brand-text-secondary">CRECI <?= e($property['agent_creci']) ?></p><?php endif; ?>
+        <?php if (!empty($property['agency_slug'])): ?>
+          <a href="<?= base_url('imobiliaria.php?slug=' . $property['agency_slug']) ?>" class="mt-1 block text-sm text-brand-primary hover:underline">Ver página da imobiliária</a>
+        <?php endif; ?>
+        <div class="mt-4 flex flex-col gap-2">
+          <?php if ($whatsapp): ?>
+            <a href="https://wa.me/55<?= e($whatsapp) ?>?text=<?= urlencode('Olá! Tenho interesse no imóvel "' . $property['title'] . '" (código ' . $property['code'] . ').') ?>" target="_blank" rel="noopener noreferrer" class="rounded-full bg-brand-green px-4 py-2.5 text-center text-sm font-semibold text-white hover:bg-brand-green-hover">Conversar no WhatsApp</a>
+          <?php endif; ?>
+          <a href="<?= base_url('fale-conosco.php?imovel=' . urlencode($property['code'])) ?>" class="rounded-full border border-brand-border px-4 py-2.5 text-center text-sm font-semibold hover:border-brand-primary">Enviar mensagem</a>
+        </div>
+        <p class="mt-4 text-xs text-brand-text-secondary">Código do imóvel: <?= e($property['code']) ?></p>
+      </div>
+    </div>
+  </div>
+
+  <?php if ($similar): ?>
+    <div class="mt-12">
+      <h2 class="mb-4 text-xl font-bold">Imóveis semelhantes</h2>
+      <?php render_property_grid($similar, $favoriteIds); ?>
+    </div>
+  <?php endif; ?>
+</div>
+<?php require __DIR__ . '/includes/footer.php'; ?>

@@ -49,3 +49,6 @@ next-env.d.ts
 .windsurf/
 .claude/
 skills-lock.json
+
+# PHP/Hostinger version — local dev config with credentials, never commit
+hostinger-php/config/config.php
