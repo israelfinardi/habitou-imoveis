@@ -4,6 +4,15 @@ require_once __DIR__ . '/constants.php';
 $__user = current_user();
 $__pageTitle = $pageTitle ?? APP_NAME;
 $__pageDescription = $pageDescription ?? 'Encontre apartamentos, casas e terrenos para comprar ou alugar em Santa Catarina.';
+
+// Estado atual dos filtros (transação/cidade), usado para manter a barra de
+// busca superior sincronizada com o que já está aplicado na página.
+$__topbarTransacao = $_GET['transacao'] ?? '';
+if (!empty($city['name']) && !empty($city['state_code'])) {
+    $__topbarCidade = $city['name'] . ' (' . $city['state_code'] . ')';
+} else {
+    $__topbarCidade = $_GET['cidade_nome'] ?? '';
+}
 ?><!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -92,13 +101,16 @@ body{font-family:'Inter',Arial,sans-serif}
 .nav-user-menu a:hover{background:#F7F7F7}
 .scrollbar-none{scrollbar-width:none}
 .scrollbar-none::-webkit-scrollbar{display:none}
+@media (min-width:1024px){
+  #results-layout.filtros-escondidos{grid-template-columns:1fr 1fr!important}
+}
 </style>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 </head>
 <body class="flex min-h-screen flex-col bg-white text-brand-text">
 
 <header class="sticky top-0 z-40 border-b border-brand-border bg-white/95 backdrop-blur">
-  <div class="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8">
+  <div class="mx-auto flex max-w-[1800px] items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8">
     <a href="<?= base_url('/') ?>" class="flex shrink-0 items-center">
       <img src="<?= base_url('assets/img/logo.svg') ?>" alt="Habitou Imóveis" class="h-9 w-auto">
     </a>
@@ -127,13 +139,14 @@ body{font-family:'Inter',Arial,sans-serif}
         </button>
       </div>
 
-      <a href="<?= base_url('imoveis.php') ?>" class="filtros-pill-btn">
+      <a href="<?= base_url('imoveis.php') ?>" class="filtros-pill-btn" id="filtros-toggle-btn">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
         <span>Filtros</span>
       </a>
     </div>
 
     <div class="hidden items-center gap-3 lg:flex">
+      <a href="<?= base_url('quem-somos.php') ?>" class="text-sm font-medium hover:text-brand-primary">Quem somos</a>
       <a href="<?= base_url('anunciante/novo.php') ?>" class="rounded-full bg-brand-primary px-4 py-2 text-sm font-semibold text-white hover:bg-brand-primary-hover">Anunciar imóvel</a>
       <?php if ($__user): ?>
         <div class="relative">
@@ -160,7 +173,7 @@ body{font-family:'Inter',Arial,sans-serif}
       <?php endif; ?>
     </div>
 
-    <a href="<?= base_url('imoveis.php') ?>" class="filtros-pill-btn lg:!hidden">
+    <a href="<?= base_url('imoveis.php') ?>" class="filtros-pill-btn lg:!hidden" id="filtros-toggle-btn-mobile">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
       <span>Filtros</span>
     </a>

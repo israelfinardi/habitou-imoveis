@@ -19,7 +19,7 @@ function render_category_pills(?string $activeType = null): void
 {
     ?>
     <div class="border-b border-brand-border bg-white">
-      <div class="scrollbar-none mx-auto flex max-w-7xl gap-7 overflow-x-auto px-4 py-3 sm:px-6 lg:px-8">
+      <div class="scrollbar-none mx-auto flex max-w-[1800px] gap-7 overflow-x-auto px-4 py-3 sm:px-6 lg:px-8">
         <?php foreach (PROPERTY_TYPE_LABEL as $type => $label): $isActive = $activeType === $type; ?>
           <a href="<?= base_url('imoveis.php?tipo=' . PROPERTY_TYPE_SLUG[$type]) ?>"
              class="flex shrink-0 flex-col items-center gap-2 border-b-2 pb-2.5 pt-1 text-xs font-medium transition <?= $isActive ? 'border-brand-text text-brand-text' : 'border-transparent text-brand-text-secondary hover:border-brand-border hover:text-brand-text' ?>">

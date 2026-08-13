@@ -11,7 +11,7 @@ $statuses = ['PENDING', 'ACTIVE', 'CANCELED', 'EXPIRED'];
 $pageTitle = 'Assinaturas (admin)';
 require __DIR__ . '/../includes/header.php';
 ?>
-<div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+<div class="mx-auto max-w-[1800px] px-4 py-8 sm:px-6 lg:px-8">
   <div class="grid grid-cols-1 gap-8 lg:grid-cols-[220px_1fr]">
     <aside><?php render_admin_nav('assinaturas'); ?></aside>
     <main>

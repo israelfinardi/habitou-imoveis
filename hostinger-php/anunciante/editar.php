@@ -46,7 +46,7 @@ $images = $imgStmt->fetchAll();
 $pageTitle = 'Editar imóvel';
 require __DIR__ . '/../includes/header.php';
 ?>
-<div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+<div class="mx-auto max-w-[1800px] px-4 py-8 sm:px-6 lg:px-8">
   <div class="grid grid-cols-1 gap-8 lg:grid-cols-[220px_1fr]">
     <aside>
       <nav class="flex flex-col gap-1">
@@ -55,9 +55,27 @@ require __DIR__ . '/../includes/header.php';
       </nav>
     </aside>
     <main>
-      <h1 class="mb-1 text-2xl font-bold">Editar imóvel</h1>
+      <div class="mb-1 flex flex-wrap items-center justify-between gap-3">
+        <h1 class="text-2xl font-bold">Editar imóvel</h1>
+        <div class="flex items-center gap-2">
+          <span class="rounded-full bg-brand-bg-subtle px-3 py-1 text-xs font-semibold"><?= e(PROPERTY_STATUS_LABEL[$property['status']]) ?></span>
+          <?php if ($property['status'] !== 'PUBLISHED'): ?>
+            <form method="post" action="<?= base_url('actions/property_action.php') ?>">
+              <?= csrf_field() ?><input type="hidden" name="id" value="<?= $id ?>"><input type="hidden" name="do" value="publish">
+              <button class="rounded-full bg-brand-primary px-4 py-2 text-sm font-semibold text-white hover:bg-brand-primary-hover">Publicar agora</button>
+            </form>
+          <?php else: ?>
+            <form method="post" action="<?= base_url('actions/property_action.php') ?>">
+              <?= csrf_field() ?><input type="hidden" name="id" value="<?= $id ?>"><input type="hidden" name="do" value="pause">
+              <button class="rounded-full border border-brand-border px-4 py-2 text-sm font-semibold hover:border-brand-primary">Pausar anúncio</button>
+            </form>
+          <?php endif; ?>
+        </div>
+      </div>
       <p class="mb-6 text-sm text-brand-text-secondary">Código <?= e($property['code']) ?></p>
-      <?php if (!empty($_GET['criado'])): ?><p class="mb-4 rounded-lg bg-brand-green/10 px-3 py-2 text-sm text-brand-green-hover">Imóvel criado com sucesso. Adicione fotos abaixo e publique quando estiver pronto.</p><?php endif; ?>
+      <?php if (!empty($_GET['criado'])): ?>
+        <p class="mb-4 rounded-lg bg-brand-bg-subtle px-3 py-2 text-sm text-brand-text-secondary">Imóvel criado como <strong>rascunho</strong> — ele só aparece na busca e nos filtros depois de publicado. Adicione fotos e clique em <strong>Publicar agora</strong> quando estiver pronto.</p>
+      <?php endif; ?>
       <?php if ($error): ?><p class="mb-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700"><?= e($error) ?></p><?php endif; ?>
 
       <section class="mb-8">

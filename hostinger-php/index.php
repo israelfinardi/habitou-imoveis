@@ -13,7 +13,7 @@ require __DIR__ . '/includes/header.php';
 ?>
 
 <section class="border-b border-brand-border bg-white py-10 sm:py-14">
-  <div class="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
+  <div class="mx-auto max-w-[1800px] px-4 text-center sm:px-6 lg:px-8">
     <h1 class="text-2xl font-extrabold tracking-tight text-brand-text sm:text-4xl">Encontre o seu imóvel em Santa Catarina</h1>
     <p class="mx-auto mt-3 max-w-xl text-brand-text-secondary">26 anos conectando pessoas aos melhores apartamentos, casas e terrenos do estado.</p>
 
@@ -40,7 +40,7 @@ require __DIR__ . '/includes/header.php';
 </section>
 <?php render_category_pills(); ?>
 
-<section class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+<section class="mx-auto max-w-[1800px] px-4 py-12 sm:px-6 lg:px-8">
   <h2 class="mb-2 text-xl font-bold">Cidades em destaque</h2>
   <div class="mb-10 flex flex-wrap gap-2">
     <?php foreach (FEATURED_CITIES as $c): ?>
@@ -76,7 +76,7 @@ require __DIR__ . '/includes/header.php';
 </section>
 
 <section class="bg-brand-bg-subtle py-12">
-  <div class="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
+  <div class="mx-auto max-w-[1800px] px-4 text-center sm:px-6 lg:px-8">
     <h2 class="text-xl font-bold">Tem um imóvel para anunciar?</h2>
     <p class="mt-2 text-brand-text-secondary">Publique gratuitamente e alcance milhares de interessados em Santa Catarina.</p>
     <a href="<?= base_url('anunciante/novo.php') ?>" class="mt-5 inline-block rounded-full bg-brand-primary px-6 py-3 text-sm font-semibold text-white hover:bg-brand-primary-hover">Anunciar imóvel</a>

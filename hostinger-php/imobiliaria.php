@@ -29,7 +29,7 @@ $pageDescription = $agency['description'] ?: "Imóveis anunciados por {$agency['
 require __DIR__ . '/includes/header.php';
 ?>
 <div class="border-b border-brand-border bg-brand-bg-subtle">
-  <div class="mx-auto flex max-w-7xl flex-col items-center gap-4 px-4 py-10 text-center sm:px-6 lg:px-8">
+  <div class="mx-auto flex max-w-[1800px] flex-col items-center gap-4 px-4 py-10 text-center sm:px-6 lg:px-8">
     <div class="relative h-20 w-20 overflow-hidden rounded-full bg-white shadow">
       <?php if ($agency['logo_url']): ?><img src="<?= e($agency['logo_url']) ?>" class="h-full w-full object-cover" alt=""><?php endif; ?>
     </div>
@@ -48,7 +48,7 @@ require __DIR__ . '/includes/header.php';
   </div>
 </div>
 
-<div class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+<div class="mx-auto max-w-[1800px] px-4 py-10 sm:px-6 lg:px-8">
   <?php if ($agents): ?>
     <div class="mb-10">
       <h2 class="mb-3 text-lg font-bold">Corretores</h2>

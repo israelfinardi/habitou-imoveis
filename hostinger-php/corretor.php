@@ -22,7 +22,7 @@ $result = list_properties([], ['p.agent_id = ?' => $id]);
 $pageTitle = $agent['first_name'] . ' ' . $agent['last_name'] . ' — Corretor';
 require __DIR__ . '/includes/header.php';
 ?>
-<div class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+<div class="mx-auto max-w-[1800px] px-4 py-10 sm:px-6 lg:px-8">
   <div class="mb-8 flex items-start gap-4">
     <?php if (!empty($agent['avatar_url'])): ?>
       <img src="<?= e($agent['avatar_url']) ?>" alt="" class="h-16 w-16 shrink-0 rounded-full object-cover">

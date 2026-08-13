@@ -54,8 +54,8 @@ if ($hasFilters) {
       </nav>
       <h1 class="mb-4 text-2xl font-bold">Imóveis em <?= e($city['name']) ?></h1>
       <p class="mb-4 text-sm text-brand-text-secondary"><?= $result['total'] ?> imóve<?= $result['total'] === 1 ? 'l encontrado' : 'is encontrados' ?></p>
-      <div class="lg:grid lg:grid-cols-[15fr_40fr_45fr] lg:items-start lg:gap-5">
-        <div class="mb-6 lg:mb-0"><?php render_filters_form(base_url('cidade.php?slug=' . $city['slug']), $_GET, false, $neighborhoods); ?></div>
+      <div id="results-layout" class="lg:grid lg:grid-cols-[15fr_40fr_45fr] lg:items-start lg:gap-5">
+        <div id="results-sidebar" class="mb-6 lg:mb-0"><?php render_filters_form(base_url('cidade.php?slug=' . $city['slug']), $_GET, false, $neighborhoods); ?></div>
         <div>
           <?php render_property_list($result['items'], $favoriteIds); ?>
           <?php
@@ -71,7 +71,7 @@ if ($hasFilters) {
     $properties = get_properties_by_city($city['slug'], 6);
     ?>
     <div class="bg-brand-bg-subtle">
-      <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+      <div class="mx-auto max-w-[1800px] px-4 py-12 sm:px-6 lg:px-8">
         <h1 class="text-3xl font-bold">Imóveis em <?= e($city['name']) ?></h1>
         <p class="mt-2 max-w-2xl text-brand-text-secondary">
           <?= e($city['description'] ?: "Explore os melhores apartamentos, casas e terrenos disponíveis para comprar ou alugar em {$city['name']}, Santa Catarina.") ?>
@@ -82,7 +82,7 @@ if ($hasFilters) {
         </div>
       </div>
     </div>
-    <div class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+    <div class="mx-auto max-w-[1800px] px-4 py-10 sm:px-6 lg:px-8">
       <h2 class="mb-4 text-xl font-bold">Tipos de imóvel em <?= e($city['name']) ?></h2>
       <div class="mb-10 flex flex-wrap gap-2">
         <?php foreach (PROPERTY_TYPE_SLUG as $type => $slugType): ?>

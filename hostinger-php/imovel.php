@@ -54,7 +54,7 @@ if ($price) {
 ?>
 <script type="application/ld+json"><?= json_encode($jsonLd, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?></script>
 
-<div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+<div class="mx-auto max-w-[1800px] px-4 py-8 sm:px-6 lg:px-8">
   <nav class="mb-4 text-sm text-brand-text-secondary">
     <a href="<?= base_url('/') ?>" class="hover:text-brand-primary">Início</a> /
     <a href="<?= base_url('cidade.php?slug=' . $property['city_slug']) ?>" class="hover:text-brand-primary"><?= e($property['city_name']) ?></a> /

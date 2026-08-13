@@ -1,7 +1,7 @@
 </main>
 
 <footer class="border-t border-brand-border bg-brand-bg-subtle text-brand-text">
-  <div class="mx-auto grid max-w-7xl grid-cols-2 gap-8 px-4 py-10 sm:px-6 md:grid-cols-4 lg:px-8">
+  <div class="mx-auto grid max-w-[1800px] grid-cols-2 gap-8 px-4 py-10 sm:px-6 md:grid-cols-4 lg:px-8">
     <div class="col-span-2 md:col-span-1">
       <p class="mb-3 text-base font-bold text-brand-text">Habitou Imóveis</p>
       <p class="text-sm text-brand-text-secondary">26 anos conectando pessoas aos melhores imóveis de Santa Catarina.</p>
@@ -40,14 +40,20 @@
 </footer>
 
 <div id="compare-bar" class="fixed inset-x-0 bottom-0 z-40 hidden border-t border-brand-border bg-white shadow-[0_-4px_12px_rgba(0,0,0,0.08)]">
-  <div class="mx-auto flex max-w-7xl items-center gap-4 px-4 py-3 sm:px-6 lg:px-8">
+  <div class="mx-auto flex max-w-[1800px] items-center gap-4 px-4 py-3 sm:px-6 lg:px-8">
     <div id="compare-items" class="flex flex-1 items-center gap-2 overflow-x-auto"></div>
     <button id="compare-clear" class="text-xs text-brand-text-secondary hover:underline">Limpar</button>
     <a id="compare-link" href="<?= base_url('comparar.php') ?>" class="rounded-full bg-brand-primary px-5 py-2 text-sm font-semibold text-white hover:bg-brand-primary-hover">Comparar</a>
   </div>
 </div>
 
-<script>const APP_BASE = <?= json_encode(rtrim(base_url('/'), '/') . '/') ?>;</script>
+<script>
+const APP_BASE = <?= json_encode(rtrim(base_url('/'), '/') . '/') ?>;
+window.__CURRENT_FILTERS = {
+  transacao: <?= json_encode($__topbarTransacao ?? '') ?>,
+  cidade: <?= json_encode($__topbarCidade ?? '') ?>
+};
+</script>
 <script src="<?= base_url('assets/js/app.js') ?>"></script>
 <script src="<?= base_url('assets/js/cidades.js') ?>"></script>
 <script src="<?= base_url('assets/js/location-picker.js') ?>"></script>

@@ -2,7 +2,12 @@
 (function () {
   var pins = window.__RESULTS_MAP_PINS || [];
   var mapEl = document.getElementById('results-map');
-  if (!mapEl || !window.L || !pins.length) return;
+  if (!mapEl || !window.L) return;
+
+  // Centro padrão: Santa Catarina, usado quando não há nenhum pin com
+  // coordenadas (ex.: filtros sem resultados).
+  var DEFAULT_CENTER = [-27.24, -50.4];
+  var DEFAULT_ZOOM = 7;
 
   var map = L.map('results-map', { scrollWheelZoom: true, zoomControl: true });
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -51,8 +56,10 @@
 
   if (bounds.length === 1) {
     map.setView(bounds[0], 14);
-  } else {
+  } else if (bounds.length > 1) {
     map.fitBounds(bounds, { padding: [30, 30], maxZoom: 15 });
+  } else {
+    map.setView(DEFAULT_CENTER, DEFAULT_ZOOM);
   }
 
   var grid = document.getElementById('results-grid');

@@ -44,7 +44,7 @@ $rows = [
 $pageTitle = 'Comparar imóveis';
 require __DIR__ . '/includes/header.php';
 ?>
-<div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+<div class="mx-auto max-w-[1800px] px-4 py-8 sm:px-6 lg:px-8">
   <h1 class="mb-6 text-2xl font-bold">Comparar imóveis</h1>
   <?php if (empty($properties)): ?>
     <div class="rounded-xl border border-dashed border-brand-border p-12 text-center text-brand-text-secondary">

@@ -9,6 +9,13 @@
   var sugestoesEl = document.getElementById('cidade-sugestoes');
   var selectedCity = null; // "Nome (UF)" escolhido, ou null = todas as cidades
 
+  // --- Sincroniza a barra com os filtros já aplicados na página ------------
+  var current = window.__CURRENT_FILTERS || {};
+  if (current.cidade) {
+    selectedCity = current.cidade;
+    if (pillLabel) pillLabel.textContent = current.cidade.replace(/\s*\([A-Za-z]{2}\)$/, '');
+  }
+
   function renderSugestoes(lista) {
     sugestoesEl.innerHTML = '';
     if (!lista.length) {
@@ -66,9 +73,10 @@
   }
 
   // --- Segmentado Todos / Comprar / Alugar + botão de busca -----------------
-  var activeTransacao = '';
+  var activeTransacao = current.transacao || '';
   var segs = document.querySelectorAll('.sp-seg');
   segs.forEach(function (seg) {
+    seg.classList.toggle('on', (seg.dataset.transacao || '') === activeTransacao);
     seg.addEventListener('click', function (e) {
       e.preventDefault();
       activeTransacao = seg.dataset.transacao || '';
@@ -77,15 +85,52 @@
   });
 
   function irParaBusca() {
-    var params = new URLSearchParams();
-    if (activeTransacao) params.set('transacao', activeTransacao);
-    if (selectedCity) params.set('cidade_nome', selectedCity);
+    // Preserva os demais filtros já aplicados (preço, quartos, tipo...) e só
+    // atualiza cidade/transação, mantendo a barra superior e os filtros
+    // laterais sempre sincronizados.
+    var params = new URLSearchParams(window.location.search);
+    params.delete('slug');
+    params.delete('pagina');
+    if (activeTransacao) params.set('transacao', activeTransacao); else params.delete('transacao');
+    if (selectedCity) {
+      params.set('cidade_nome', selectedCity);
+      params.delete('cidade');
+    } else {
+      params.delete('cidade_nome');
+      params.delete('cidade');
+    }
     var qs = params.toString();
     window.location.href = APP_BASE + 'imoveis.php' + (qs ? '?' + qs : '');
   }
   var searchBtn = document.getElementById('airbnb-bar-search-btn');
   if (searchBtn) {
     searchBtn.addEventListener('click', irParaBusca);
+  }
+
+  // --- Botão "Filtros": esconde/mostra a coluna de filtros na página de
+  // resultados (mapa+lista passam a dividir 50/50). Fora dessas páginas,
+  // continua navegando normalmente para imoveis.php.
+  var layout = document.getElementById('results-layout');
+  var sidebar = document.getElementById('results-sidebar');
+  var STORAGE_KEY = 'habitou_filtros_escondidos';
+
+  function applyFiltrosState(hidden) {
+    if (!layout || !sidebar) return;
+    sidebar.style.display = hidden ? 'none' : '';
+    layout.classList.toggle('filtros-escondidos', hidden);
+  }
+
+  if (layout && sidebar) {
+    applyFiltrosState(window.localStorage.getItem(STORAGE_KEY) === '1');
+    [document.getElementById('filtros-toggle-btn'), document.getElementById('filtros-toggle-btn-mobile')].forEach(function (btn) {
+      if (!btn) return;
+      btn.addEventListener('click', function (e) {
+        e.preventDefault();
+        var hidden = !(window.localStorage.getItem(STORAGE_KEY) === '1');
+        window.localStorage.setItem(STORAGE_KEY, hidden ? '1' : '0');
+        applyFiltrosState(hidden);
+      });
+    });
   }
 
   // --- Menu da conta -------------------------------------------------------
