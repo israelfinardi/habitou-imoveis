@@ -52,29 +52,52 @@ function render_property_form(array $defaults = [], array $errors = []): void
       <?php endforeach; ?>
     </div>
 
+    <div class="mb-4">
+      <label class="mb-1 block text-sm font-medium">Localização no mapa</label>
+      <p class="mb-2 text-xs text-brand-text-secondary">Clique no mapa (ou arraste o pino) no local exato do imóvel — cidade, bairro e rua abaixo são preenchidos automaticamente.</p>
+      <div class="mb-2 flex gap-2">
+        <input type="text" id="property-map-search" placeholder="Buscar endereço para localizar no mapa..." class="w-full rounded-lg border border-brand-border px-3 py-2 text-sm">
+        <button type="button" id="property-map-search-btn" class="shrink-0 rounded-lg border border-brand-border px-4 py-2 text-sm font-medium hover:border-brand-primary">Buscar</button>
+      </div>
+      <div id="property-map" class="h-80 w-full rounded-xl border border-brand-border"></div>
+      <p id="property-map-status" class="mt-2 text-xs text-brand-text-secondary">Nenhum ponto marcado ainda.</p>
+    </div>
+
     <div class="grid grid-cols-2 gap-3">
       <div class="mb-4">
         <label class="mb-1 block text-sm font-medium">Cidade</label>
-        <input type="text" name="cidade" class="js-city-picker w-full rounded-lg border border-brand-border px-3 py-2 text-sm"
+        <input type="text" name="cidade" id="js-cidade-input" class="js-city-picker w-full rounded-lg border border-brand-border px-3 py-2 text-sm"
                list="cidades-datalist-imovel" autocomplete="off" required
                placeholder="Digite o nome da cidade..." value="<?= $val('city_label') ?>">
         <datalist id="cidades-datalist-imovel"></datalist>
-        <p class="mt-1 text-xs text-brand-text-secondary">Qualquer cidade do Brasil. Digite e escolha uma opção da lista (formato "Cidade (UF)").</p>
+        <p class="mt-1 text-xs text-brand-text-secondary">Qualquer cidade do Brasil. Preenchido automaticamente ao marcar o mapa, ou digite e escolha uma opção da lista (formato "Cidade (UF)").</p>
       </div>
       <div class="mb-4">
         <label class="mb-1 block text-sm font-medium">Bairro</label>
-        <input name="bairro" required value="<?= $val('neighborhood_name') ?>" class="w-full rounded-lg border border-brand-border px-3 py-2 text-sm">
+        <input name="bairro" id="js-bairro-input" required value="<?= $val('neighborhood_name') ?>" class="w-full rounded-lg border border-brand-border px-3 py-2 text-sm">
       </div>
     </div>
     <div class="grid grid-cols-2 gap-3 sm:grid-cols-4">
-      <div class="mb-4"><label class="mb-1 block text-xs font-medium text-brand-text-secondary">Rua</label><input name="street" value="<?= $val('street') ?>" class="w-full rounded-lg border border-brand-border px-3 py-2 text-sm"></div>
+      <div class="mb-4"><label class="mb-1 block text-xs font-medium text-brand-text-secondary">Rua</label><input name="street" id="js-street-input" value="<?= $val('street') ?>" class="w-full rounded-lg border border-brand-border px-3 py-2 text-sm"></div>
       <div class="mb-4"><label class="mb-1 block text-xs font-medium text-brand-text-secondary">Número</label><input name="number" value="<?= $val('number') ?>" class="w-full rounded-lg border border-brand-border px-3 py-2 text-sm"></div>
       <div class="mb-4"><label class="mb-1 block text-xs font-medium text-brand-text-secondary">Complemento</label><input name="complement" value="<?= $val('complement') ?>" class="w-full rounded-lg border border-brand-border px-3 py-2 text-sm"></div>
-      <div class="mb-4"><label class="mb-1 block text-xs font-medium text-brand-text-secondary">CEP</label><input name="zipCode" value="<?= $val('zip_code') ?>" class="w-full rounded-lg border border-brand-border px-3 py-2 text-sm"></div>
+      <div class="mb-4"><label class="mb-1 block text-xs font-medium text-brand-text-secondary">CEP</label><input name="zipCode" id="js-zip-input" value="<?= $val('zip_code') ?>" class="w-full rounded-lg border border-brand-border px-3 py-2 text-sm"></div>
     </div>
     <div class="grid grid-cols-2 gap-3">
-      <div class="mb-4"><label class="mb-1 block text-xs font-medium text-brand-text-secondary">Latitude (opcional)</label><input type="number" step="0.000001" name="latitude" value="<?= $val('latitude') ?>" class="w-full rounded-lg border border-brand-border px-3 py-2 text-sm"></div>
-      <div class="mb-4"><label class="mb-1 block text-xs font-medium text-brand-text-secondary">Longitude (opcional)</label><input type="number" step="0.000001" name="longitude" value="<?= $val('longitude') ?>" class="w-full rounded-lg border border-brand-border px-3 py-2 text-sm"></div>
+      <div class="mb-4"><label class="mb-1 block text-xs font-medium text-brand-text-secondary">Latitude</label><input type="number" step="0.000001" name="latitude" id="js-lat-input" value="<?= $val('latitude') ?>" class="w-full rounded-lg border border-brand-border px-3 py-2 text-sm"></div>
+      <div class="mb-4"><label class="mb-1 block text-xs font-medium text-brand-text-secondary">Longitude</label><input type="number" step="0.000001" name="longitude" id="js-lng-input" value="<?= $val('longitude') ?>" class="w-full rounded-lg border border-brand-border px-3 py-2 text-sm"></div>
+    </div>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="<?= base_url('assets/js/property-location-map.js') ?>"></script>
+
+    <div class="mt-2 border-t border-brand-border pt-4">
+      <label class="mb-1 block text-sm font-medium">Contato deste anúncio</label>
+      <p class="mb-3 text-xs text-brand-text-secondary">Opcional — deixe em branco para usar o telefone, e-mail e WhatsApp do seu perfil. Preencha só se quiser que este anúncio específico use um contato diferente.</p>
+      <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <div class="mb-4"><label class="mb-1 block text-xs font-medium text-brand-text-secondary">Telefone</label><input name="contactPhone" value="<?= $val('contact_phone') ?>" placeholder="(00) 00000-0000" class="w-full rounded-lg border border-brand-border px-3 py-2 text-sm"></div>
+        <div class="mb-4"><label class="mb-1 block text-xs font-medium text-brand-text-secondary">WhatsApp</label><input name="contactWhatsapp" value="<?= $val('contact_whatsapp') ?>" placeholder="(00) 00000-0000" class="w-full rounded-lg border border-brand-border px-3 py-2 text-sm"></div>
+        <div class="mb-4"><label class="mb-1 block text-xs font-medium text-brand-text-secondary">E-mail</label><input type="email" name="contactEmail" value="<?= $val('contact_email') ?>" placeholder="contato@..." class="w-full rounded-lg border border-brand-border px-3 py-2 text-sm"></div>
+      </div>
     </div>
     <?php
 }
@@ -105,5 +128,8 @@ function parse_property_form(array $post): array
         'zipCode' => trim($post['zipCode'] ?? ''),
         'latitude' => $post['latitude'] !== '' ? (float) $post['latitude'] : null,
         'longitude' => $post['longitude'] !== '' ? (float) $post['longitude'] : null,
+        'contactPhone' => trim($post['contactPhone'] ?? ''),
+        'contactEmail' => trim($post['contactEmail'] ?? ''),
+        'contactWhatsapp' => trim($post['contactWhatsapp'] ?? ''),
     ];
 }

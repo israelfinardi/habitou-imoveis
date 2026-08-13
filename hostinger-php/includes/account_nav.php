@@ -1,5 +1,5 @@
 <?php
-function render_account_nav(string $active): void
+function render_account_nav(string $active, bool $showAgencyProfile = false): void
 {
     $items = [
         'overview' => ['minha-conta.php', 'Visão geral'],
@@ -8,6 +8,9 @@ function render_account_nav(string $active): void
         'anuncios' => ['anunciante/imoveis.php', 'Meus anúncios'],
         'favoritos' => ['minha-conta-favoritos.php', 'Favoritos'],
     ];
+    if ($showAgencyProfile) {
+        $items['imobiliaria'] = ['imobiliaria/perfil.php', 'Perfil da imobiliária'];
+    }
     echo '<nav class="flex flex-col gap-1">';
     foreach ($items as $key => [$href, $label]) {
         $cls = $key === $active ? 'text-brand-primary font-semibold' : 'text-brand-text';

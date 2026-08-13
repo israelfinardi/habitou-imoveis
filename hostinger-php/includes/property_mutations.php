@@ -104,15 +104,17 @@ function create_property(array $input, array $actor): int
     $stmt = $pdo->prepare('INSERT INTO properties
         (code, title, slug, description, listing_type, property_type, price_sale, price_rent, condo_fee, iptu,
          total_area, built_area, bedrooms, suites, bathrooms, parking_spaces, features, status,
-         city_id, neighborhood_id, street, number, complement, zip_code, latitude, longitude, advertiser_id, agency_id)
-        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,"DRAFT",?,?,?,?,?,?,?,?,?,?)');
+         city_id, neighborhood_id, street, number, complement, zip_code, latitude, longitude,
+         contact_phone, contact_email, contact_whatsapp, advertiser_id, agency_id)
+        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,"DRAFT",?,?,?,?,?,?,?,?,?,?,?,?,?)');
     $stmt->execute([
         $code, $input['title'], $slug, $input['description'] ?: null, $input['listingType'], $input['propertyType'],
         $input['priceSale'] ?: null, $input['priceRent'] ?: null, $input['condoFee'] ?: null, $input['iptu'] ?: null,
         $input['totalArea'] ?: null, $input['builtArea'] ?: null, $input['bedrooms'] ?: null, $input['suites'] ?: null,
         $input['bathrooms'] ?: null, $input['parkingSpaces'] ?: null, json_encode($input['features'] ?? [], JSON_UNESCAPED_UNICODE),
         $cityId, $neighborhoodId, $input['street'] ?: null, $input['number'] ?: null, $input['complement'] ?: null,
-        $input['zipCode'] ?: null, $input['latitude'] ?: null, $input['longitude'] ?: null, $actor['id'], $agencyId,
+        $input['zipCode'] ?: null, $input['latitude'] ?: null, $input['longitude'] ?: null,
+        $input['contactPhone'] ?: null, $input['contactEmail'] ?: null, $input['contactWhatsapp'] ?: null, $actor['id'], $agencyId,
     ]);
     return (int) $pdo->lastInsertId();
 }
@@ -132,14 +134,16 @@ function update_property(int $propertyId, array $input, array $actor): void
 
     $stmt = db()->prepare('UPDATE properties SET title=?, description=?, listing_type=?, property_type=?, price_sale=?, price_rent=?,
         condo_fee=?, iptu=?, total_area=?, built_area=?, bedrooms=?, suites=?, bathrooms=?, parking_spaces=?, features=?,
-        city_id=?, neighborhood_id=?, street=?, number=?, complement=?, zip_code=?, latitude=?, longitude=? WHERE id=?');
+        city_id=?, neighborhood_id=?, street=?, number=?, complement=?, zip_code=?, latitude=?, longitude=?,
+        contact_phone=?, contact_email=?, contact_whatsapp=? WHERE id=?');
     $stmt->execute([
         $input['title'], $input['description'] ?: null, $input['listingType'], $input['propertyType'],
         $input['priceSale'] ?: null, $input['priceRent'] ?: null, $input['condoFee'] ?: null, $input['iptu'] ?: null,
         $input['totalArea'] ?: null, $input['builtArea'] ?: null, $input['bedrooms'] ?: null, $input['suites'] ?: null,
         $input['bathrooms'] ?: null, $input['parkingSpaces'] ?: null, json_encode($input['features'] ?? [], JSON_UNESCAPED_UNICODE),
         $cityId, $neighborhoodId, $input['street'] ?: null, $input['number'] ?: null, $input['complement'] ?: null,
-        $input['zipCode'] ?: null, $input['latitude'] ?: null, $input['longitude'] ?: null, $propertyId,
+        $input['zipCode'] ?: null, $input['latitude'] ?: null, $input['longitude'] ?: null,
+        $input['contactPhone'] ?: null, $input['contactEmail'] ?: null, $input['contactWhatsapp'] ?: null, $propertyId,
     ]);
 }
 
@@ -186,15 +190,17 @@ function duplicate_property(int $propertyId, array $actor): int
     $stmt = $pdo->prepare('INSERT INTO properties
         (code, title, slug, description, listing_type, property_type, price_sale, price_rent, condo_fee, iptu,
          total_area, built_area, bedrooms, suites, bathrooms, parking_spaces, features, status,
-         city_id, neighborhood_id, street, number, complement, zip_code, latitude, longitude, advertiser_id, agency_id)
-        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,"DRAFT",?,?,?,?,?,?,?,?,?,?)');
+         city_id, neighborhood_id, street, number, complement, zip_code, latitude, longitude,
+         contact_phone, contact_email, contact_whatsapp, advertiser_id, agency_id)
+        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,"DRAFT",?,?,?,?,?,?,?,?,?,?,?,?,?)');
     $stmt->execute([
         $code, $property['title'] . ' (cópia)', $slug, $property['description'], $property['listing_type'], $property['property_type'],
         $property['price_sale'], $property['price_rent'], $property['condo_fee'], $property['iptu'],
         $property['total_area'], $property['built_area'], $property['bedrooms'], $property['suites'],
         $property['bathrooms'], $property['parking_spaces'], json_encode($property['features'], JSON_UNESCAPED_UNICODE),
         $property['city_id'], $property['neighborhood_id'], $property['street'], $property['number'], $property['complement'],
-        $property['zip_code'], $property['latitude'], $property['longitude'], $actor['id'], $property['agency_id'],
+        $property['zip_code'], $property['latitude'], $property['longitude'],
+        $property['contact_phone'], $property['contact_email'], $property['contact_whatsapp'], $actor['id'], $property['agency_id'],
     ]);
     $newId = (int) $pdo->lastInsertId();
 

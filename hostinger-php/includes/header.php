@@ -20,17 +20,17 @@ $__pageDescription = $pageDescription ?? 'Encontre apartamentos, casas e terreno
       extend: {
         colors: {
           brand: {
-            primary: '#FF385C',
-            'primary-hover': '#E31C5F',
-            dark: '#E31C5F',
-            light: '#FF7085',
+            primary: '#C1502E',
+            'primary-hover': '#D45F3A',
+            dark: '#7A2E12',
+            light: '#DE6B46',
             text: '#222222',
             'text-secondary': '#717171',
             border: '#DDDDDD',
-            'bg-subtle': '#F7F7F7',
+            'bg-subtle': '#F8F6F4',
             green: '#25D366',
             'green-hover': '#1DA851',
-            navy: '#222222',
+            navy: '#3D1D10',
           },
         },
         fontFamily: {
@@ -51,7 +51,7 @@ body{font-family:'Inter',Arial,sans-serif}
   padding:5px 11px;font-size:12px;font-weight:700;box-shadow:0 1px 5px rgba(0,0,0,.18);
   cursor:pointer;
 }
-.price-pin-label.active,.price-pin-label:hover{background:#FF385C;color:#fff;border-color:#FF385C;z-index:1000!important}
+.price-pin-label.active,.price-pin-label:hover{background:#C1502E;color:#fff;border-color:#C1502E;z-index:1000!important}
 .map-pin-popup .leaflet-popup-content-wrapper{padding:0;border-radius:12px;overflow:hidden}
 .map-pin-popup .leaflet-popup-content{margin:0;width:100%!important}
 
@@ -78,8 +78,8 @@ body{font-family:'Inter',Arial,sans-serif}
 .sp-seg{border:0;background:0 0;padding:10px 16px;border-radius:999px;cursor:pointer;font-weight:600;font-size:14px;color:#222222;transition:.16s;white-space:nowrap;text-decoration:none;display:inline-block}
 .sp-seg:hover{background:#F7F7F7}
 .sp-seg.on{background:#EBEBEB;font-weight:700}
-.airbnb-bar-btn{display:flex;align-items:center;justify-content:center;width:40px;height:40px;margin-left:4px;border-radius:999px;background:#FF385C;color:#fff;border:0;cursor:pointer;flex:none;transition:background .16s}
-.airbnb-bar-btn:hover{background:#E31C5F}
+.airbnb-bar-btn{display:flex;align-items:center;justify-content:center;width:40px;height:40px;margin-left:4px;border-radius:999px;background:#C1502E;color:#fff;border:0;cursor:pointer;flex:none;transition:background .16s}
+.airbnb-bar-btn:hover{background:#D45F3A}
 .airbnb-bar-btn svg{width:16px;height:16px}
 .filtros-pill-btn{display:inline-flex;align-items:center;gap:8px;border:1px solid #DDDDDD;border-radius:999px;padding:10px 16px;font-size:13.5px;font-weight:700;cursor:pointer;white-space:nowrap;background:#fff;transition:.16s;text-decoration:none;color:#222222;box-shadow:0 1px 4px rgba(0,0,0,.08)}
 .filtros-pill-btn:hover{box-shadow:0 2px 10px rgba(0,0,0,.14)}
@@ -99,9 +99,8 @@ body{font-family:'Inter',Arial,sans-serif}
 
 <header class="sticky top-0 z-40 border-b border-brand-border bg-white/95 backdrop-blur">
   <div class="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8">
-    <a href="<?= base_url('/') ?>" class="flex shrink-0 items-center gap-2">
-      <span class="text-xl font-bold tracking-tight text-brand-primary">Habitou</span>
-      <span class="hidden text-xl font-light text-brand-navy sm:inline">Imóveis</span>
+    <a href="<?= base_url('/') ?>" class="flex shrink-0 items-center">
+      <img src="<?= base_url('assets/img/logo.svg') ?>" alt="Habitou Imóveis" class="h-9 w-auto">
     </a>
 
     <div class="hidden flex-1 items-center justify-center gap-3 lg:flex">

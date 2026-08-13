@@ -17,17 +17,20 @@ require __DIR__ . '/includes/header.php';
 $activeType = !empty($_GET['tipo']) ? array_search($_GET['tipo'], PROPERTY_TYPE_SLUG, true) : null;
 render_category_pills($activeType ?: null);
 ?>
-<div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+<div class="w-full px-4 py-8 sm:px-6 lg:px-8">
   <h1 class="mb-1 text-2xl font-bold">Busca de imóveis</h1>
   <p class="mb-6 text-sm text-brand-text-secondary"><?= $result['total'] ?> imóve<?= $result['total'] === 1 ? 'l encontrado' : 'is encontrados' ?></p>
 
-  <div class="mb-6"><?php render_filters_form(base_url('imoveis.php'), $_GET, true); ?></div>
-
-  <?php render_property_results($result['items'], $favoriteIds); ?>
-
-  <?php
-  $baseQuery = 'imoveis.php?' . http_build_query(array_diff_key($_GET, ['pagina' => '']));
-  render_pagination($result['page'], $result['total_pages'], base_url($baseQuery));
-  ?>
+  <div class="lg:grid lg:grid-cols-[15fr_40fr_45fr] lg:items-start lg:gap-5">
+    <div class="mb-6 lg:mb-0"><?php render_filters_form(base_url('imoveis.php'), $_GET, true); ?></div>
+    <div>
+      <?php render_property_list($result['items'], $favoriteIds); ?>
+      <?php
+      $baseQuery = 'imoveis.php?' . http_build_query(array_diff_key($_GET, ['pagina' => '']));
+      render_pagination($result['page'], $result['total_pages'], base_url($baseQuery));
+      ?>
+    </div>
+    <div class="mt-6 lg:mt-0"><?php render_results_map($result['items']); ?></div>
+  </div>
 </div>
 <?php require __DIR__ . '/includes/footer.php'; ?>

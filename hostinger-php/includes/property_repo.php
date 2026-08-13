@@ -154,9 +154,14 @@ function get_property_by_slug(string $slug): ?array
     $stmt = $pdo->prepare('
         SELECT p.*, c.name AS city_name, c.slug AS city_slug, c.state_code, c.latitude AS city_lat, c.longitude AS city_lng,
                n.name AS neighborhood_name, n.slug AS neighborhood_slug,
-               ag.name AS agency_name, ag.slug AS agency_slug, ag.phone AS agency_phone, ag.logo_url AS agency_logo,
-               au.first_name AS advertiser_first_name, au.last_name AS advertiser_last_name, au.phone AS advertiser_phone, au.email AS advertiser_email,
-               agu.first_name AS agent_first_name, agu.last_name AS agent_last_name, agu.phone AS agent_phone, agu.creci AS agent_creci
+               ag.name AS agency_name, ag.slug AS agency_slug, ag.phone AS agency_phone, ag.whatsapp AS agency_whatsapp,
+               ag.email AS agency_email, ag.website AS agency_website, ag.logo_url AS agency_logo,
+               ag.city AS agency_city, ag.state AS agency_state, ag.service_area AS agency_service_area,
+               au.first_name AS advertiser_first_name, au.last_name AS advertiser_last_name, au.phone AS advertiser_phone,
+               au.whatsapp AS advertiser_whatsapp, au.email AS advertiser_email, au.avatar_url AS advertiser_avatar,
+               au.website AS advertiser_website, au.service_area AS advertiser_service_area, au.bio AS advertiser_bio,
+               agu.first_name AS agent_first_name, agu.last_name AS agent_last_name, agu.phone AS agent_phone,
+               agu.whatsapp AS agent_whatsapp, agu.email AS agent_email, agu.avatar_url AS agent_avatar, agu.creci AS agent_creci
         FROM properties p
         JOIN cities c ON c.id = p.city_id
         LEFT JOIN neighborhoods n ON n.id = p.neighborhood_id

@@ -1,58 +1,19 @@
 <?php
 /**
- * Popula o banco com dados de demonstração (imóveis, imobiliárias, planos e
- * conteúdo de blog/central de ajuda extraídos do site original). Chamada
- * automaticamente por config/database.php na primeira vez que o site roda
- * (banco ainda não existe) — não precisa ser executada manualmente.
+ * Popula o banco com os dados essenciais para o site funcionar (planos,
+ * conta de administrador, cidades em destaque e conteúdo institucional de
+ * blog/central de ajuda) — sem nenhum imóvel ou imobiliária de exemplo.
+ * Chamada automaticamente por config/database.php na primeira vez que o
+ * site roda (banco ainda não existe) — não precisa ser executada manualmente.
  */
-
-function seed_agency_slug_from_url(?string $url, string $name): string
-{
-    if ($url && preg_match('#/imobiliarias/([^/]+)#', $url, $m)) {
-        return $m[1];
-    }
-    return slugify($name);
-}
-
-function seed_get_neighborhood(PDO $pdo, int $cityId, string $name, array &$cache): int
-{
-    $key = $cityId . ':' . $name;
-    if (isset($cache[$key])) {
-        return $cache[$key];
-    }
-    $slug = slugify($name) ?: 'sem-bairro';
-    $stmt = $pdo->prepare('INSERT INTO neighborhoods (city_id, name, slug) VALUES (?,?,?)
-        ON CONFLICT(city_id, slug) DO UPDATE SET name = excluded.name');
-    $stmt->execute([$cityId, $name, $slug]);
-    $id = (int) $pdo->query('SELECT id FROM neighborhoods WHERE city_id=' . $cityId . ' AND slug=' . $pdo->quote($slug))->fetchColumn();
-    $cache[$key] = $id;
-    return $id;
-}
 
 function seed_database(PDO $pdo): void
 {
-    $TYPE_MAP = [
-        'Apartamento' => 'APARTMENT',
-        'Casa' => 'HOUSE',
-        'Terreno' => 'LAND',
-        'Sala/Escritório' => 'COMMERCIAL_ROOM',
-        'Loja' => 'STORE',
-        'Galpão' => 'WAREHOUSE',
-        'Imóvel Rural' => 'RURAL',
-        'Outros Imóveis' => 'OTHER',
-    ];
-
-    $VALID_CITIES = array_merge(array_column(FEATURED_CITIES, 'name'), ['Campo Alegre']);
-
-    error_log('[habitou] Primeira execução: populando dados de demonstração...');
-    // Uma única transação para milhares de inserts: sem isso, cada INSERT
-    // isolado força um fsync no SQLite e a primeira carga do site (que
-    // dispara esse seed) fica visivelmente lenta para quem acessar primeiro.
+    error_log('[habitou] Primeira execução: populando dados iniciais...');
+    // Uma única transação: sem isso, cada INSERT isolado força um fsync no
+    // SQLite e a primeira carga do site (que dispara esse seed) fica
+    // visivelmente lenta para quem acessar primeiro.
     $pdo->beginTransaction();
-    $properties = json_decode(file_get_contents(__DIR__ . '/../data/properties.json'), true);
-    $properties = array_values(array_filter($properties, function ($p) use ($VALID_CITIES, $TYPE_MAP) {
-        return $p['city'] && in_array($p['city'], $VALID_CITIES, true) && $p['type'] && isset($TYPE_MAP[$p['type']]);
-    }));
 
     // --- Planos --------------------------------------------------------------
     $plansData = [
@@ -72,135 +33,13 @@ function seed_database(PDO $pdo): void
         ON CONFLICT(email) DO UPDATE SET first_name = excluded.first_name');
     $stmt->execute(['Administrador', 'Habitou', 'admin@habitou.com.br', $adminHash, 'ADMIN', 'ACTIVE']);
 
-    // --- Cidades e bairros -----------------------------------------------------
-    $cityIds = [];
+    // --- Cidades em destaque -----------------------------------------------------
+    // Páginas de marketing curadas — devem sempre existir, mesmo sem nenhum
+    // imóvel cadastrado ainda.
     foreach (FEATURED_CITIES as $c) {
         $stmt = $pdo->prepare('INSERT INTO cities (name, slug, state, state_code, region, latitude, longitude) VALUES (?,?,?,?,?,?,?)
             ON CONFLICT(slug) DO UPDATE SET name = excluded.name');
         $stmt->execute([$c['name'], $c['slug'], $c['state'], $c['state_code'], 'Santa Catarina', $c['lat'], $c['lng']]);
-        $cityIds[$c['name']] = (int) $pdo->query("SELECT id FROM cities WHERE slug='{$c['slug']}'")->fetchColumn();
-    }
-    if (!isset($cityIds['Campo Alegre'])) {
-        $stmt = $pdo->prepare('INSERT INTO cities (name, slug, state, state_code, region, latitude, longitude) VALUES (?,?,?,?,?,?,?)
-            ON CONFLICT(slug) DO UPDATE SET name = excluded.name');
-        $stmt->execute(['Campo Alegre', 'campo-alegre', 'Santa Catarina', 'SC', 'Santa Catarina', -26.3853, -49.2444]);
-        $cityIds['Campo Alegre'] = (int) $pdo->query("SELECT id FROM cities WHERE slug='campo-alegre'")->fetchColumn();
-    }
-    $neighborhoodCache = [];
-
-    // --- Imobiliárias e usuários-anunciantes -----------------------------------
-    $distinctAgencies = [];
-    foreach ($properties as $p) {
-        if (!empty($p['agencyName']) && !isset($distinctAgencies[$p['agencyName']])) {
-            $distinctAgencies[$p['agencyName']] = $p['agencyUrl'] ?? null;
-        }
-    }
-
-    // password_hash(PASSWORD_BCRYPT) é deliberadamente lento (~250ms) — como
-    // toda conta de demonstração de imobiliária usa a mesma senha, calcula o
-    // hash uma única vez em vez de repetir isso a cada imobiliária (o que,
-    // com centenas delas, tornava a primeira carga do site bem mais lenta).
-    $demoAgencyUserHash = password_hash('Imobiliaria@123', PASSWORD_BCRYPT);
-
-    $agencyInfo = []; // name => ['id' => x, 'advertiser_id' => y]
-    foreach ($distinctAgencies as $name => $url) {
-        $slug = seed_agency_slug_from_url($url, $name);
-        $stmt = $pdo->prepare('INSERT INTO agencies (name, slug, status, description) VALUES (?,?,?,?)
-            ON CONFLICT(slug) DO UPDATE SET name = excluded.name');
-        $stmt->execute([$name, $slug, 'ACTIVE', "{$name} é parceira Habitou Imóveis, com anúncios verificados em Santa Catarina."]);
-        $agencyId = (int) $pdo->query('SELECT id FROM agencies WHERE slug=' . $pdo->quote($slug))->fetchColumn();
-
-        $email = substr('contato+' . $slug . '@habitou.com.br', 0, 254);
-        $userHash = $demoAgencyUserHash;
-        $firstName = explode(' ', $name)[0] ?: 'Imobiliária';
-        $stmt = $pdo->prepare('INSERT INTO users (first_name, last_name, email, password_hash, role, status, agency_id) VALUES (?,?,?,?,?,?,?)
-            ON CONFLICT(email) DO UPDATE SET agency_id = excluded.agency_id');
-        $stmt->execute([$firstName, 'Parceira', $email, $userHash, 'AGENCY_ADMIN', 'ACTIVE', $agencyId]);
-        $advertiserId = (int) $pdo->query('SELECT id FROM users WHERE email=' . $pdo->quote($email))->fetchColumn();
-
-        $agencyInfo[$name] = ['id' => $agencyId, 'advertiser_id' => $advertiserId];
-    }
-
-    // Feed de demonstração para a imobiliária com mais anúncios.
-    $agencyNames = array_keys($distinctAgencies);
-    $topAgencyName = $agencyNames[0] ?? null;
-    $demoFeedId = null;
-    if ($topAgencyName && isset($agencyInfo[$topAgencyName])) {
-        $stmt = $pdo->prepare('INSERT INTO feeds (agency_id, name, url, status, frequency_minutes, last_sync_at, last_run_status) VALUES (?,?,?,?,?,CURRENT_TIMESTAMP,?)');
-        $stmt->execute([$agencyInfo[$topAgencyName]['id'], 'Feed principal (VRSync)', 'https://exemplo-crm.com.br/feeds/vrsync.xml', 'ACTIVE', 1440, 'SUCCESS']);
-        $demoFeedId = (int) $pdo->lastInsertId();
-        $stmt = $pdo->prepare('INSERT INTO feed_sync_logs (feed_id, started_at, finished_at, status) VALUES (?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, ?)');
-        $stmt->execute([$demoFeedId, 'SUCCESS']);
-    }
-
-    // --- Anunciante de fallback --------------------------------------------
-    $fallbackEmail = 'anunciante-demo@habitou.com.br';
-    $stmt = $pdo->prepare('INSERT INTO users (first_name, last_name, email, password_hash, role, status) VALUES (?,?,?,?,?,?)
-        ON CONFLICT(email) DO UPDATE SET first_name = excluded.first_name');
-    $stmt->execute(['Anunciante', 'Demo', $fallbackEmail, password_hash('Anunciante@123', PASSWORD_BCRYPT), 'ADVERTISER', 'ACTIVE']);
-    $fallbackAdvertiserId = (int) $pdo->query('SELECT id FROM users WHERE email=' . $pdo->quote($fallbackEmail))->fetchColumn();
-
-    // --- Imóveis -----------------------------------------------------------
-    $created = 0;
-    $insertProperty = $pdo->prepare('INSERT INTO properties
-        (code, external_code, origin, source_feed_id, title, slug, description, listing_type, property_type,
-         price_sale, price_rent, total_area, bedrooms, suites, parking_spaces, status, published_at,
-         city_id, neighborhood_id, street, advertiser_id, agency_id)
-        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)');
-    $insertImage = $pdo->prepare('INSERT INTO property_images (property_id, url, `order`, is_primary, origin) VALUES (?,?,?,?,?)');
-    $existsStmt = $pdo->prepare('SELECT id FROM properties WHERE slug = ?');
-
-    foreach ($properties as $p) {
-        $propertyType = $TYPE_MAP[$p['type']];
-        $listingType = ($p['transaction'] ?? '') === 'Locação' ? 'RENT' : 'SALE';
-        $cityId = $cityIds[$p['city']] ?? null;
-        if (!$cityId) {
-            continue;
-        }
-        $neighborhoodId = !empty($p['neighborhood']) ? seed_get_neighborhood($pdo, $cityId, $p['neighborhood'], $neighborhoodCache) : null;
-        $info = $p['agencyName'] ? ($agencyInfo[$p['agencyName']] ?? null) : null;
-
-        $slug = pathinfo($p['sourcePath'], PATHINFO_FILENAME);
-        $existsStmt->execute([$slug]);
-        if ($existsStmt->fetchColumn()) {
-            continue;
-        }
-
-        $isTopAgency = $p['agencyName'] === $topAgencyName;
-        $code = next_property_code($pdo);
-
-        $insertProperty->execute([
-            $code,
-            $p['code'] ?? $p['externalId'] ?? null,
-            $isTopAgency ? 'VRSYNC' : 'MANUAL',
-            $isTopAgency ? $demoFeedId : null,
-            $p['title'],
-            $slug,
-            $p['description'] ?: null,
-            $listingType,
-            $propertyType,
-            $listingType === 'SALE' ? $p['price'] : null,
-            $listingType === 'RENT' ? $p['price'] : null,
-            $p['area'] ?? null,
-            $p['bedrooms'] ?? null,
-            $p['suites'] ?? null,
-            $p['parkingSpaces'] ?? null,
-            'PUBLISHED',
-            !empty($p['publishedAt']) ? date('Y-m-d H:i:s', strtotime($p['publishedAt'])) : date('Y-m-d H:i:s'),
-            $cityId,
-            $neighborhoodId,
-            $p['address'] ?? null,
-            $info['advertiser_id'] ?? $fallbackAdvertiserId,
-            $info['id'] ?? null,
-        ]);
-        $propertyId = (int) $pdo->lastInsertId();
-
-        $photos = array_slice($p['photos'] ?? [], 0, 20);
-        foreach ($photos as $idx => $url) {
-            $insertImage->execute([$propertyId, $url, $idx, $idx === 0 ? 1 : 0, $isTopAgency ? 'VRSYNC' : 'MANUAL']);
-        }
-
-        $created++;
     }
 
     // --- Blog e central de ajuda -------------------------------------------
@@ -226,5 +65,5 @@ function seed_database(PDO $pdo): void
     }
 
     $pdo->commit();
-    error_log("[habitou] Seed concluído: {$created} imóveis, " . count($agencyInfo) . ' imobiliárias.');
+    error_log('[habitou] Seed concluído: dados iniciais prontos (sem imóveis de exemplo).');
 }

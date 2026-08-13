@@ -18,8 +18,8 @@ document.addEventListener('click', function (e) {
       btn.classList.toggle('is-favorite', data.favorite);
       const isOverlay = btn.classList.contains('js-favorite-overlay');
       const svg = btn.querySelector('svg');
-      svg.setAttribute('fill', data.favorite ? '#FF385C' : (isOverlay ? 'rgba(0,0,0,.5)' : 'none'));
-      svg.setAttribute('stroke', data.favorite ? (isOverlay ? '#fff' : '#FF385C') : (isOverlay ? '#fff' : '#717171'));
+      svg.setAttribute('fill', data.favorite ? '#C1502E' : (isOverlay ? 'rgba(0,0,0,.5)' : 'none'));
+      svg.setAttribute('stroke', data.favorite ? (isOverlay ? '#fff' : '#C1502E') : (isOverlay ? '#fff' : '#717171'));
     });
 });
 

@@ -35,12 +35,16 @@ require __DIR__ . '/includes/header.php';
     </div>
     <h1 class="text-2xl font-bold"><?= e($agency['name']) ?></h1>
     <?php if ($agency['description']): ?><p class="max-w-2xl text-sm text-brand-text-secondary"><?= e($agency['description']) ?></p><?php endif; ?>
+    <?php if (!empty($agency['service_area'])): ?><p class="text-sm text-brand-text-secondary">Atua em: <?= e($agency['service_area']) ?></p><?php endif; ?>
     <div class="flex flex-wrap justify-center gap-4 text-sm text-brand-text-secondary">
       <?php if ($agency['phone']): ?><span><?= e($agency['phone']) ?></span><?php endif; ?>
       <?php if ($agency['email']): ?><span><?= e($agency['email']) ?></span><?php endif; ?>
-      <?php if ($agency['city']): ?><span><?= e($agency['city']) ?> — <?= e($agency['state']) ?></span><?php endif; ?>
+      <?php if ($agency['city']): ?><span><?= e($agency['city']) ?><?= $agency['state'] ? ' — ' . e($agency['state']) : '' ?></span><?php endif; ?>
       <?php if ($agency['website']): ?><a href="<?= e($agency['website']) ?>" target="_blank" rel="noopener noreferrer" class="text-brand-primary hover:underline"><?= e($agency['website']) ?></a><?php endif; ?>
     </div>
+    <?php if (!empty($agency['whatsapp'])): ?>
+      <a href="https://wa.me/55<?= e(preg_replace('/\D/', '', $agency['whatsapp'])) ?>" target="_blank" rel="noopener noreferrer" class="rounded-full bg-brand-green px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-green-hover">Conversar no WhatsApp</a>
+    <?php endif; ?>
   </div>
 </div>
 

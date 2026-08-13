@@ -96,7 +96,7 @@ if ($price) {
           </p>
         </div>
         <button type="button" class="js-favorite-btn <?= $isFavorite ? 'is-favorite' : '' ?> flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white shadow ring-1 ring-brand-border" data-property-id="<?= (int) $property['id'] ?>" aria-label="Favoritar">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="<?= $isFavorite ? '#FF385C' : 'none' ?>" stroke="<?= $isFavorite ? '#FF385C' : '#717171' ?>" stroke-width="1.8"><path d="M12 21s-7.5-4.6-10-9.3C.4 8.1 2 4.5 5.6 4c2-.3 3.8.6 6.4 3 2.6-2.4 4.4-3.3 6.4-3 3.6.5 5.2 4.1 3.6 7.7C19.5 16.4 12 21 12 21z"/></svg>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="<?= $isFavorite ? '#C1502E' : 'none' ?>" stroke="<?= $isFavorite ? '#C1502E' : '#717171' ?>" stroke-width="1.8"><path d="M12 21s-7.5-4.6-10-9.3C.4 8.1 2 4.5 5.6 4c2-.3 3.8.6 6.4 3 2.6-2.4 4.4-3.3 6.4-3 3.6.5 5.2 4.1 3.6 7.7C19.5 16.4 12 21 12 21z"/></svg>
         </button>
       </div>
 
@@ -156,21 +156,46 @@ if ($price) {
     <div class="lg:col-span-1">
       <div class="sticky top-24 rounded-xl border border-brand-border bg-white p-5">
         <?php
-        $contactName = !empty($property['agent_first_name'])
+        $isAgent = !empty($property['agent_first_name']);
+        $isAgency = !$isAgent && !empty($property['agency_name']);
+        $contactName = $isAgent
             ? $property['agent_first_name'] . ' ' . $property['agent_last_name']
-            : (!empty($property['agency_name']) ? $property['agency_name'] : $property['advertiser_first_name'] . ' ' . $property['advertiser_last_name']);
-        $phone = $property['agent_phone'] ?: ($property['agency_phone'] ?: $property['advertiser_phone']);
-        $whatsapp = $phone ? preg_replace('/\D/', '', $phone) : null;
+            : ($isAgency ? $property['agency_name'] : $property['advertiser_first_name'] . ' ' . $property['advertiser_last_name']);
+        $avatarUrl = $isAgent ? ($property['agent_avatar'] ?? null) : ($isAgency ? ($property['agency_logo'] ?? null) : ($property['advertiser_avatar'] ?? null));
+        $areaAtuacao = $isAgency ? ($property['agency_service_area'] ?: trim(($property['agency_city'] ?? '') . ($property['agency_state'] ? ' — ' . $property['agency_state'] : ''))) : ($property['advertiser_service_area'] ?? null);
+
+        $phone = $property['contact_phone'] ?: ($property['agent_phone'] ?: ($property['agency_phone'] ?: $property['advertiser_phone']));
+        $email = $property['contact_email'] ?: ($property['agent_email'] ?: ($property['agency_email'] ?: $property['advertiser_email']));
+        $whatsappRaw = $property['contact_whatsapp'] ?: ($property['agent_whatsapp'] ?: ($property['agency_whatsapp'] ?: ($property['advertiser_whatsapp'] ?: $phone)));
+        $whatsapp = $whatsappRaw ? preg_replace('/\D/', '', $whatsappRaw) : null;
         ?>
-        <p class="text-xs font-semibold uppercase text-brand-text-secondary">Anunciado por</p>
-        <p class="mt-1 text-lg font-bold"><?= e($contactName) ?></p>
-        <?php if (!empty($property['agent_creci'])): ?><p class="text-xs text-brand-text-secondary">CRECI <?= e($property['agent_creci']) ?></p><?php endif; ?>
-        <?php if (!empty($property['agency_slug'])): ?>
+        <div class="flex items-center gap-3">
+          <?php if ($avatarUrl): ?>
+            <img src="<?= e($avatarUrl) ?>" alt="" class="h-12 w-12 shrink-0 rounded-full object-cover">
+          <?php else: ?>
+            <span class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-brand-primary text-lg font-semibold text-white"><?= e(mb_strtoupper(mb_substr($contactName, 0, 1))) ?></span>
+          <?php endif; ?>
+          <div>
+            <p class="text-xs font-semibold uppercase text-brand-text-secondary">Anunciado por</p>
+            <p class="text-lg font-bold leading-tight"><?= e($contactName) ?></p>
+          </div>
+        </div>
+        <?php if (!empty($property['agent_creci'])): ?><p class="mt-2 text-xs text-brand-text-secondary">CRECI <?= e($property['agent_creci']) ?></p><?php endif; ?>
+        <?php if ($areaAtuacao): ?><p class="mt-1 text-xs text-brand-text-secondary">Atua em: <?= e($areaAtuacao) ?></p><?php endif; ?>
+        <?php if ($isAgent && !empty($property['agency_name'])): ?>
+          <a href="<?= base_url('imobiliaria.php?slug=' . $property['agency_slug']) ?>" class="mt-1 block text-sm text-brand-primary hover:underline"><?= e($property['agency_name']) ?></a>
+        <?php elseif (!empty($property['agency_slug'])): ?>
           <a href="<?= base_url('imobiliaria.php?slug=' . $property['agency_slug']) ?>" class="mt-1 block text-sm text-brand-primary hover:underline">Ver página da imobiliária</a>
         <?php endif; ?>
         <div class="mt-4 flex flex-col gap-2">
           <?php if ($whatsapp): ?>
             <a href="https://wa.me/55<?= e($whatsapp) ?>?text=<?= urlencode('Olá! Tenho interesse no imóvel "' . $property['title'] . '" (código ' . $property['code'] . ').') ?>" target="_blank" rel="noopener noreferrer" class="rounded-full bg-brand-green px-4 py-2.5 text-center text-sm font-semibold text-white hover:bg-brand-green-hover">Conversar no WhatsApp</a>
+          <?php endif; ?>
+          <?php if ($phone): ?>
+            <a href="tel:<?= e(preg_replace('/\D/', '', $phone)) ?>" class="rounded-full border border-brand-border px-4 py-2.5 text-center text-sm font-semibold hover:border-brand-primary"><?= e($phone) ?></a>
+          <?php endif; ?>
+          <?php if ($email): ?>
+            <a href="mailto:<?= e($email) ?>" class="rounded-full border border-brand-border px-4 py-2.5 text-center text-sm font-semibold hover:border-brand-primary">Enviar e-mail</a>
           <?php endif; ?>
           <a href="<?= base_url('fale-conosco.php?imovel=' . urlencode($property['code'])) ?>" class="rounded-full border border-brand-border px-4 py-2.5 text-center text-sm font-semibold hover:border-brand-primary">Enviar mensagem</a>
         </div>
