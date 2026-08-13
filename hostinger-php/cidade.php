@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . '/includes/bootstrap.php';
-require_once __DIR__ . '/includes/filters_form.php';
+require_once __DIR__ . '/includes/filters_modal.php';
 
 $slug = $_GET['slug'] ?? '';
 $stmt = db()->prepare('SELECT * FROM cities WHERE slug = ?');
@@ -54,8 +54,7 @@ if ($hasFilters) {
       </nav>
       <h1 class="mb-4 text-2xl font-bold">Imóveis em <?= e($city['name']) ?></h1>
       <p class="mb-4 text-sm text-brand-text-secondary"><?= $result['total'] ?> imóve<?= $result['total'] === 1 ? 'l encontrado' : 'is encontrados' ?></p>
-      <div id="results-layout" class="lg:grid lg:grid-cols-[15fr_40fr_45fr] lg:items-start lg:gap-5">
-        <div id="results-sidebar" class="mb-6 lg:mb-0"><?php render_filters_form(base_url('cidade.php?slug=' . $city['slug']), $_GET, false, $neighborhoods); ?></div>
+      <div id="results-layout" class="lg:grid lg:grid-cols-2 lg:items-start lg:gap-6">
         <div>
           <?php render_property_list($result['items'], $favoriteIds); ?>
           <?php
@@ -66,6 +65,7 @@ if ($hasFilters) {
         <div class="mt-6 lg:mt-0"><?php render_results_map($result['items']); ?></div>
       </div>
     </div>
+    <?php render_filters_modal(base_url('cidade.php?slug=' . $city['slug']), $_GET, $neighborhoods); ?>
     <?php
 } else {
     $properties = get_properties_by_city($city['slug'], 6);

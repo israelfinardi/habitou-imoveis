@@ -101,9 +101,6 @@ body{font-family:'Inter',Arial,sans-serif}
 .nav-user-menu a:hover{background:#F7F7F7}
 .scrollbar-none{scrollbar-width:none}
 .scrollbar-none::-webkit-scrollbar{display:none}
-@media (min-width:1024px){
-  #results-layout.filtros-escondidos{grid-template-columns:1fr 1fr!important}
-}
 </style>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 </head>

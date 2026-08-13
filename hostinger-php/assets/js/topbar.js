@@ -107,32 +107,6 @@
     searchBtn.addEventListener('click', irParaBusca);
   }
 
-  // --- Botão "Filtros": esconde/mostra a coluna de filtros na página de
-  // resultados (mapa+lista passam a dividir 50/50). Fora dessas páginas,
-  // continua navegando normalmente para imoveis.php.
-  var layout = document.getElementById('results-layout');
-  var sidebar = document.getElementById('results-sidebar');
-  var STORAGE_KEY = 'habitou_filtros_escondidos';
-
-  function applyFiltrosState(hidden) {
-    if (!layout || !sidebar) return;
-    sidebar.style.display = hidden ? 'none' : '';
-    layout.classList.toggle('filtros-escondidos', hidden);
-  }
-
-  if (layout && sidebar) {
-    applyFiltrosState(window.localStorage.getItem(STORAGE_KEY) === '1');
-    [document.getElementById('filtros-toggle-btn'), document.getElementById('filtros-toggle-btn-mobile')].forEach(function (btn) {
-      if (!btn) return;
-      btn.addEventListener('click', function (e) {
-        e.preventDefault();
-        var hidden = !(window.localStorage.getItem(STORAGE_KEY) === '1');
-        window.localStorage.setItem(STORAGE_KEY, hidden ? '1' : '0');
-        applyFiltrosState(hidden);
-      });
-    });
-  }
-
   // --- Menu da conta -------------------------------------------------------
   var userBtn = document.getElementById('nav-user-btn');
   var userMenu = document.getElementById('nav-user-menu');

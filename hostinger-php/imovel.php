@@ -180,8 +180,11 @@ if ($price) {
             <p class="text-lg font-bold leading-tight"><?= e($contactName) ?></p>
           </div>
         </div>
-        <?php if (!empty($property['agent_creci'])): ?><p class="mt-2 text-xs text-brand-text-secondary">CRECI <?= e($property['agent_creci']) ?></p><?php endif; ?>
+        <?php if (!empty($property['agent_creci'])): ?><p class="mt-2 text-xs text-brand-text-secondary">CRECI <?= e($property['agent_creci']) ?> verificado</p><?php endif; ?>
         <?php if ($areaAtuacao): ?><p class="mt-1 text-xs text-brand-text-secondary">Atua em: <?= e($areaAtuacao) ?></p><?php endif; ?>
+        <?php if ($isAgent): ?>
+          <a href="<?= base_url('corretor.php?id=' . (int) $property['agent_id']) ?>" class="mt-2 block text-sm font-semibold text-brand-primary hover:underline">Ver perfil completo</a>
+        <?php endif; ?>
         <?php if ($isAgent && !empty($property['agency_name'])): ?>
           <a href="<?= base_url('imobiliaria.php?slug=' . $property['agency_slug']) ?>" class="mt-1 block text-sm text-brand-primary hover:underline"><?= e($property['agency_name']) ?></a>
         <?php elseif (!empty($property['agency_slug'])): ?>

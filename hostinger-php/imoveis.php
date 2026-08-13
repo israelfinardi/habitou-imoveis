@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . '/includes/bootstrap.php';
-require_once __DIR__ . '/includes/filters_form.php';
+require_once __DIR__ . '/includes/filters_modal.php';
 require_once __DIR__ . '/includes/property_mutations.php';
 
 $params = $_GET;
@@ -21,8 +21,7 @@ render_category_pills($activeType ?: null);
   <h1 class="mb-1 text-2xl font-bold">Busca de imóveis</h1>
   <p class="mb-6 text-sm text-brand-text-secondary"><?= $result['total'] ?> imóve<?= $result['total'] === 1 ? 'l encontrado' : 'is encontrados' ?></p>
 
-  <div id="results-layout" class="lg:grid lg:grid-cols-[15fr_40fr_45fr] lg:items-start lg:gap-5">
-    <div id="results-sidebar" class="mb-6 lg:mb-0"><?php render_filters_form(base_url('imoveis.php'), $_GET, true); ?></div>
+  <div id="results-layout" class="lg:grid lg:grid-cols-2 lg:items-start lg:gap-6">
     <div>
       <?php render_property_list($result['items'], $favoriteIds); ?>
       <?php
@@ -33,4 +32,5 @@ render_category_pills($activeType ?: null);
     <div class="mt-6 lg:mt-0"><?php render_results_map($result['items']); ?></div>
   </div>
 </div>
+<?php render_filters_modal(base_url('imoveis.php'), $_GET); ?>
 <?php require __DIR__ . '/includes/footer.php'; ?>

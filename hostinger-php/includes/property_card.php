@@ -3,10 +3,12 @@ function render_property_card(array $p, bool $isFavorite = false): void
 {
     $price = $p['listing_type'] === 'RENT' ? ($p['price_rent'] ?? null) : ($p['price_sale'] ?? null);
     $href = property_href($p);
+    // Título no padrão Airbnb: "Tipo · Cidade" (ex.: "Casa · Rio do Sul").
+    $cardTitle = e(PROPERTY_TYPE_LABEL[$p['property_type']] ?? 'Imóvel') . ' · ' . e($p['city_name']);
     $meta = array_filter([
-        !empty($p['bedrooms']) ? (int) $p['bedrooms'] . ' dorm' : null,
-        !empty($p['parking_spaces']) ? (int) $p['parking_spaces'] . ' vaga(s)' : null,
-        !empty($p['total_area']) ? format_area($p['total_area']) : null,
+        !empty($p['bedrooms']) ? (int) $p['bedrooms'] . ' quarto' . ((int) $p['bedrooms'] > 1 ? 's' : '') : null,
+        !empty($p['bathrooms']) ? (int) $p['bathrooms'] . ' banheiro' . ((int) $p['bathrooms'] > 1 ? 's' : '') : null,
+        !empty($p['parking_spaces']) ? (int) $p['parking_spaces'] . ' vaga' . ((int) $p['parking_spaces'] > 1 ? 's' : '') : null,
     ]);
     ?>
     <article data-property-id="<?= (int) $p['id'] ?>" class="group">
@@ -24,12 +26,12 @@ function render_property_card(array $p, bool $isFavorite = false): void
         </button>
       </a>
       <div class="pt-3">
-        <a href="<?= e($href) ?>" class="block truncate text-[15px] font-semibold text-brand-text"><?= e($p['title']) ?></a>
-        <p class="mt-0.5 truncate text-sm text-brand-text-secondary">
-          <?= !empty($p['neighborhood_name']) ? e($p['neighborhood_name']) . ', ' : '' ?><?= e($p['city_name']) ?> — <?= e($p['state_code']) ?>
-        </p>
+        <a href="<?= e($href) ?>" class="block truncate text-[15px] font-semibold text-brand-text"><?= $cardTitle ?></a>
+        <?php if (!empty($p['neighborhood_name'])): ?>
+          <p class="mt-0.5 truncate text-sm text-brand-text-secondary"><?= e($p['neighborhood_name']) ?></p>
+        <?php endif; ?>
         <?php if ($meta): ?>
-          <p class="mt-0.5 truncate text-sm text-brand-text-secondary"><?= e(implode(' · ', $meta)) ?> · <?= e(PROPERTY_TYPE_LABEL[$p['property_type']]) ?></p>
+          <p class="mt-0.5 truncate text-sm text-brand-text-secondary"><?= e(implode(' · ', $meta)) ?></p>
         <?php endif; ?>
         <p class="mt-1.5 text-[15px] font-semibold text-brand-text"><?= format_currency_brl($price) ?><?= $p['listing_type'] === 'RENT' ? '<span class="font-normal text-brand-text-secondary">/mês</span>' : '' ?></p>
       </div>
