@@ -21,7 +21,7 @@ function render_filters_modal(string $action, array $get, array $neighborhoods =
         </div>
 
         <form method="get" action="<?= e($action) ?>" id="filtros-modal-form" data-count-url="<?= e($countUrl) ?>" class="min-h-0 flex-1 overflow-y-auto px-5 py-5">
-          <?php foreach ($get as $k => $v): if (!in_array($k, ['q','tipo','bairro','precoMin','precoMax','quartos','suites','banheiros','vagas','areaMin','areaMax','ordenar','pagina'], true)): ?>
+          <?php foreach ($get as $k => $v): if (!in_array($k, ['q','tipo','bairro','precoMin','precoMax','quartos','suites','banheiros','vagas','areaMin','areaMax','caracteristicas','ordenar','pagina'], true)): ?>
             <input type="hidden" name="<?= e($k) ?>" value="<?= e($v) ?>">
           <?php endif; endforeach; ?>
 
@@ -102,6 +102,34 @@ function render_filters_modal(string $action, array $get, array $neighborhoods =
                     <input type="hidden" name="<?= e($field) ?>" value="<?= $v ?: '' ?>" class="js-stepper-input js-filtros-live">
                   </div>
                 </div>
+              <?php endforeach; ?>
+            </div>
+          </div>
+
+          <div class="mb-6 border-t border-brand-border pt-5">
+            <h3 class="mb-3 text-sm font-semibold">Área útil (m²)</h3>
+            <div class="flex items-center gap-3">
+              <div class="flex-1">
+                <label class="mb-1 block text-[11px] font-medium text-brand-text-secondary">Mínimo</label>
+                <input type="number" min="0" name="areaMin" value="<?= $val('areaMin') ?>" placeholder="m²" class="js-filtros-live w-full rounded-lg border border-brand-border px-3 py-2.5 text-sm">
+              </div>
+              <span class="mt-4 text-brand-text-secondary">—</span>
+              <div class="flex-1">
+                <label class="mb-1 block text-[11px] font-medium text-brand-text-secondary">Máximo</label>
+                <input type="number" min="0" name="areaMax" value="<?= $val('areaMax') ?>" placeholder="m²" class="js-filtros-live w-full rounded-lg border border-brand-border px-3 py-2.5 text-sm">
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-6 border-t border-brand-border pt-5">
+            <h3 class="mb-3 text-sm font-semibold">Comodidades</h3>
+            <div class="flex flex-wrap gap-2">
+              <?php $selectedFeatures = (array) ($get['caracteristicas'] ?? []); ?>
+              <?php foreach (COMMON_FEATURES as $feature): ?>
+                <label class="filtro-pill">
+                  <input type="checkbox" name="caracteristicas[]" value="<?= e($feature) ?>" <?= in_array($feature, $selectedFeatures, true) ? 'checked' : '' ?> class="js-filtros-live">
+                  <span><?= e($feature) ?></span>
+                </label>
               <?php endforeach; ?>
             </div>
           </div>

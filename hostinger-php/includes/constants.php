@@ -41,6 +41,11 @@ const COMMON_FEATURES = [
     'Salão de festas', 'Playground', 'Quadra esportiva', 'Ar condicionado',
     'Aceita animais', 'Varanda gourmet', 'Armários planejados',
     'Garagem coberta', 'Segurança 24h',
+    'Sacada', 'Closet', 'Lareira', 'Home office', 'Depósito',
+    'Espaço pet', 'Coworking', 'Sauna', 'Portão eletrônico',
+    'Câmeras de segurança', 'Gerador', 'Fechadura digital',
+    'Isolamento acústico', 'Condomínio fechado', 'Aceita financiamento',
+    'Estuda permuta', 'Perto de transporte público',
 ];
 
 const FEATURED_CITIES = [

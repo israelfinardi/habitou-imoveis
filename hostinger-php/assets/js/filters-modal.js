@@ -92,6 +92,7 @@
     clearBtn.addEventListener('click', function () {
       form.querySelectorAll('input[type=text], input[type=search], input[type=number]').forEach(function (el) { el.value = ''; });
       form.querySelectorAll('input[type=radio]').forEach(function (el) { el.checked = el.value === ''; });
+      form.querySelectorAll('input[type=checkbox]').forEach(function (el) { el.checked = false; });
       form.querySelectorAll('select').forEach(function (el) { el.selectedIndex = 0; });
       form.querySelectorAll('.js-stepper').forEach(function (stepper) {
         var input = stepper.querySelector('.js-stepper-input');

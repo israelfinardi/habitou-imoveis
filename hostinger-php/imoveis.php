@@ -15,9 +15,8 @@ $pageTitle = 'Busca de imóveis';
 $pageDescription = 'Busque apartamentos, casas e terrenos para comprar ou alugar em Santa Catarina.';
 require __DIR__ . '/includes/header.php';
 ?>
-<div class="w-full px-4 py-8 sm:px-6 lg:px-8">
-  <h1 class="mb-1 text-2xl font-bold">Busca de imóveis</h1>
-  <p class="mb-6 text-sm text-brand-text-secondary"><?= $result['total'] ?> imóve<?= $result['total'] === 1 ? 'l encontrado' : 'is encontrados' ?></p>
+<div class="w-full px-4 py-6 sm:px-6 lg:px-8">
+  <h1 class="sr-only">Busca de imóveis</h1>
 
   <div id="results-layout" class="lg:grid lg:grid-cols-2 lg:items-start lg:gap-6">
     <div>

@@ -47,13 +47,12 @@ if ($hasFilters) {
     $params['cidade'] = $city['slug'];
     $result = list_properties($params);
     ?>
-    <div class="w-full px-4 py-8 sm:px-6 lg:px-8">
+    <div class="w-full px-4 py-6 sm:px-6 lg:px-8">
       <nav class="mb-4 text-sm text-brand-text-secondary">
         <a href="<?= base_url('/') ?>" class="hover:text-brand-primary">Início</a> /
         <a href="<?= base_url('cidade.php?slug=' . $city['slug']) ?>" class="hover:text-brand-primary"><?= e($city['name']) ?></a>
       </nav>
-      <h1 class="mb-4 text-2xl font-bold">Imóveis em <?= e($city['name']) ?></h1>
-      <p class="mb-4 text-sm text-brand-text-secondary"><?= $result['total'] ?> imóve<?= $result['total'] === 1 ? 'l encontrado' : 'is encontrados' ?></p>
+      <h1 class="sr-only">Imóveis em <?= e($city['name']) ?></h1>
       <div id="results-layout" class="lg:grid lg:grid-cols-2 lg:items-start lg:gap-6">
         <div>
           <?php render_property_list($result['items'], $favoriteIds); ?>

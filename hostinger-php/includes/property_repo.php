@@ -72,6 +72,17 @@ function build_property_filters(array $params, array $extra = []): array
         $like = '%' . $params['q'] . '%';
         array_push($args, $like, $like, $like, $like);
     }
+    // Cada característica marcada precisa estar presente (AND) no JSON de
+    // features do imóvel — só aceitamos valores da lista canônica
+    // (COMMON_FEATURES) para não permitir injeção de padrão LIKE arbitrário.
+    if (!empty($params['caracteristicas']) && is_array($params['caracteristicas'])) {
+        foreach ($params['caracteristicas'] as $feature) {
+            if (in_array($feature, COMMON_FEATURES, true)) {
+                $where[] = 'p.features LIKE ?';
+                $args[] = '%"' . $feature . '"%';
+            }
+        }
+    }
 
     return [implode(' AND ', $where), $args];
 }
