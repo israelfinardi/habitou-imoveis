@@ -103,21 +103,27 @@ const PROPERTY_LIST_JOIN = "
     LEFT JOIN agencies ag ON ag.id = p.agency_id
 ";
 
-function attach_primary_images(PDO $pdo, array $rows): array
+/**
+ * Anexa a cada imóvel image_url (a primeira foto, para o mapa e compat.)
+ * e images (até $limit fotos, para o carrossel dos cards de lista/grade).
+ */
+function attach_primary_images(PDO $pdo, array $rows, int $limit = 5): array
 {
     if (empty($rows)) {
         return $rows;
     }
     $ids = array_column($rows, 'id');
     $placeholders = implode(',', array_fill(0, count($ids), '?'));
-    $stmt = $pdo->prepare("SELECT property_id, url FROM property_images WHERE property_id IN ($placeholders) AND `order` = 0");
+    $stmt = $pdo->prepare("SELECT property_id, url FROM property_images WHERE property_id IN ($placeholders) ORDER BY `order` ASC");
     $stmt->execute($ids);
     $images = [];
     foreach ($stmt->fetchAll() as $img) {
-        $images[$img['property_id']] = $img['url'];
+        $images[$img['property_id']][] = $img['url'];
     }
     foreach ($rows as &$row) {
-        $row['image_url'] = $images[$row['id']] ?? null;
+        $urls = $images[$row['id']] ?? [];
+        $row['images'] = array_slice($urls, 0, $limit);
+        $row['image_url'] = $urls[0] ?? null;
     }
     return $rows;
 }

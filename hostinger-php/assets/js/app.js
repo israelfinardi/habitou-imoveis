@@ -1,4 +1,8 @@
 // --- Favoritos -------------------------------------------------------------
+// capture:true: o botão de favoritar também aparece dentro do popup do
+// mapa (results-map.js), e o Leaflet chama stopPropagation() nos cliques
+// dentro do popup na fase de bubble — sem capture, este handler nunca
+// rodaria para esses cliques.
 document.addEventListener('click', function (e) {
   const btn = e.target.closest('.js-favorite-btn');
   if (!btn) return;
@@ -21,7 +25,7 @@ document.addEventListener('click', function (e) {
       svg.setAttribute('fill', data.favorite ? '#C1502E' : (isOverlay ? 'rgba(0,0,0,.5)' : 'none'));
       svg.setAttribute('stroke', data.favorite ? (isOverlay ? '#fff' : '#C1502E') : (isOverlay ? '#fff' : '#717171'));
     });
-});
+}, true);
 
 // --- Comparador (localStorage) ---------------------------------------------
 const COMPARE_KEY = 'habitou:compare';

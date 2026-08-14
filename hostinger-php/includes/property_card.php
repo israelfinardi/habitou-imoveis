@@ -11,14 +11,32 @@ function render_property_card(array $p, bool $isFavorite = false): void
         !empty($p['parking_spaces']) ? (int) $p['parking_spaces'] . ' vaga' . ((int) $p['parking_spaces'] > 1 ? 's' : '') : null,
     ]);
     ?>
+    <?php $images = !empty($p['images']) ? $p['images'] : (!empty($p['image_url']) ? [$p['image_url']] : []); ?>
     <article data-property-id="<?= (int) $p['id'] ?>" class="group">
-      <a href="<?= e($href) ?>" class="relative block aspect-square w-full overflow-hidden rounded-xl bg-brand-bg-subtle sm:aspect-[4/3]">
-        <?php if (!empty($p['image_url'])): ?>
-          <img src="<?= e($p['image_url']) ?>" alt="<?= e($p['title']) ?>" loading="lazy" class="h-full w-full object-cover transition duration-300 group-hover:scale-105">
+      <a href="<?= e($href) ?>" class="js-carousel relative block aspect-square w-full overflow-hidden rounded-2xl bg-brand-bg-subtle sm:aspect-[4/3]">
+        <?php if ($images): ?>
+          <div class="js-carousel-track scrollbar-none flex h-full w-full snap-x snap-mandatory overflow-x-auto scroll-smooth">
+            <?php foreach ($images as $img): ?>
+              <img src="<?= e($img) ?>" alt="<?= e($p['title']) ?>" loading="lazy" class="h-full w-full shrink-0 snap-center object-cover">
+            <?php endforeach; ?>
+          </div>
         <?php else: ?>
           <div class="flex h-full items-center justify-center text-sm text-brand-text-secondary">Sem foto</div>
         <?php endif; ?>
-        <span class="absolute left-3 top-3 rounded-full bg-white px-2.5 py-1 text-xs font-semibold text-brand-text shadow">
+        <?php if (count($images) > 1): ?>
+          <button type="button" class="js-carousel-prev absolute left-2 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-brand-text opacity-0 shadow transition group-hover:opacity-100" aria-label="Foto anterior">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+          <button type="button" class="js-carousel-next absolute right-2 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-brand-text opacity-0 shadow transition group-hover:opacity-100" aria-label="Próxima foto">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+          </button>
+          <div class="js-carousel-dots pointer-events-none absolute bottom-2 left-1/2 flex -translate-x-1/2 gap-1">
+            <?php foreach ($images as $i => $_): ?>
+              <span class="h-1.5 w-1.5 rounded-full <?= $i === 0 ? 'bg-white' : 'bg-white/50' ?>"></span>
+            <?php endforeach; ?>
+          </div>
+        <?php endif; ?>
+        <span class="pointer-events-none absolute left-3 top-3 rounded-full bg-white px-2.5 py-1 text-xs font-semibold text-brand-text shadow">
           <?= $p['listing_type'] === 'RENT' ? 'Aluguel' : 'Venda' ?>
         </span>
         <button type="button" class="js-favorite-btn js-favorite-overlay <?= $isFavorite ? 'is-favorite' : '' ?> absolute right-3 top-3 flex h-8 w-8 items-center justify-center" data-property-id="<?= (int) $p['id'] ?>" aria-label="Favoritar">
@@ -68,7 +86,7 @@ function render_property_list(array $items, array $favoriteIds = [], string $emp
  * sincronizado por hover com os cards da lista. Sticky no desktop e em
  * tela cheia (via botão "Ver no mapa") no celular.
  */
-function render_results_map(array $items): void
+function render_results_map(array $items, array $favoriteIds = []): void
 {
     $pins = [];
     foreach ($items as $p) {
@@ -78,15 +96,22 @@ function render_results_map(array $items): void
             continue;
         }
         $price = $p['listing_type'] === 'RENT' ? ($p['price_rent'] ?? null) : ($p['price_sale'] ?? null);
-        $meta = trim((!empty($p['neighborhood_name']) ? $p['neighborhood_name'] . ', ' : '') . $p['city_name']);
+        $meta = array_filter([
+            !empty($p['bedrooms']) ? (int) $p['bedrooms'] . ' quarto' . ((int) $p['bedrooms'] > 1 ? 's' : '') : null,
+            !empty($p['bathrooms']) ? (int) $p['bathrooms'] . ' banheiro' . ((int) $p['bathrooms'] > 1 ? 's' : '') : null,
+            !empty($p['parking_spaces']) ? (int) $p['parking_spaces'] . ' vaga' . ((int) $p['parking_spaces'] > 1 ? 's' : '') : null,
+        ]);
         $pins[] = [
             'id' => (int) $p['id'],
             'lat' => (float) $lat,
             'lng' => (float) $lng,
             'label' => format_price_short($price, $p['listing_type'] === 'RENT'),
-            'title' => $p['title'],
-            'meta' => $meta,
-            'image' => $p['image_url'] ?? null,
+            'price' => format_currency_brl($price) . ($p['listing_type'] === 'RENT' ? '/mês' : ''),
+            'title' => (PROPERTY_TYPE_LABEL[$p['property_type']] ?? 'Imóvel') . ' · ' . $p['city_name'],
+            'neighborhood' => $p['neighborhood_name'] ?? '',
+            'meta' => implode(' · ', $meta),
+            'images' => !empty($p['images']) ? $p['images'] : (!empty($p['image_url']) ? [$p['image_url']] : []),
+            'isFavorite' => in_array((int) $p['id'], $favoriteIds, true),
             'href' => property_href($p),
         ];
     }
@@ -103,7 +128,7 @@ function render_results_map(array $items): void
     </div>
     <script>window.__RESULTS_MAP_PINS = <?= json_encode($pins, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;</script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="<?= base_url('assets/js/results-map.js') ?>"></script>
+    <script src="<?= asset_url('assets/js/results-map.js') ?>"></script>
     <?php
 }
 

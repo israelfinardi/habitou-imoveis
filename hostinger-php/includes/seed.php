@@ -17,9 +17,12 @@ function seed_database(PDO $pdo): void
 
     // --- Planos --------------------------------------------------------------
     $plansData = [
-        ['name' => 'Básico', 'slug' => 'basico', 'price' => 0, 'max_listings' => 3, 'description' => 'Ideal para anunciantes individuais.', 'features' => ['Até 3 anúncios ativos', 'Suporte por e-mail']],
-        ['name' => 'Profissional', 'slug' => 'profissional', 'price' => 99.9, 'max_listings' => 30, 'description' => 'Para corretores autônomos.', 'features' => ['Até 30 anúncios ativos', 'Destaque nos resultados', 'Suporte prioritário']],
-        ['name' => 'Imobiliária', 'slug' => 'imobiliaria', 'price' => 349.9, 'max_listings' => null, 'description' => 'Para imobiliárias com sincronização VRSync.', 'features' => ['Anúncios ilimitados', 'Sincronização automática de feeds (VRSync)', 'Múltiplos corretores', 'Painel administrativo']],
+        ['name' => 'Plano 5 imóveis', 'slug' => 'plano-5', 'price' => 89.9, 'max_listings' => 5, 'description' => 'Ideal para anunciantes individuais.', 'features' => ['Até 5 anúncios ativos']],
+        ['name' => 'Plano 15 imóveis', 'slug' => 'plano-15', 'price' => 199.9, 'max_listings' => 15, 'description' => 'Para corretores autônomos.', 'features' => ['Até 15 anúncios ativos']],
+        ['name' => 'Plano 25 imóveis', 'slug' => 'plano-25', 'price' => 349.9, 'max_listings' => 25, 'description' => 'Para corretores e pequenas imobiliárias.', 'features' => ['Até 25 anúncios ativos']],
+        ['name' => 'Plano 50 imóveis', 'slug' => 'plano-50', 'price' => 400, 'max_listings' => 50, 'description' => 'Para imobiliárias em crescimento.', 'features' => ['Até 50 anúncios ativos']],
+        ['name' => 'Plano 75 imóveis', 'slug' => 'plano-75', 'price' => 500, 'max_listings' => 75, 'description' => 'Para imobiliárias com carteira ampla.', 'features' => ['Até 75 anúncios ativos']],
+        ['name' => 'Novo plano 100 imóveis', 'slug' => 'plano-100', 'price' => 700, 'max_listings' => 100, 'description' => 'Para imobiliárias com sincronização VRSync.', 'features' => ['Até 100 anúncios ativos', 'Sincronização automática de feeds (VRSync)']],
     ];
     foreach ($plansData as $p) {
         $stmt = $pdo->prepare('INSERT INTO plans (name, slug, description, price, max_listings, features) VALUES (?,?,?,?,?,?)

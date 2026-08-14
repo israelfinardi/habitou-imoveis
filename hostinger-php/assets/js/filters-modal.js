@@ -47,7 +47,7 @@
 
     function render() {
       var v = parseInt(input.value, 10) || 0;
-      display.textContent = v > 0 ? v + '+' : 'Qualquer';
+      display.textContent = v > 0 ? v + '+' : '0';
       dec.disabled = v <= 0;
     }
     dec.addEventListener('click', function () {
@@ -96,7 +96,7 @@
       form.querySelectorAll('.js-stepper').forEach(function (stepper) {
         var input = stepper.querySelector('.js-stepper-input');
         input.value = '';
-        stepper.querySelector('.js-stepper-value').textContent = 'Qualquer';
+        stepper.querySelector('.js-stepper-value').textContent = '0';
         stepper.querySelector('.js-stepper-dec').disabled = true;
       });
       refreshCount();

@@ -88,7 +88,7 @@ function render_property_form(array $defaults = [], array $errors = []): void
       <div class="mb-4"><label class="mb-1 block text-xs font-medium text-brand-text-secondary">Longitude</label><input type="number" step="0.000001" name="longitude" id="js-lng-input" value="<?= $val('longitude') ?>" class="w-full rounded-lg border border-brand-border px-3 py-2 text-sm"></div>
     </div>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="<?= base_url('assets/js/property-location-map.js') ?>"></script>
+    <script src="<?= asset_url('assets/js/property-location-map.js') ?>"></script>
 
     <div class="mt-2 border-t border-brand-border pt-4">
       <label class="mb-1 block text-sm font-medium">Contato deste anúncio</label>

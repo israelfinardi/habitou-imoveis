@@ -62,7 +62,7 @@ if ($hasFilters) {
           render_pagination($result['page'], $result['total_pages'], base_url($baseQuery));
           ?>
         </div>
-        <div class="mt-6 lg:mt-0"><?php render_results_map($result['items']); ?></div>
+        <div class="mt-6 lg:mt-0"><?php render_results_map($result['items'], $favoriteIds); ?></div>
       </div>
     </div>
     <?php render_filters_modal(base_url('cidade.php?slug=' . $city['slug']), $_GET, $neighborhoods); ?>

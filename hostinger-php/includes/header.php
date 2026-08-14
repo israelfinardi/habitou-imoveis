@@ -43,16 +43,16 @@ if (!empty($city['name']) && !empty($city['state_code'])) {
           },
         },
         fontFamily: {
-          sans: ['Inter', 'system-ui', 'sans-serif'],
+          sans: ['Plus Jakarta Sans', 'system-ui', 'sans-serif'],
         },
       },
     },
   };
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-body{font-family:'Inter',Arial,sans-serif}
+body{font-family:'Plus Jakarta Sans',Arial,sans-serif}
 .price-pin{background:transparent;border:0}
 .price-pin-label{
   display:inline-block;white-space:nowrap;transform:translate(-50%,-100%);

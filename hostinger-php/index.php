@@ -98,7 +98,7 @@ require __DIR__ . '/includes/header.php';
         Apartamentos, casas e terrenos verificados em Florianópolis, Blumenau, Balneário Camboriú, Joinville e outras cidades de Santa Catarina.
       </p>
 
-      <form action="<?= base_url('imoveis.php') ?>" method="get" class="mt-7 rounded-2xl border border-brand-border bg-white p-4 shadow-lg">
+      <form action="<?= base_url('imoveis.php') ?>" method="get" class="mt-7 rounded-3xl border border-brand-border bg-white p-4 shadow-lg">
         <div class="mb-3 flex gap-1">
           <label class="hero-transacao-tab">
             <input type="radio" name="transacao" value="comprar" checked>
@@ -191,7 +191,7 @@ require __DIR__ . '/includes/header.php';
       ]);
       ?>
       <div class="hidden lg:block">
-        <div class="relative overflow-hidden rounded-2xl border border-brand-border bg-white shadow-xl">
+        <div class="relative overflow-hidden rounded-3xl border border-brand-border bg-white shadow-xl">
           <span class="absolute left-3 top-3 z-10 rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-brand-text shadow">✨ Destaque da semana</span>
           <a href="<?= e(property_href($heroMain)) ?>" class="relative block aspect-[4/3] w-full bg-brand-bg-subtle">
             <?php if (!empty($heroMain['image_url'])): ?>
@@ -211,7 +211,7 @@ require __DIR__ . '/includes/header.php';
         <?php if ($heroMini): ?>
           <div class="mt-3 grid grid-cols-3 gap-3">
             <?php foreach ($heroMini as $mini): $miniPrice = $mini['listing_type'] === 'RENT' ? ($mini['price_rent'] ?? null) : ($mini['price_sale'] ?? null); ?>
-              <a href="<?= e(property_href($mini)) ?>" class="group relative block aspect-square overflow-hidden rounded-xl border border-brand-border bg-brand-bg-subtle">
+              <a href="<?= e(property_href($mini)) ?>" class="group relative block aspect-square overflow-hidden rounded-2xl border border-brand-border bg-brand-bg-subtle">
                 <?php if (!empty($mini['image_url'])): ?>
                   <img src="<?= e($mini['image_url']) ?>" alt="<?= e($mini['title']) ?>" class="h-full w-full object-cover transition group-hover:scale-105">
                 <?php endif; ?>
@@ -244,7 +244,7 @@ document.getElementById('buscar-codigo-link')?.addEventListener('click', functio
     <div><p class="text-2xl font-extrabold text-brand-text sm:text-3xl"><?= number_format($stats['imoveis'], 0, ',', '.') ?></p><p class="mt-1 text-sm text-brand-text-secondary">imóveis anunciados</p></div>
     <div><p class="text-2xl font-extrabold text-brand-text sm:text-3xl"><?= number_format($stats['imobiliarias'], 0, ',', '.') ?></p><p class="mt-1 text-sm text-brand-text-secondary">imobiliárias parceiras</p></div>
     <div><p class="text-2xl font-extrabold text-brand-text sm:text-3xl"><?= number_format($stats['cidades'], 0, ',', '.') ?></p><p class="mt-1 text-sm text-brand-text-secondary">cidades em SC</p></div>
-    <div><p class="text-2xl font-extrabold text-brand-text sm:text-3xl">26 anos</p><p class="mt-1 text-sm text-brand-text-secondary">de mercado em SC</p></div>
+    <div><p class="text-2xl font-extrabold text-brand-text sm:text-3xl">100%</p><p class="mt-1 text-sm text-brand-text-secondary">corretores com CRECI verificado</p></div>
   </div>
 </section>
 <?php endif; ?>
@@ -254,7 +254,7 @@ document.getElementById('buscar-codigo-link')?.addEventListener('click', functio
   <p class="mt-2 text-brand-text-secondary">Explore por região</p>
   <div class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
     <?php foreach ($regions as $region): $tag = $region['href'] ? 'a' : 'div'; ?>
-      <<?= $tag ?> <?= $region['href'] ? 'href="' . e($region['href']) . '"' : '' ?> class="block rounded-xl border border-brand-border p-4 transition <?= $region['href'] ? 'hover:border-brand-primary hover:shadow-sm' : '' ?>">
+      <<?= $tag ?> <?= $region['href'] ? 'href="' . e($region['href']) . '"' : '' ?> class="block rounded-2xl border border-brand-border p-4 transition <?= $region['href'] ? 'hover:border-brand-primary hover:shadow-sm' : '' ?>">
         <p class="text-xs font-semibold uppercase tracking-wide text-brand-primary"><?= e($region['subtitle']) ?></p>
         <p class="mt-1 text-base font-bold text-brand-text"><?= e($region['name']) ?></p>
         <p class="mt-1 text-xs text-brand-text-secondary"><?= e(implode(', ', $region['cities'])) ?></p>
@@ -270,7 +270,7 @@ document.getElementById('buscar-codigo-link')?.addEventListener('click', functio
     <h2 class="mt-1 text-2xl font-bold text-brand-text">Buscar por tipo</h2>
     <div class="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
       <?php foreach ($typeCounts as $type => $count): ?>
-        <a href="<?= base_url('imoveis.php?tipo=' . PROPERTY_TYPE_SLUG[$type]) ?>" class="flex flex-col items-center gap-2 rounded-xl border border-brand-border bg-white p-4 text-center transition hover:border-brand-primary">
+        <a href="<?= base_url('imoveis.php?tipo=' . PROPERTY_TYPE_SLUG[$type]) ?>" class="flex flex-col items-center gap-2 rounded-2xl border border-brand-border bg-white p-4 text-center transition hover:border-brand-primary">
           <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" class="text-brand-text"><?= CATEGORY_ICONS[$type] ?></svg>
           <span class="text-sm font-semibold text-brand-text"><?= e(PROPERTY_TYPE_LABEL[$type]) ?></span>
           <span class="text-xs text-brand-text-secondary"><?= number_format($count, 0, ',', '.') ?> anúncio<?= $count === 1 ? '' : 's' ?></span>

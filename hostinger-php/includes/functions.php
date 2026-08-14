@@ -72,6 +72,18 @@ function base_url(string $path = ''): string
     return $base . '/' . ltrim($path, '/');
 }
 
+/**
+ * Como base_url(), mas para JS/CSS: acrescenta ?v=<mtime do arquivo> para
+ * invalidar o cache do navegador automaticamente sempre que o arquivo mudar
+ * (sem isso, um deploy novo pode continuar rodando o JS antigo em cache).
+ */
+function asset_url(string $path): string
+{
+    $file = __DIR__ . '/../' . ltrim($path, '/');
+    $version = is_file($file) ? filemtime($file) : time();
+    return base_url($path) . '?v=' . $version;
+}
+
 function current_url_with(array $overrides): string
 {
     $params = $_GET;

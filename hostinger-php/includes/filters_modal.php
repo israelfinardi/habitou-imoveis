@@ -97,7 +97,7 @@ function render_filters_modal(string $action, array $get, array $neighborhoods =
                   <span class="text-sm"><?= e($label) ?></span>
                   <div class="flex items-center gap-3">
                     <button type="button" class="js-stepper-dec flex h-8 w-8 items-center justify-center rounded-full border border-brand-border text-lg leading-none hover:border-brand-primary disabled:cursor-not-allowed disabled:opacity-30" <?= $v <= 0 ? 'disabled' : '' ?>>&minus;</button>
-                    <span class="js-stepper-value w-6 text-center text-sm"><?= $v > 0 ? $v . '+' : 'Qualquer' ?></span>
+                    <span class="js-stepper-value w-6 shrink-0 text-center text-sm"><?= $v > 0 ? $v . '+' : '0' ?></span>
                     <button type="button" class="js-stepper-inc flex h-8 w-8 items-center justify-center rounded-full border border-brand-border text-lg leading-none hover:border-brand-primary">+</button>
                     <input type="hidden" name="<?= e($field) ?>" value="<?= $v ?: '' ?>" class="js-stepper-input js-filtros-live">
                   </div>
@@ -130,11 +130,11 @@ function render_filters_modal(string $action, array $get, array $neighborhoods =
     .filtro-pill:hover span{border-color:#222222}
     .filtro-tipo-card{display:block}
     .filtro-tipo-card input{position:absolute;opacity:0;width:0;height:0}
-    .filtro-tipo-card span{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;border:1px solid #DDDDDD;border-radius:12px;padding:14px 6px;font-size:12px;font-weight:600;text-align:center;cursor:pointer;transition:.15s;color:#222}
+    .filtro-tipo-card span{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;border:1px solid #DDDDDD;border-radius:16px;padding:14px 6px;font-size:12px;font-weight:600;text-align:center;cursor:pointer;transition:.15s;color:#222}
     .filtro-tipo-card em{font-style:normal;line-height:1.2}
     .filtro-tipo-card input:checked + span{border-color:#222222;border-width:2px;background:#F7F7F7}
     .filtro-tipo-card:hover span{border-color:#222222}
     </style>
-    <script src="<?= base_url('assets/js/filters-modal.js') ?>"></script>
+    <script src="<?= asset_url('assets/js/filters-modal.js') ?>"></script>
     <?php
 }
