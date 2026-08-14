@@ -41,10 +41,10 @@
   function buildPopupHtml(p) {
     var images = p.images || [];
     var media = images.length
-      ? '<div class="js-carousel-track scrollbar-none flex h-28 w-full snap-x snap-mandatory overflow-x-auto scroll-smooth">' +
-        images.map(function (src) { return '<img src="' + esc(src) + '" alt="" class="h-28 w-full shrink-0 snap-center object-cover">'; }).join('') +
+      ? '<div class="js-carousel-track scrollbar-none flex h-36 w-full snap-x snap-mandatory overflow-x-auto scroll-smooth">' +
+        images.map(function (src) { return '<img src="' + esc(src) + '" alt="" class="h-36 w-full shrink-0 snap-center object-cover">'; }).join('') +
         '</div>'
-      : '<div class="flex h-28 w-full items-center justify-center bg-brand-bg-subtle text-xs text-brand-text-secondary">Sem foto</div>';
+      : '<div class="flex h-36 w-full items-center justify-center bg-brand-bg-subtle text-xs text-brand-text-secondary">Sem foto</div>';
     var arrows = images.length > 1
       ? '<button type="button" class="js-carousel-prev absolute left-1.5 top-1/2 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-brand-text opacity-0 shadow transition group-hover:opacity-100" aria-label="Foto anterior"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>' +
         '<button type="button" class="js-carousel-next absolute right-1.5 top-1/2 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-brand-text opacity-0 shadow transition group-hover:opacity-100" aria-label="Próxima foto"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>' +
@@ -53,7 +53,7 @@
         '</div>'
       : '';
     return (
-      '<div class="w-56 overflow-hidden rounded-xl">' +
+      '<div class="w-72 overflow-hidden rounded-xl">' +
       '<div class="js-carousel group relative">' +
       media + arrows +
       '<button type="button" class="js-favorite-btn js-favorite-overlay ' + (p.isFavorite ? 'is-favorite' : '') + ' absolute right-2 top-2 flex h-7 w-7 items-center justify-center" data-property-id="' + p.id + '" aria-label="Favoritar">' +
@@ -74,10 +74,16 @@
       className: 'price-pin',
       html: '<div class="price-pin-label">' + p.label + '</div>',
       iconSize: [0, 0],
+      // O rótulo é posicionado por CSS (translate(-50%,-100%)), então o
+      // ponto [0,0] do ícone cai exatamente na base do balão (o "pino" no
+      // mapa). O popup precisa de um popupAnchor deslocado para cima dessa
+      // altura + uma folga, senão o card do popup nasce por cima do próprio
+      // pino em vez de flutuar acima dele.
       iconAnchor: [0, 0],
+      popupAnchor: [0, -34],
     });
     var marker = L.marker([p.lat, p.lng], { icon: icon, riseOnHover: true });
-    marker.bindPopup(buildPopupHtml(p), { closeButton: true, minWidth: 224, maxWidth: 224, className: 'map-pin-popup' });
+    marker.bindPopup(buildPopupHtml(p), { closeButton: true, minWidth: 288, maxWidth: 288, className: 'map-pin-popup', autoPanPadding: [40, 40] });
     marker.on('popupopen', function () { setActive(p.id, true); });
     marker.on('popupclose', function () { setActive(p.id, false); });
     marker.addTo(map);

@@ -76,8 +76,8 @@ $pageDescription = 'Encontre apartamentos, casas e terrenos para comprar ou alug
 require __DIR__ . '/includes/header.php';
 ?>
 
-<section class="relative overflow-hidden border-b border-brand-border bg-gradient-to-b from-brand-bg-subtle to-white py-12 sm:py-16">
-  <div class="pointer-events-none absolute inset-0 hidden lg:block" aria-hidden="true">
+<section class="relative border-b border-brand-border bg-gradient-to-b from-brand-bg-subtle to-white py-12 sm:py-16">
+  <div class="pointer-events-none absolute inset-0 hidden overflow-hidden lg:block" aria-hidden="true">
     <div class="absolute -left-10 top-6 h-28 w-28 rounded-[2rem] border-2 border-brand-light/40"></div>
     <div class="absolute left-24 top-0 h-20 w-20 rounded-[1.5rem] bg-brand-primary/10"></div>
     <div class="absolute -left-4 bottom-10 h-24 w-24 rounded-[1.5rem] border-2 border-brand-primary/25"></div>
