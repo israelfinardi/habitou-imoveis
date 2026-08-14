@@ -31,6 +31,11 @@
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; OpenStreetMap contributors',
   }).addTo(map);
+  // Exposto pro wizard de anúncio (assets/js/property-wizard.js) chamar
+  // invalidateSize() quando essa etapa, escondida com display:none até o
+  // usuário chegar nela, fica visível — Leaflet mede um container 0x0 se
+  // inicializa escondido.
+  window.__propertyMap = map;
 
   var marker = null;
   function placeMarker(lat, lng) {
