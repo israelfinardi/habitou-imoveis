@@ -11,10 +11,11 @@ $heroMain = $featured[0] ?? null;
 $heroMini = array_slice($featured, 1, 3);
 
 $heroCity = db()->query(
-    'SELECT c.id, c.name, c.slug, COUNT(p.id) AS total
+    'SELECT c.id, c.name, c.slug, c.state_code, COUNT(p.id) AS total
      FROM cities c LEFT JOIN properties p ON p.city_id = c.id AND p.status = "PUBLISHED"
      GROUP BY c.id ORDER BY total DESC LIMIT 1'
 )->fetch();
+$heroCityLabel = $heroCity ? $heroCity['name'] . ' (' . $heroCity['state_code'] . ')' : null;
 $heroNeighborhoods = [];
 if ($heroCity) {
     $stmtN = db()->prepare('SELECT name, slug FROM neighborhoods WHERE city_id = ? ORDER BY name LIMIT 5');
@@ -121,12 +122,17 @@ require __DIR__ . '/includes/header.php';
           </div>
           <div>
             <label class="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-brand-text-secondary">Cidade</label>
-            <select name="cidade" class="w-full rounded-xl border border-brand-border px-3 py-2.5 text-sm">
-              <option value="">Todas as cidades</option>
-              <?php foreach (FEATURED_CITIES as $c): ?>
-                <option value="<?= e($c['slug']) ?>" <?= $heroCity && $heroCity['slug'] === $c['slug'] ? 'selected' : '' ?>><?= e($c['name']) ?></option>
-              <?php endforeach; ?>
-            </select>
+            <div class="cidade-pill cidade-pill--field" id="hero-cidade-pill">
+              <button type="button" class="cidade-pill-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16" class="shrink-0 text-brand-text-secondary"><path d="M12 21s-7-6.1-7-11a7 7 0 0 1 14 0c0 4.9-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
+                <span class="cidade-pill-label">Todas as cidades</span>
+              </button>
+              <input type="hidden" name="cidade_nome" class="cidade-hidden-input" value="<?= e($heroCityLabel ?? '') ?>">
+              <div class="cidade-dropdown">
+                <input type="text" class="cidade-busca-input" placeholder="Digite o nome da cidade..." autocomplete="off">
+                <div class="cidade-sugestoes"></div>
+              </div>
+            </div>
           </div>
           <div>
             <label class="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-brand-text-secondary">Valor</label>

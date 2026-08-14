@@ -77,6 +77,12 @@ body{font-family:'Inter',Arial,sans-serif}
 .cidade-dropdown input{width:100%;border:1px solid #DDDDDD;border-radius:10px;padding:11px 14px;font-size:14.5px;box-sizing:border-box}
 .cidade-dropdown input:focus{outline:2px solid #222222;outline-offset:1px}
 .cidade-sugestoes{margin-top:8px;max-height:320px;overflow-y:auto}
+.cidade-pill--field{width:100%}
+.cidade-pill--field .cidade-pill-btn{width:100%;justify-content:flex-start;border:1px solid #DDDDDD;border-radius:12px;padding:10px 12px;font-weight:400;color:#222}
+.cidade-pill--field .cidade-pill-btn:hover{background:#fff;border-color:#222}
+.cidade-pill--field.on .cidade-pill-btn{background:#fff}
+.cidade-pill--field .cidade-pill-label{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cidade-pill--field .cidade-dropdown{width:100%}
 .cidade-sugestao{display:flex;align-items:center;gap:12px;padding:10px 8px;border-radius:10px;cursor:pointer;font-size:14.5px}
 .cidade-sugestao:hover{background:#F7F7F7}
 .cidade-sugestao .ic{width:34px;height:34px;border-radius:50%;background:#F7F7F7;display:flex;align-items:center;justify-content:center;flex:none}
@@ -115,13 +121,13 @@ body{font-family:'Inter',Arial,sans-serif}
     <div class="hidden flex-1 items-center justify-center gap-3 lg:flex">
       <div class="airbnb-bar">
         <div class="cidade-pill" id="cidade-pill">
-          <button type="button" class="cidade-pill-btn" id="cidade-pill-btn">
+          <button type="button" class="cidade-pill-btn">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.1-7-11a7 7 0 0 1 14 0c0 4.9-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
-            <span id="cidade-pill-label">Cidade</span>
+            <span class="cidade-pill-label">Cidade</span>
           </button>
-          <div class="cidade-dropdown" id="cidade-dropdown">
-            <input type="text" id="cidade-busca-input" placeholder="Digite o nome da cidade..." autocomplete="off">
-            <div class="cidade-sugestoes" id="cidade-sugestoes"></div>
+          <div class="cidade-dropdown">
+            <input type="text" class="cidade-busca-input" placeholder="Digite o nome da cidade..." autocomplete="off">
+            <div class="cidade-sugestoes"></div>
           </div>
         </div>
 
