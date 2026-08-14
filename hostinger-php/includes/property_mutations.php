@@ -119,6 +119,64 @@ function create_property(array $input, array $actor): int
     return (int) $pdo->lastInsertId();
 }
 
+/**
+ * Converte uma linha de `properties` (já carregada) de volta no formato de
+ * entrada esperado por update_property() — usado pelo wizard de anúncio
+ * (actions/property_draft.php), que salva a cada etapa só os campos daquela
+ * etapa e precisa reenviar o restante do imóvel inalterado.
+ */
+function property_row_to_input(array $property): array
+{
+    $cityLabel = '';
+    if (!empty($property['city_id'])) {
+        $stmt = db()->prepare('SELECT name, state_code FROM cities WHERE id = ?');
+        $stmt->execute([$property['city_id']]);
+        $city = $stmt->fetch();
+        if ($city) {
+            $cityLabel = $city['name'] . ' (' . $city['state_code'] . ')';
+        }
+    }
+    $neighborhoodName = '';
+    if (!empty($property['neighborhood_id'])) {
+        $stmt = db()->prepare('SELECT name FROM neighborhoods WHERE id = ?');
+        $stmt->execute([$property['neighborhood_id']]);
+        $neighborhoodName = (string) $stmt->fetchColumn();
+    }
+    $features = $property['features'] ?? [];
+    if (is_string($features)) {
+        $features = json_decode($features, true) ?: [];
+    }
+
+    return [
+        'title' => $property['title'] ?? '',
+        'description' => $property['description'] ?? '',
+        'listingType' => $property['listing_type'] ?? 'SALE',
+        'propertyType' => $property['property_type'] ?? 'APARTMENT',
+        'priceSale' => $property['price_sale'] ?? null,
+        'priceRent' => $property['price_rent'] ?? null,
+        'condoFee' => $property['condo_fee'] ?? null,
+        'iptu' => $property['iptu'] ?? null,
+        'totalArea' => $property['total_area'] ?? null,
+        'builtArea' => $property['built_area'] ?? null,
+        'bedrooms' => $property['bedrooms'] ?? null,
+        'suites' => $property['suites'] ?? null,
+        'bathrooms' => $property['bathrooms'] ?? null,
+        'parkingSpaces' => $property['parking_spaces'] ?? null,
+        'features' => $features,
+        'cidade' => $cityLabel,
+        'bairro' => $neighborhoodName,
+        'street' => $property['street'] ?? '',
+        'number' => $property['number'] ?? '',
+        'complement' => $property['complement'] ?? '',
+        'zipCode' => $property['zip_code'] ?? '',
+        'latitude' => $property['latitude'] ?? null,
+        'longitude' => $property['longitude'] ?? null,
+        'contactPhone' => $property['contact_phone'] ?? '',
+        'contactEmail' => $property['contact_email'] ?? '',
+        'contactWhatsapp' => $property['contact_whatsapp'] ?? '',
+    ];
+}
+
 function update_property(int $propertyId, array $input, array $actor): void
 {
     $property = get_property_by_id($propertyId);

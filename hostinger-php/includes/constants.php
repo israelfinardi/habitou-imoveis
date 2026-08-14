@@ -48,6 +48,17 @@ const COMMON_FEATURES = [
     'Estuda permuta', 'Perto de transporte público',
 ];
 
+// Agrupamento de COMMON_FEATURES por categoria, usado só na exibição do
+// wizard de anúncio (includes/property_wizard.php) — o filtro de busca
+// (filters_modal.php) continua com a lista plana.
+const FEATURE_GROUPS = [
+    'Lazer' => ['Piscina', 'Churrasqueira', 'Academia', 'Área de lazer', 'Salão de festas', 'Playground', 'Quadra esportiva', 'Sauna'],
+    'Conforto' => ['Mobiliado', 'Semi-mobiliado', 'Ar condicionado', 'Aceita animais', 'Varanda gourmet', 'Armários planejados', 'Sacada', 'Closet', 'Lareira', 'Home office', 'Isolamento acústico'],
+    'Segurança' => ['Portaria 24h', 'Segurança 24h', 'Portão eletrônico', 'Câmeras de segurança', 'Fechadura digital', 'Gerador'],
+    'Estrutura e localização' => ['Elevador', 'Garagem coberta', 'Vista para o mar', 'Depósito', 'Espaço pet', 'Coworking', 'Condomínio fechado', 'Perto de transporte público'],
+    'Negociação' => ['Aceita financiamento', 'Estuda permuta'],
+];
+
 const FEATURED_CITIES = [
     ['name' => 'Florianópolis', 'slug' => 'florianopolis', 'state' => 'Santa Catarina', 'state_code' => 'SC', 'lat' => -27.5954, 'lng' => -48.5480],
     ['name' => 'Blumenau', 'slug' => 'blumenau', 'state' => 'Santa Catarina', 'state_code' => 'SC', 'lat' => -26.9194, 'lng' => -49.0661],
