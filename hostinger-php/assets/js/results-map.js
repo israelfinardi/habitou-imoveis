@@ -41,10 +41,10 @@
   function buildPopupHtml(p) {
     var images = p.images || [];
     var media = images.length
-      ? '<div class="js-carousel-track scrollbar-none flex h-36 w-full snap-x snap-mandatory overflow-x-auto scroll-smooth">' +
-        images.map(function (src) { return '<img src="' + esc(src) + '" alt="" class="h-36 w-full shrink-0 snap-center object-cover">'; }).join('') +
+      ? '<div class="js-carousel-track scrollbar-none flex h-44 w-full snap-x snap-mandatory overflow-x-auto scroll-smooth">' +
+        images.map(function (src) { return '<img src="' + esc(src) + '" alt="" class="h-44 w-full shrink-0 snap-center object-cover">'; }).join('') +
         '</div>'
-      : '<div class="flex h-36 w-full items-center justify-center bg-brand-bg-subtle text-xs text-brand-text-secondary">Sem foto</div>';
+      : '<div class="flex h-44 w-full items-center justify-center bg-brand-bg-subtle text-xs text-brand-text-secondary">Sem foto</div>';
     var arrows = images.length > 1
       ? '<button type="button" class="js-carousel-prev absolute left-1.5 top-1/2 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-brand-text opacity-0 shadow transition group-hover:opacity-100" aria-label="Foto anterior"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>' +
         '<button type="button" class="js-carousel-next absolute right-1.5 top-1/2 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-brand-text opacity-0 shadow transition group-hover:opacity-100" aria-label="Próxima foto"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>' +
@@ -53,10 +53,10 @@
         '</div>'
       : '';
     return (
-      '<div class="w-72 overflow-hidden rounded-xl">' +
+      '<div class="w-80 overflow-hidden rounded-xl">' +
       '<div class="js-carousel group relative">' +
       media + arrows +
-      '<button type="button" class="js-favorite-btn js-favorite-overlay ' + (p.isFavorite ? 'is-favorite' : '') + ' absolute right-2 top-2 flex h-7 w-7 items-center justify-center" data-property-id="' + p.id + '" aria-label="Favoritar">' +
+      '<button type="button" class="js-favorite-btn js-favorite-overlay ' + (p.isFavorite ? 'is-favorite' : '') + ' absolute left-2 top-2 flex h-7 w-7 items-center justify-center" data-property-id="' + p.id + '" aria-label="Favoritar">' +
       '<svg width="20" height="20" viewBox="0 0 24 24" fill="' + (p.isFavorite ? '#C1502E' : 'rgba(0,0,0,.5)') + '" stroke="#fff" stroke-width="1.5" style="filter:drop-shadow(0 1px 2px rgba(0,0,0,.3))"><path d="M12 21s-7.5-4.6-10-9.3C.4 8.1 2 4.5 5.6 4c2-.3 3.8.6 6.4 3 2.6-2.4 4.4-3.3 6.4-3 3.6.5 5.2 4.1 3.6 7.7C19.5 16.4 12 21 12 21z"/></svg>' +
       '</button>' +
       '</div>' +
@@ -83,7 +83,7 @@
       popupAnchor: [0, -34],
     });
     var marker = L.marker([p.lat, p.lng], { icon: icon, riseOnHover: true });
-    marker.bindPopup(buildPopupHtml(p), { closeButton: true, minWidth: 288, maxWidth: 288, className: 'map-pin-popup', autoPanPadding: [40, 40] });
+    marker.bindPopup(buildPopupHtml(p), { closeButton: true, minWidth: 320, maxWidth: 320, className: 'map-pin-popup', autoPanPadding: [40, 40] });
     marker.on('popupopen', function () { setActive(p.id, true); });
     marker.on('popupclose', function () { setActive(p.id, false); });
     marker.addTo(map);

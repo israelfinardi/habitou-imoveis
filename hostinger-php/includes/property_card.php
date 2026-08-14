@@ -74,11 +74,21 @@ function render_property_grid(array $items, array $favoriteIds = [], string $emp
 
 /**
  * Coluna de listagem dos resultados (usada junto de render_results_map()
- * num layout de 3 colunas: filtros 15% / lista 40% / mapa 45%).
+ * num layout de 3 colunas: filtros 15% / lista 40% / mapa 45%). O breakpoint
+ * de 3 colunas é mais alto que o do grid de largura cheia (xl em vez de lg)
+ * porque essa coluna ocupa só uma fatia da página, ao lado do mapa.
  */
 function render_property_list(array $items, array $favoriteIds = [], string $emptyMessage = 'Nenhum imóvel encontrado com esses filtros.'): void
 {
-    render_property_grid($items, $favoriteIds, $emptyMessage, 'results-grid', false);
+    if (empty($items)) {
+        echo '<div class="rounded-xl border border-dashed border-brand-border p-12 text-center text-brand-text-secondary">' . e($emptyMessage) . '</div>';
+        return;
+    }
+    echo '<div id="results-grid" class="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">';
+    foreach ($items as $p) {
+        render_property_card($p, in_array((int) $p['id'], $favoriteIds, true));
+    }
+    echo '</div>';
 }
 
 /**

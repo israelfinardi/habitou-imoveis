@@ -63,6 +63,13 @@ body{font-family:'Plus Jakarta Sans',Arial,sans-serif}
 .price-pin-label.active,.price-pin-label:hover{background:#C1502E;color:#fff;border-color:#C1502E;z-index:1000!important}
 .map-pin-popup .leaflet-popup-content-wrapper{padding:0;border-radius:12px;overflow:hidden}
 .map-pin-popup .leaflet-popup-content{margin:0;width:100%!important}
+.map-pin-popup .leaflet-popup-close-button{
+  top:8px!important;right:8px!important;width:26px!important;height:26px!important;
+  display:flex!important;align-items:center;justify-content:center;
+  background:rgba(255,255,255,.92)!important;border-radius:999px;
+  box-shadow:0 1px 4px rgba(0,0,0,.3);font-size:16px!important;
+  color:#222!important;z-index:20;
+}
 
 /* --- Barra de busca única estilo Airbnb (cidade | transação | botão) --- */
 .airbnb-bar{display:flex;align-items:center;background:#fff;border:1px solid #DDDDDD;border-radius:999px;box-shadow:0 1px 2px rgba(0,0,0,.08);transition:box-shadow .2s;padding:6px}
