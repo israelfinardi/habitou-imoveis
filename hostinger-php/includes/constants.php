@@ -52,6 +52,20 @@ const FEATURED_CITIES = [
     ['name' => 'Indaial', 'slug' => 'indaial', 'state' => 'Santa Catarina', 'state_code' => 'SC', 'lat' => -26.8977, 'lng' => -49.2306],
 ];
 
+// Mesorregiões de Santa Catarina, usadas na seção "Explore por região" da
+// home — agrupamento geográfico real (não depende de cities.region, que só
+// é preenchido para cidades cadastradas via o localizador de cadastro).
+const SC_REGIONS = [
+    ['name' => 'Grande Florianópolis', 'subtitle' => 'Capital · Litoral central', 'cities' => ['Florianópolis', 'São José', 'Palhoça', 'Biguaçu']],
+    ['name' => 'Vale Europeu', 'subtitle' => 'Imigração · Tradição', 'cities' => ['Blumenau', 'Brusque', 'Gaspar', 'Indaial', 'Pomerode']],
+    ['name' => 'Costa Esmeralda', 'subtitle' => 'Litoral norte', 'cities' => ['Balneário Camboriú', 'Itajaí', 'Itapema', 'Bombinhas']],
+    ['name' => 'Norte Catarinense', 'subtitle' => 'Indústria · Logística', 'cities' => ['Joinville', 'Jaraguá do Sul', 'São Bento do Sul']],
+    ['name' => 'Alto Vale do Itajaí', 'subtitle' => 'Vale interior', 'cities' => ['Rio do Sul', 'Ituporanga', 'Ibirama', 'Taió']],
+    ['name' => 'Serrana', 'subtitle' => 'Serra Catarinense', 'cities' => ['Lages', 'São Joaquim', 'Bom Retiro', 'Urubici']],
+    ['name' => 'Oeste Catarinense', 'subtitle' => 'Agronegócio · Fronteira', 'cities' => ['Chapecó', 'Concórdia', 'São Miguel do Oeste']],
+    ['name' => 'Sul Catarinense', 'subtitle' => 'Litoral sul · Carvão', 'cities' => ['Criciúma', 'Tubarão', 'Araranguá', 'Laguna']],
+];
+
 const BRAZIL_STATES = [
     'AC' => 'Acre', 'AL' => 'Alagoas', 'AP' => 'Amapá', 'AM' => 'Amazonas', 'BA' => 'Bahia',
     'CE' => 'Ceará', 'DF' => 'Distrito Federal', 'ES' => 'Espírito Santo', 'GO' => 'Goiás',

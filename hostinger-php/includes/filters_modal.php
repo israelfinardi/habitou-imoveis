@@ -32,15 +32,21 @@ function render_filters_modal(string $action, array $get, array $neighborhoods =
 
           <div class="mb-6 border-t border-brand-border pt-5">
             <h3 class="mb-3 text-sm font-semibold">Tipo de imóvel</h3>
-            <div class="flex flex-wrap gap-2">
-              <label class="filtro-pill">
+            <div class="grid grid-cols-3 gap-2 sm:grid-cols-4">
+              <label class="filtro-tipo-card">
                 <input type="radio" name="tipo" value="" <?= $currentType === '' ? 'checked' : '' ?> class="js-filtros-live">
-                <span>Qualquer tipo</span>
+                <span>
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="7" height="7" rx="1"/><rect x="13" y="4" width="7" height="7" rx="1"/><rect x="4" y="13" width="7" height="7" rx="1"/><rect x="13" y="13" width="7" height="7" rx="1"/></svg>
+                  <em>Qualquer tipo</em>
+                </span>
               </label>
               <?php foreach (PROPERTY_TYPE_SLUG as $type => $slug): ?>
-                <label class="filtro-pill">
+                <label class="filtro-tipo-card">
                   <input type="radio" name="tipo" value="<?= e($slug) ?>" <?= $currentType === $slug ? 'checked' : '' ?> class="js-filtros-live">
-                  <span><?= e(PROPERTY_TYPE_LABEL[$type]) ?></span>
+                  <span>
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><?= CATEGORY_ICONS[$type] ?></svg>
+                    <em><?= e(PROPERTY_TYPE_LABEL[$type]) ?></em>
+                  </span>
                 </label>
               <?php endforeach; ?>
             </div>
@@ -122,6 +128,12 @@ function render_filters_modal(string $action, array $get, array $neighborhoods =
     .filtro-pill span{border:1px solid #DDDDDD;border-radius:999px;padding:8px 14px;font-size:13.5px;font-weight:600;cursor:pointer;transition:.15s}
     .filtro-pill input:checked + span{border-color:#222222;background:#222222;color:#fff}
     .filtro-pill:hover span{border-color:#222222}
+    .filtro-tipo-card{display:block}
+    .filtro-tipo-card input{position:absolute;opacity:0;width:0;height:0}
+    .filtro-tipo-card span{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;border:1px solid #DDDDDD;border-radius:12px;padding:14px 6px;font-size:12px;font-weight:600;text-align:center;cursor:pointer;transition:.15s;color:#222}
+    .filtro-tipo-card em{font-style:normal;line-height:1.2}
+    .filtro-tipo-card input:checked + span{border-color:#222222;border-width:2px;background:#F7F7F7}
+    .filtro-tipo-card:hover span{border-color:#222222}
     </style>
     <script src="<?= base_url('assets/js/filters-modal.js') ?>"></script>
     <?php
