@@ -108,11 +108,15 @@ function publish_plan_to_mercadopago(array $plan): void
 }
 
 /**
- * Cria a assinatura no Mercado Pago para o usuário/plano e devolve a URL de
- * checkout (init_point) pra onde o usuário deve ser redirecionado. Grava
- * uma linha local em status PENDING antes de chamar a API, pra já ter um id
- * local pra usar na back_url — se a chamada à API falhar, a linha é
- * removida.
+ * Devolve a URL de checkout hospedado do Mercado Pago pra esse plano — o
+ * cliente entra com o e-mail/cartão dele diretamente na página do Mercado
+ * Pago, sem passar por nada no nosso servidor. Tentar criar a assinatura
+ * via API antes (POST /preapproval) e redirecionar pro init_point retornado
+ * não funciona de forma confiável nesse fluxo (dá 400/500 dependendo dos
+ * campos) — o link de checkout do próprio plano já é a forma correta e
+ * documentada de iniciar. A assinatura em si só passa a existir do lado do
+ * Mercado Pago quando o cliente termina o checkout; nós descobrimos isso no
+ * retorno (assinatura-retorno.php) e/ou pelo webhook.
  */
 function start_subscription_checkout(array $user, array $plan): string
 {
@@ -120,50 +124,65 @@ function start_subscription_checkout(array $user, array $plan): string
         throw new \RuntimeException('Este plano ainda não está sincronizado com o Mercado Pago.');
     }
 
+    return 'https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=' . urlencode($plan['mp_plan_id']);
+}
+
+/**
+ * Encontra a assinatura local de um preapproval do Mercado Pago que ainda
+ * não tinha linha aqui (o fluxo de checkout hospedado cria a assinatura do
+ * lado deles, não do nosso) — usada por activate_subscription_from_preapproval.
+ * Identifica o usuário local por $knownUserId (a sessão logada que acessou
+ * o link de retorno — a forma mais confiável) ou, na falta dele (caso do
+ * webhook, sem sessão), pelo payer_email cadastrado na assinatura no
+ * Mercado Pago batendo com o e-mail de um usuário nosso.
+ */
+function find_or_create_subscription_for_preapproval(array $mp, ?int $knownUserId = null): ?array
+{
     $pdo = db();
-    $pdo->prepare('INSERT INTO subscriptions (user_id, agency_id, plan_id, status) VALUES (?,?,?,"PENDING")')
-        ->execute([$user['id'], $user['agency_id'] ?: null, $plan['id']]);
-    $localId = (int) $pdo->lastInsertId();
-
-    try {
-        $result = mp_create_preapproval([
-            'preapproval_plan_id' => $plan['mp_plan_id'],
-            'reason' => $plan['name'],
-            'external_reference' => 'habitou-' . $user['id'] . '-' . $plan['id'] . '-' . $localId,
-            'payer_email' => $user['email'],
-            // Vazio (em vez de omitido) sinaliza pro Mercado Pago que é o
-            // fluxo de checkout hospedado (o pagador digita o cartão na
-            // página deles) — sem isso a API exige um cartão já tokenizado
-            // no nosso servidor (checkout transparente, que não implementamos).
-            'card_token_id' => '',
-            'back_url' => base_url('assinatura-retorno.php?sub=' . $localId),
-            'notification_url' => base_url('actions/mercadopago_webhook.php'),
-            'status' => 'pending',
-        ]);
-    } catch (MercadoPagoException $e) {
-        $pdo->prepare('DELETE FROM subscriptions WHERE id = ?')->execute([$localId]);
-        throw $e;
+    $mpPlanId = $mp['preapproval_plan_id'] ?? null;
+    if (!$mpPlanId) {
+        return null;
+    }
+    $planStmt = $pdo->prepare('SELECT id FROM plans WHERE mp_plan_id = ?');
+    $planStmt->execute([$mpPlanId]);
+    $planId = $planStmt->fetchColumn();
+    if (!$planId) {
+        return null;
     }
 
-    $initPoint = $result['init_point'] ?? null;
-    if (!$initPoint) {
-        $pdo->prepare('DELETE FROM subscriptions WHERE id = ?')->execute([$localId]);
-        throw new MercadoPagoException('O Mercado Pago não retornou uma URL de checkout.');
+    $userId = $knownUserId;
+    if (!$userId && !empty($mp['payer_email'])) {
+        $userStmt = $pdo->prepare('SELECT id FROM users WHERE LOWER(email) = LOWER(?)');
+        $userStmt->execute([$mp['payer_email']]);
+        $userId = $userStmt->fetchColumn() ?: null;
+    }
+    if (!$userId) {
+        return null;
     }
 
-    $pdo->prepare('UPDATE subscriptions SET external_id = ? WHERE id = ?')->execute([$result['id'], $localId]);
+    $agencyStmt = $pdo->prepare('SELECT agency_id FROM users WHERE id = ?');
+    $agencyStmt->execute([$userId]);
+    $agencyId = $agencyStmt->fetchColumn() ?: null;
 
-    return $initPoint;
+    $pdo->prepare('INSERT INTO subscriptions (user_id, agency_id, plan_id, status, external_id) VALUES (?,?,?,"PENDING",?)')
+        ->execute([$userId, $agencyId ?: null, $planId, $mp['id']]);
+    $newId = (int) $pdo->lastInsertId();
+
+    $stmt = $pdo->prepare('SELECT * FROM subscriptions WHERE id = ?');
+    $stmt->execute([$newId]);
+    return $stmt->fetch() ?: null;
 }
 
 /**
  * Confere na API do Mercado Pago o status real de uma assinatura (nunca
  * confia em valores vindos do retorno do checkout ou do corpo do webhook) e
- * espelha no banco local. Ao ativar um plano, cancela qualquer outra
- * assinatura ACTIVE/PENDING do mesmo usuário/imobiliária, já que só um
- * plano fica valendo por vez.
+ * espelha no banco local — criando a linha local na primeira vez que a
+ * gente sabe da assinatura, já que ela nasce do lado do Mercado Pago no
+ * checkout hospedado. Ao ativar um plano, cancela qualquer outra assinatura
+ * ACTIVE/PENDING do mesmo usuário/imobiliária, já que só um plano fica
+ * valendo por vez.
  */
-function activate_subscription_from_preapproval(?string $preapprovalId): ?array
+function activate_subscription_from_preapproval(?string $preapprovalId, ?int $knownUserId = null): ?array
 {
     if (!$preapprovalId) {
         return null;
@@ -179,7 +198,10 @@ function activate_subscription_from_preapproval(?string $preapprovalId): ?array
     $stmt->execute([$preapprovalId]);
     $sub = $stmt->fetch();
     if (!$sub) {
-        return null;
+        $sub = find_or_create_subscription_for_preapproval($mp, $knownUserId);
+        if (!$sub) {
+            return null;
+        }
     }
 
     $newStatus = mp_status_to_local($mp['status'] ?? '');

@@ -97,16 +97,6 @@ function mp_update_preapproval_plan(string $id, array $data): array
     return $res['body'];
 }
 
-/** POST /preapproval — cria a assinatura de um pagador para um plano específico. */
-function mp_create_preapproval(array $data): array
-{
-    $res = mp_request('POST', '/preapproval', $data);
-    if (!$res['ok']) {
-        throw new MercadoPagoException('Erro ao criar assinatura no Mercado Pago (HTTP ' . $res['status'] . '): ' . ($res['body']['message'] ?? 'erro desconhecido'));
-    }
-    return $res['body'];
-}
-
 /** GET /preapproval/{id} — status atual de uma assinatura. */
 function mp_get_preapproval(string $id): ?array
 {
