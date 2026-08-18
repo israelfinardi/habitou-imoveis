@@ -3,10 +3,23 @@ require_once __DIR__ . '/includes/bootstrap.php';
 
 $user = require_login();
 
+// O link normal já vem com ?sub=<id local>. Mas o Mercado Pago às vezes usa
+// o back_url configurado no PLANO (não o que a gente manda por assinatura) e
+// aí só chega o preapproval_id que ele mesmo acrescenta na URL — nesse caso
+// a assinatura é localizada por ele, sempre conferindo que pertence a quem
+// está logado agora antes de mostrar qualquer detalhe do plano.
 $subId = (int) ($_GET['sub'] ?? 0);
-$stmt = db()->prepare('SELECT s.*, p.name AS plan_name FROM subscriptions s JOIN plans p ON p.id = s.plan_id WHERE s.id = ? AND s.user_id = ?');
-$stmt->execute([$subId, $user['id']]);
-$sub = $stmt->fetch();
+if ($subId) {
+    $stmt = db()->prepare('SELECT s.*, p.name AS plan_name FROM subscriptions s JOIN plans p ON p.id = s.plan_id WHERE s.id = ? AND s.user_id = ?');
+    $stmt->execute([$subId, $user['id']]);
+    $sub = $stmt->fetch();
+} elseif (!empty($_GET['preapproval_id'])) {
+    $stmt = db()->prepare('SELECT s.*, p.name AS plan_name FROM subscriptions s JOIN plans p ON p.id = s.plan_id WHERE s.external_id = ? AND s.user_id = ?');
+    $stmt->execute([$_GET['preapproval_id'], $user['id']]);
+    $sub = $stmt->fetch();
+} else {
+    $sub = null;
+}
 
 $result = null;
 $error = null;

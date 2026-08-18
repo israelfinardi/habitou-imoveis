@@ -33,6 +33,7 @@ function sync_plans_from_mercadopago(): array
     $mpPlans = mp_list_preapproval_plans();
     $created = 0;
     $updated = 0;
+    $expectedBackUrl = base_url('assinatura-retorno.php');
 
     foreach ($mpPlans as $mpPlan) {
         $mpId = $mpPlan['id'] ?? null;
@@ -46,6 +47,18 @@ function sync_plans_from_mercadopago(): array
         $frequencyType = $recurring['frequency_type'] ?? 'months';
         $billingPeriod = ($frequency === 1 && $frequencyType === 'months') ? 'MONTHLY' : strtoupper($frequency . '_' . $frequencyType);
         $active = ($mpPlan['status'] ?? '') === 'active' ? 1 : 0;
+
+        // Corrige o link de retorno do checkout desse plano se estiver
+        // desatualizado (ex.: planos publicados antes da correção do
+        // assinatura-retorno.php, ou editados manualmente no painel deles).
+        if (($mpPlan['back_url'] ?? null) !== $expectedBackUrl) {
+            try {
+                mp_update_preapproval_plan($mpId, ['back_url' => $expectedBackUrl]);
+            } catch (MercadoPagoException $e) {
+                // Não interrompe a sincronização por causa disso — o plano
+                // ainda é espelhado normalmente, só o back_url fica pendente.
+            }
+        }
 
         $stmt = $pdo->prepare('SELECT id FROM plans WHERE mp_plan_id = ?');
         $stmt->execute([$mpId]);
@@ -88,7 +101,7 @@ function publish_plan_to_mercadopago(array $plan): void
             'transaction_amount' => (float) $plan['price'],
             'currency_id' => 'BRL',
         ],
-        'back_url' => base_url('planos.php'),
+        'back_url' => base_url('assinatura-retorno.php'),
     ]);
 
     db()->prepare('UPDATE plans SET mp_plan_id = ? WHERE id = ?')->execute([$result['id'], $plan['id']]);
@@ -118,6 +131,11 @@ function start_subscription_checkout(array $user, array $plan): string
             'reason' => $plan['name'],
             'external_reference' => 'habitou-' . $user['id'] . '-' . $plan['id'] . '-' . $localId,
             'payer_email' => $user['email'],
+            // Vazio (em vez de omitido) sinaliza pro Mercado Pago que é o
+            // fluxo de checkout hospedado (o pagador digita o cartão na
+            // página deles) — sem isso a API exige um cartão já tokenizado
+            // no nosso servidor (checkout transparente, que não implementamos).
+            'card_token_id' => '',
             'back_url' => base_url('assinatura-retorno.php?sub=' . $localId),
             'notification_url' => base_url('actions/mercadopago_webhook.php'),
             'status' => 'pending',

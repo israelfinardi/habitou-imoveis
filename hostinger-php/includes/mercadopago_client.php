@@ -87,6 +87,16 @@ function mp_create_preapproval_plan(array $data): array
     return $res['body'];
 }
 
+/** PUT /preapproval_plan/{id} — corrige campos de um plano já criado (ex.: back_url). */
+function mp_update_preapproval_plan(string $id, array $data): array
+{
+    $res = mp_request('PUT', '/preapproval_plan/' . urlencode($id), $data);
+    if (!$res['ok']) {
+        throw new MercadoPagoException('Erro ao atualizar plano no Mercado Pago (HTTP ' . $res['status'] . '): ' . ($res['body']['message'] ?? 'erro desconhecido'));
+    }
+    return $res['body'];
+}
+
 /** POST /preapproval — cria a assinatura de um pagador para um plano específico. */
 function mp_create_preapproval(array $data): array
 {
