@@ -4,8 +4,6 @@ require_once __DIR__ . '/includes/bootstrap.php';
 $user = current_user();
 $featured = get_featured_properties(6);
 $favoriteIds = $user ? get_favorite_ids($user['id']) : [];
-$florianopolis = get_properties_by_city('florianopolis', 3);
-$blumenau = get_properties_by_city('blumenau', 3);
 
 $heroMain = $featured[0] ?? null;
 $heroMini = array_slice($featured, 1, 3);
@@ -37,30 +35,11 @@ foreach ($typeCountsStmt->fetchAll() as $row) {
 }
 arsort($typeCounts);
 
-// Contagem real de imóveis publicados por mesorregião de SC, para "Explore por região".
-$regions = [];
-foreach (SC_REGIONS as $region) {
-    $placeholders = implode(',', array_fill(0, count($region['cities']), '?'));
-    $stmtR = db()->prepare(
-        "SELECT COUNT(*) FROM properties p JOIN cities c ON c.id = p.city_id
-         WHERE p.status = \"PUBLISHED\" AND c.name IN ($placeholders)"
-    );
-    $stmtR->execute($region['cities']);
-    $region['total'] = (int) $stmtR->fetchColumn();
-    // Só linkamos direto para a cidade quando ela já existe entre as
-    // cidades em destaque (com página própria) — as demais mesorregiões
-    // aparecem só como conteúdo informativo, sem link quebrado.
-    $region['href'] = null;
-    foreach ($region['cities'] as $cityName) {
-        foreach (FEATURED_CITIES as $fc) {
-            if ($fc['name'] === $cityName) {
-                $region['href'] = base_url('cidade.php?slug=' . $fc['slug']);
-                break 2;
-            }
-        }
-    }
-    $regions[] = $region;
-}
+// Imóveis da cidade mais ativa do momento (heroCity, já usada como padrão do
+// formulário de busca) — alimenta a seção "Imóveis em {cidade}" mais abaixo.
+// Nacional: mostra sempre a cidade mais movimentada, seja qual for, em vez
+// de cidades fixas.
+$heroCityProperties = $heroCity ? get_properties_by_city($heroCity['slug'], 3) : [];
 
 $faqs = [
     ['Como funciona o aluguel sem fiador?', 'O aluguel sem fiador funciona através de seguros fiança ou caução. Ao alugar um imóvel pela Habitou Imóveis, você pode verificar com o anunciante quais modalidades ele aceita, dispensando a necessidade de um fiador tradicional.'],
@@ -71,8 +50,8 @@ $faqs = [
     ['Posso visitar o imóvel antes de finalizar a compra online?', 'Sim, e recomendamos sempre visitar. Combine a visita diretamente com o anunciante pelos contatos informados no anúncio.'],
 ];
 
-$pageTitle = APP_NAME . ' — Apartamentos, casas e terrenos em Santa Catarina';
-$pageDescription = 'Encontre apartamentos, casas e terrenos para comprar ou alugar em Santa Catarina. Anuncie seu imóvel ou encontre imobiliárias e corretores de confiança.';
+$pageTitle = APP_NAME . ' — Apartamentos, casas e terrenos em todo o Brasil';
+$pageDescription = 'Encontre apartamentos, casas e terrenos para comprar ou alugar em todo o Brasil. Anuncie seu imóvel ou encontre imobiliárias e corretores de confiança.';
 require __DIR__ . '/includes/header.php';
 ?>
 
@@ -89,13 +68,13 @@ require __DIR__ . '/includes/header.php';
   <div class="relative mx-auto grid max-w-[1800px] gap-10 px-4 sm:px-6 lg:grid-cols-2 lg:items-center lg:gap-6 lg:px-8">
     <div>
       <span class="inline-flex items-center gap-2 rounded-full border border-brand-border bg-white px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-brand-text-secondary">
-        <span class="h-1.5 w-1.5 rounded-full bg-brand-green"></span> O portal de imóveis de Santa Catarina
+        <span class="h-1.5 w-1.5 rounded-full bg-brand-green"></span> O portal de imóveis do Brasil
       </span>
       <h1 class="mt-4 text-3xl font-extrabold leading-tight tracking-tight text-brand-text sm:text-4xl lg:text-[2.6rem]">
-        Encontre seu <span class="text-brand-primary">próximo lar</span> no litoral ou na serra.
+        Encontre seu <span class="text-brand-primary">próximo lar</span> em qualquer lugar do Brasil.
       </h1>
       <p class="mt-3 max-w-xl text-brand-text-secondary">
-        Apartamentos, casas e terrenos verificados em Florianópolis, Blumenau, Balneário Camboriú, Joinville e outras cidades de Santa Catarina.
+        Apartamentos, casas e terrenos verificados em todo o país.
       </p>
 
       <form action="<?= base_url('imoveis.php') ?>" method="get" class="mt-7 rounded-3xl border border-brand-border bg-white p-4 shadow-lg">
@@ -243,26 +222,11 @@ document.getElementById('buscar-codigo-link')?.addEventListener('click', functio
   <div class="mx-auto grid max-w-[1800px] grid-cols-2 gap-6 px-4 text-center sm:px-6 lg:grid-cols-4 lg:px-8">
     <div><p class="text-2xl font-extrabold text-brand-text sm:text-3xl"><?= number_format($stats['imoveis'], 0, ',', '.') ?></p><p class="mt-1 text-sm text-brand-text-secondary">imóveis anunciados</p></div>
     <div><p class="text-2xl font-extrabold text-brand-text sm:text-3xl"><?= number_format($stats['imobiliarias'], 0, ',', '.') ?></p><p class="mt-1 text-sm text-brand-text-secondary">imobiliárias parceiras</p></div>
-    <div><p class="text-2xl font-extrabold text-brand-text sm:text-3xl"><?= number_format($stats['cidades'], 0, ',', '.') ?></p><p class="mt-1 text-sm text-brand-text-secondary">cidades em SC</p></div>
+    <div><p class="text-2xl font-extrabold text-brand-text sm:text-3xl"><?= number_format($stats['cidades'], 0, ',', '.') ?></p><p class="mt-1 text-sm text-brand-text-secondary">cidades atendidas</p></div>
     <div><p class="text-2xl font-extrabold text-brand-text sm:text-3xl">100%</p><p class="mt-1 text-sm text-brand-text-secondary">corretores com CRECI verificado</p></div>
   </div>
 </section>
 <?php endif; ?>
-
-<section class="mx-auto max-w-[1800px] px-4 py-12 sm:px-6 lg:px-8">
-  <h2 class="text-2xl font-bold text-brand-text">Do litoral norte<br>à serra catarinense.</h2>
-  <p class="mt-2 text-brand-text-secondary">Explore por região</p>
-  <div class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-    <?php foreach ($regions as $region): $tag = $region['href'] ? 'a' : 'div'; ?>
-      <<?= $tag ?> <?= $region['href'] ? 'href="' . e($region['href']) . '"' : '' ?> class="block rounded-2xl border border-brand-border p-4 transition <?= $region['href'] ? 'hover:border-brand-primary hover:shadow-sm' : '' ?>">
-        <p class="text-xs font-semibold uppercase tracking-wide text-brand-primary"><?= e($region['subtitle']) ?></p>
-        <p class="mt-1 text-base font-bold text-brand-text"><?= e($region['name']) ?></p>
-        <p class="mt-1 text-xs text-brand-text-secondary"><?= e(implode(', ', $region['cities'])) ?></p>
-        <p class="mt-2 text-xs font-medium text-brand-text-secondary"><?= number_format($region['total'], 0, ',', '.') ?> imóve<?= $region['total'] === 1 ? 'l' : 'is' ?></p>
-      </<?= $tag ?>>
-    <?php endforeach; ?>
-  </div>
-</section>
 
 <section class="border-t border-brand-border bg-brand-bg-subtle py-12">
   <div class="mx-auto max-w-[1800px] px-4 sm:px-6 lg:px-8">
@@ -281,36 +245,19 @@ document.getElementById('buscar-codigo-link')?.addEventListener('click', functio
 </section>
 
 <section class="mx-auto max-w-[1800px] px-4 py-12 sm:px-6 lg:px-8">
-  <h2 class="mb-2 text-xl font-bold">Cidades em destaque</h2>
-  <div class="mb-10 flex flex-wrap gap-2">
-    <?php foreach (FEATURED_CITIES as $c): ?>
-      <a href="<?= base_url('cidade.php?slug=' . $c['slug']) ?>" class="rounded-full border border-brand-border px-4 py-2 text-sm font-medium hover:border-brand-primary hover:text-brand-primary"><?= e($c['name']) ?></a>
-    <?php endforeach; ?>
-  </div>
-
   <div class="mb-4 flex items-center justify-between">
     <h2 class="text-xl font-bold">Imóveis em destaque</h2>
     <a href="<?= base_url('imoveis.php') ?>" class="text-sm font-medium text-brand-primary hover:underline">Ver todos</a>
   </div>
   <?php render_property_grid($featured, $favoriteIds); ?>
 
-  <?php if ($florianopolis): ?>
+  <?php if ($heroCity && $heroCityProperties): ?>
     <div class="mt-12">
       <div class="mb-4 flex items-center justify-between">
-        <h2 class="text-xl font-bold">Imóveis em Florianópolis</h2>
-        <a href="<?= base_url('cidade.php?slug=florianopolis') ?>" class="text-sm font-medium text-brand-primary hover:underline">Ver mais</a>
+        <h2 class="text-xl font-bold">Imóveis em <?= e($heroCity['name']) ?></h2>
+        <a href="<?= base_url('cidade.php?slug=' . $heroCity['slug']) ?>" class="text-sm font-medium text-brand-primary hover:underline">Ver mais</a>
       </div>
-      <?php render_property_grid($florianopolis, $favoriteIds); ?>
-    </div>
-  <?php endif; ?>
-
-  <?php if ($blumenau): ?>
-    <div class="mt-12">
-      <div class="mb-4 flex items-center justify-between">
-        <h2 class="text-xl font-bold">Imóveis em Blumenau</h2>
-        <a href="<?= base_url('cidade.php?slug=blumenau') ?>" class="text-sm font-medium text-brand-primary hover:underline">Ver mais</a>
-      </div>
-      <?php render_property_grid($blumenau, $favoriteIds); ?>
+      <?php render_property_grid($heroCityProperties, $favoriteIds); ?>
     </div>
   <?php endif; ?>
 </section>

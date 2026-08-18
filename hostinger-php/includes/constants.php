@@ -59,27 +59,20 @@ const FEATURE_GROUPS = [
     'Negociação' => ['Aceita financiamento', 'Estuda permuta'],
 ];
 
-const FEATURED_CITIES = [
+// Não é mais exibida como "cidades em destaque" em lugar nenhum do site (o
+// portal cobre o Brasil todo, não uma região específica) — serve só de
+// bootstrap: popula algumas cidades reais no primeiro run (includes/seed.php)
+// e garante slugs estáveis para elas em get_or_create_city() /
+// property_mutations.php, evitando duplicar a cidade com um slug diferente
+// caso ela já tenha imóveis publicados sob o slug curto (ex. "florianopolis"
+// em vez de "florianopolis-sc").
+const SEED_CITIES = [
     ['name' => 'Florianópolis', 'slug' => 'florianopolis', 'state' => 'Santa Catarina', 'state_code' => 'SC', 'lat' => -27.5954, 'lng' => -48.5480],
     ['name' => 'Blumenau', 'slug' => 'blumenau', 'state' => 'Santa Catarina', 'state_code' => 'SC', 'lat' => -26.9194, 'lng' => -49.0661],
     ['name' => 'Balneário Camboriú', 'slug' => 'balneario-camboriu', 'state' => 'Santa Catarina', 'state_code' => 'SC', 'lat' => -26.9906, 'lng' => -48.6349],
     ['name' => 'Joinville', 'slug' => 'joinville', 'state' => 'Santa Catarina', 'state_code' => 'SC', 'lat' => -26.3044, 'lng' => -48.8464],
     ['name' => 'Itajaí', 'slug' => 'itajai', 'state' => 'Santa Catarina', 'state_code' => 'SC', 'lat' => -26.9078, 'lng' => -48.6614],
     ['name' => 'Indaial', 'slug' => 'indaial', 'state' => 'Santa Catarina', 'state_code' => 'SC', 'lat' => -26.8977, 'lng' => -49.2306],
-];
-
-// Mesorregiões de Santa Catarina, usadas na seção "Explore por região" da
-// home — agrupamento geográfico real (não depende de cities.region, que só
-// é preenchido para cidades cadastradas via o localizador de cadastro).
-const SC_REGIONS = [
-    ['name' => 'Grande Florianópolis', 'subtitle' => 'Capital · Litoral central', 'cities' => ['Florianópolis', 'São José', 'Palhoça', 'Biguaçu']],
-    ['name' => 'Vale Europeu', 'subtitle' => 'Imigração · Tradição', 'cities' => ['Blumenau', 'Brusque', 'Gaspar', 'Indaial', 'Pomerode']],
-    ['name' => 'Costa Esmeralda', 'subtitle' => 'Litoral norte', 'cities' => ['Balneário Camboriú', 'Itajaí', 'Itapema', 'Bombinhas']],
-    ['name' => 'Norte Catarinense', 'subtitle' => 'Indústria · Logística', 'cities' => ['Joinville', 'Jaraguá do Sul', 'São Bento do Sul']],
-    ['name' => 'Alto Vale do Itajaí', 'subtitle' => 'Vale interior', 'cities' => ['Rio do Sul', 'Ituporanga', 'Ibirama', 'Taió']],
-    ['name' => 'Serrana', 'subtitle' => 'Serra Catarinense', 'cities' => ['Lages', 'São Joaquim', 'Bom Retiro', 'Urubici']],
-    ['name' => 'Oeste Catarinense', 'subtitle' => 'Agronegócio · Fronteira', 'cities' => ['Chapecó', 'Concórdia', 'São Miguel do Oeste']],
-    ['name' => 'Sul Catarinense', 'subtitle' => 'Litoral sul · Carvão', 'cities' => ['Criciúma', 'Tubarão', 'Araranguá', 'Laguna']],
 ];
 
 const BRAZIL_STATES = [

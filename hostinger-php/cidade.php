@@ -7,13 +7,14 @@ $stmt = db()->prepare('SELECT * FROM cities WHERE slug = ?');
 $stmt->execute([$slug]);
 $city = $stmt->fetch();
 
-// As cidades em destaque são páginas de marketing curadas — devem sempre existir,
-// mesmo que ainda não tenham nenhum imóvel cadastrado (ex.: banco recém-limpo).
+// As cidades de bootstrap (includes/constants.php) devem sempre existir como
+// página, mesmo que ainda não tenham nenhum imóvel cadastrado (ex.: banco
+// recém-limpo).
 if (!$city) {
-    foreach (FEATURED_CITIES as $fc) {
+    foreach (SEED_CITIES as $fc) {
         if ($fc['slug'] === $slug) {
             db()->prepare('INSERT INTO cities (name, slug, state, state_code, region, latitude, longitude) VALUES (?,?,?,?,?,?,?)')
-                ->execute([$fc['name'], $fc['slug'], $fc['state'], $fc['state_code'], 'Santa Catarina', $fc['lat'], $fc['lng']]);
+                ->execute([$fc['name'], $fc['slug'], $fc['state'], $fc['state_code'], BRAZIL_REGIONS[$fc['state_code']] ?? null, $fc['lat'], $fc['lng']]);
             $stmt->execute([$slug]);
             $city = $stmt->fetch();
             break;
@@ -73,7 +74,7 @@ if ($hasFilters) {
       <div class="mx-auto max-w-[1800px] px-4 py-12 sm:px-6 lg:px-8">
         <h1 class="text-3xl font-bold">Imóveis em <?= e($city['name']) ?></h1>
         <p class="mt-2 max-w-2xl text-brand-text-secondary">
-          <?= e($city['description'] ?: "Explore os melhores apartamentos, casas e terrenos disponíveis para comprar ou alugar em {$city['name']}, Santa Catarina.") ?>
+          <?= e($city['description'] ?: "Explore os melhores apartamentos, casas e terrenos disponíveis para comprar ou alugar em {$city['name']}, {$city['state']}.") ?>
         </p>
         <div class="mt-6 flex gap-3">
           <a href="<?= base_url('cidade.php?slug=' . $city['slug'] . '&transacao=comprar') ?>" class="rounded-full bg-brand-primary px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-primary-hover">Comprar</a>

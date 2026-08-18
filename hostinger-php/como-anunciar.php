@@ -7,15 +7,15 @@ $features = [
     ['Leads onde você preferir', 'Receba contatos por WhatsApp, telefone ou e-mail — sem intermediários.'],
     ['Sua página no portal', 'Tenha um espaço próprio com todos os seus imóveis, dados de contato e identidade profissional.'],
 ];
-$pageTitle = 'Como anunciar imóveis em SC';
-$pageDescription = 'Anuncie no Habitou Imóveis e receba leads qualificados de quem realmente quer comprar ou alugar em Santa Catarina.';
+$pageTitle = 'Como anunciar imóveis no Habitou Imóveis';
+$pageDescription = 'Anuncie no Habitou Imóveis e receba leads qualificados de quem realmente quer comprar ou alugar, em qualquer lugar do Brasil.';
 require __DIR__ . '/includes/header.php';
 ?>
 <div class="bg-brand-navy py-16 text-center text-white">
   <div class="mx-auto max-w-3xl px-4">
     <p class="text-sm font-semibold uppercase tracking-wide text-white/60">Para corretores e imobiliárias</p>
     <h1 class="mt-2 text-3xl font-bold sm:text-4xl">Anuncie no Habitou Imóveis e receba leads qualificados</h1>
-    <p class="mt-4 text-white/70">Um portal novo, feito só para Santa Catarina — conectando corretores e imobiliárias a compradores e locatários de verdade, sem taxa para quem busca.</p>
+    <p class="mt-4 text-white/70">Um portal novo, feito para todo o Brasil — conectando corretores e imobiliárias a compradores e locatários de verdade, sem taxa para quem busca.</p>
     <div class="mt-6 flex flex-wrap justify-center gap-3">
       <a href="<?= base_url('planos.php') ?>" class="inline-block rounded-full bg-brand-primary px-6 py-3 text-sm font-semibold text-white hover:bg-brand-primary-hover">Ver planos e anunciar</a>
       <a href="<?= base_url('cadastro.php?tipo=imobiliaria') ?>" class="inline-block rounded-full border border-white/30 px-6 py-3 text-sm font-semibold text-white hover:border-white">Cadastrar imobiliária</a>

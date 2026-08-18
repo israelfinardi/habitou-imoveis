@@ -7,7 +7,7 @@ require __DIR__ . '/includes/header.php';
 <div class="mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:px-8">
   <h1 class="mb-8 text-3xl font-bold">Termos de uso</h1>
   <div class="space-y-4 text-sm leading-relaxed">
-    <p>O presente termo regula as condições gerais de utilização do website "Habitou Imóveis" (www.habitou.com.br), plataforma destinada a corretores e imobiliárias registrados junto ao CRECI-SC para divulgação de imóveis em Santa Catarina.</p>
+    <p>O presente termo regula as condições gerais de utilização do website "Habitou Imóveis" (www.habitou.com.br), plataforma destinada a corretores e imobiliárias registrados junto ao CRECI de seu estado para divulgação de imóveis em todo o Brasil.</p>
     <h2 class="pt-4 text-lg font-bold">Definições</h2>
     <p>Para os fins destes Termos de Uso, as seguintes definições serão adotadas:</p>
     <p><strong>Termos de uso:</strong> são os termos contidos nesta página.</p>

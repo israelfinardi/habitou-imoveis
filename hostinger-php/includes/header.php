@@ -3,7 +3,7 @@ require_once __DIR__ . '/auth.php';
 require_once __DIR__ . '/constants.php';
 $__user = current_user();
 $__pageTitle = $pageTitle ?? APP_NAME;
-$__pageDescription = $pageDescription ?? 'Encontre apartamentos, casas e terrenos para comprar ou alugar em Santa Catarina.';
+$__pageDescription = $pageDescription ?? 'Encontre apartamentos, casas e terrenos para comprar ou alugar em todo o Brasil.';
 
 // Estado atual dos filtros (transação/cidade), usado para manter a barra de
 // busca superior sincronizada com o que já está aplicado na página.
@@ -156,8 +156,7 @@ body{font-family:'Plus Jakarta Sans',Arial,sans-serif}
     </div>
 
     <div class="hidden items-center gap-3 lg:flex">
-      <a href="<?= base_url('quem-somos.php') ?>" class="text-sm font-medium hover:text-brand-primary">Quem somos</a>
-      <a href="<?= base_url('anunciante/novo.php') ?>" class="rounded-full bg-brand-primary px-4 py-2 text-sm font-semibold text-white hover:bg-brand-primary-hover">Anunciar imóvel</a>
+      <a href="<?= base_url('anunciante/novo.php') ?>" class="rounded-full border border-brand-border px-4 py-2 text-sm font-semibold text-brand-text hover:border-brand-text">Anunciar imóvel</a>
       <?php if ($__user): ?>
         <div class="relative">
           <button type="button" class="nav-user-btn" id="nav-user-btn">
@@ -204,15 +203,11 @@ body{font-family:'Plus Jakarta Sans',Arial,sans-serif}
         <a href="<?= base_url('cadastro.php') ?>" class="flex-1 rounded-full bg-brand-primary py-2 text-center text-sm font-medium text-white">Cadastre-se</a>
       </div>
     <?php endif; ?>
-    <p class="mb-1 mt-2 text-xs font-semibold uppercase text-brand-text-secondary">Cidades</p>
-    <?php foreach (FEATURED_CITIES as $c): ?>
-      <a href="<?= base_url('cidade.php?slug=' . $c['slug']) ?>" class="block py-1.5 text-sm"><?= e($c['name']) ?></a>
-    <?php endforeach; ?>
-    <div class="mt-3 flex flex-col gap-1 border-t border-brand-border pt-3">
+    <div class="flex flex-col gap-1">
       <a href="<?= base_url('imobiliarias.php') ?>" class="py-1.5 text-sm">Imobiliárias e corretores</a>
       <a href="<?= base_url('como-anunciar.php') ?>" class="py-1.5 text-sm">Como anunciar</a>
       <a href="<?= base_url('quem-somos.php') ?>" class="py-1.5 text-sm">Sobre nós</a>
-      <a href="<?= base_url('anunciante/novo.php') ?>" class="mt-2 rounded-full bg-brand-primary px-4 py-2 text-center text-sm font-semibold text-white">Anunciar imóvel</a>
+      <a href="<?= base_url('anunciante/novo.php') ?>" class="mt-2 rounded-full border border-brand-border px-4 py-2 text-center text-sm font-semibold text-brand-text">Anunciar imóvel</a>
       <?php if ($__user): ?><a href="<?= base_url('logout.php') ?>" class="py-1.5 text-sm text-brand-text-secondary">Sair</a><?php endif; ?>
     </div>
   </div>

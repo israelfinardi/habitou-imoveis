@@ -66,9 +66,9 @@ function parse_city_label(string $label): ?array
         return null;
     }
 
-    // Reaproveita o slug já usado pelas cidades em destaque de SC (sem sufixo de UF),
-    // pra não quebrar os links de navegação que já apontam pra eles.
-    foreach (FEATURED_CITIES as $fc) {
+    // Reaproveita o slug já usado pelas cidades de bootstrap (sem sufixo de
+    // UF), pra não quebrar os links de navegação que já apontam pra eles.
+    foreach (SEED_CITIES as $fc) {
         if ($fc['state_code'] === $uf && mb_strtolower($fc['name']) === mb_strtolower($name)) {
             return [$name, $uf, $fc['slug']];
         }

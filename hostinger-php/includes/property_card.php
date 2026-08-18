@@ -125,8 +125,8 @@ function render_results_map(array $items, array $favoriteIds = []): void
             'href' => property_href($p),
         ];
     }
-    // O mapa é sempre renderizado (mesmo sem pins), com uma vista padrão de
-    // Santa Catarina — assim a coluna do mapa nunca fica em branco.
+    // O mapa é sempre renderizado (mesmo sem pins), com uma vista padrão do
+    // Brasil inteiro — assim a coluna do mapa nunca fica em branco.
     ?>
     <button type="button" id="map-toggle-btn" class="mb-3 flex items-center gap-2 rounded-full border border-brand-border px-4 py-2 text-sm font-semibold hover:border-brand-primary lg:hidden">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 20l-6-3V4l6 3 6-3 6 3v13l-6-3-6 3z"/><path d="M9 4v13M15 7v13"/></svg>

@@ -29,8 +29,8 @@ function vrsync_resolve_location(array $listing): array
     $cityId = $stmt->fetchColumn();
     if (!$cityId) {
         $stateCode = mb_strlen($listing['address']['state']) === 2 ? mb_strtoupper($listing['address']['state']) : mb_strtoupper(mb_substr($listing['address']['state'], 0, 2));
-        $pdo->prepare('INSERT INTO cities (name, slug, state, state_code, region) VALUES (?,?,?,?,"Santa Catarina")')
-            ->execute([$listing['address']['city'], $citySlug, $listing['address']['state'], $stateCode]);
+        $pdo->prepare('INSERT INTO cities (name, slug, state, state_code, region) VALUES (?,?,?,?,?)')
+            ->execute([$listing['address']['city'], $citySlug, $listing['address']['state'], $stateCode, BRAZIL_REGIONS[$stateCode] ?? null]);
         $cityId = (int) $pdo->lastInsertId();
     }
 

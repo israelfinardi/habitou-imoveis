@@ -15,12 +15,12 @@ $catStmt = $pdo->query('SELECT category, COUNT(*) AS c FROM articles WHERE kind 
 $categories = $catStmt->fetchAll();
 
 $pageTitle = 'Blog';
-$pageDescription = 'Análises de mercado, guias práticos e o que muda de verdade para quem compra, vende, aluga ou anuncia em Santa Catarina.';
+$pageDescription = 'Análises de mercado, guias práticos e o que muda de verdade para quem compra, vende, aluga ou anuncia imóveis no Brasil.';
 require __DIR__ . '/includes/header.php';
 ?>
 <div class="mx-auto max-w-5xl px-4 py-12 sm:px-6 lg:px-8">
   <p class="text-sm font-semibold uppercase tracking-wide text-brand-primary">Habitou Imóveis · Conteúdo</p>
-  <h1 class="mt-2 text-3xl font-bold">O mercado imobiliário de Santa Catarina, explicado.</h1>
+  <h1 class="mt-2 text-3xl font-bold">O mercado imobiliário brasileiro, explicado.</h1>
   <p class="mt-2 max-w-2xl text-brand-text-secondary">Análises de mercado, guias práticos e o que muda de verdade para quem compra, vende, aluga ou anuncia no estado.</p>
 
   <div class="mb-8 mt-6 flex flex-wrap gap-2">

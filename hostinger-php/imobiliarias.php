@@ -27,7 +27,7 @@ $agencies = $stmt->fetchAll();
 $totalPages = max(1, (int) ceil($total / $pageSize));
 
 $pageTitle = 'Imobiliárias e corretores';
-$pageDescription = 'Conheça as imobiliárias parceiras Habitou Imóveis em Santa Catarina.';
+$pageDescription = 'Conheça as imobiliárias parceiras Habitou Imóveis em todo o Brasil.';
 require __DIR__ . '/includes/header.php';
 ?>
 <div class="mx-auto max-w-[1800px] px-4 py-8 sm:px-6 lg:px-8">

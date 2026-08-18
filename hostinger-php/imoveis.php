@@ -12,7 +12,7 @@ $user = current_user();
 $favoriteIds = $user ? get_favorite_ids($user['id']) : [];
 
 $pageTitle = 'Busca de imóveis';
-$pageDescription = 'Busque apartamentos, casas e terrenos para comprar ou alugar em Santa Catarina.';
+$pageDescription = 'Busque apartamentos, casas e terrenos para comprar ou alugar em todo o Brasil.';
 require __DIR__ . '/includes/header.php';
 ?>
 <div class="w-full px-4 py-6 sm:px-6 lg:px-8">

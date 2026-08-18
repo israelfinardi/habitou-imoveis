@@ -3,20 +3,20 @@ require_once __DIR__ . '/includes/bootstrap.php';
 
 $values = [
     ['Parceria real', 'Estamos ao lado dos corretores — não competimos com eles. Nossa missão é entregar audiência, ferramentas e presença digital aos profissionais.'],
-    ['Exclusividade profissional', 'Somente corretores e imobiliárias credenciados pelo CRECI-SC anunciam aqui. Isso garante qualidade, ética e confiança em cada anúncio.'],
-    ['Raízes catarinenses', 'Somos de SC, para SC. Focamos no mercado local desde o primeiro dia, cidade por cidade.'],
+    ['Exclusividade profissional', 'Somente corretores e imobiliárias credenciados pelo CRECI de seu estado anunciam aqui. Isso garante qualidade, ética e confiança em cada anúncio.'],
+    ['Alcance nacional', 'Cobrimos o Brasil todo, cidade por cidade — de capitais a cidades pequenas, onde tiver corretor cadastrado.'],
     ['Simplicidade', 'Cadastro rápido, sem burocracia e sem fidelidade — o corretor entra e sai quando quiser.'],
 ];
 
 $pageTitle = 'Quem somos';
-$pageDescription = 'Conheça o Habitou Imóveis: um portal novo, feito para conectar corretores e imobiliárias de Santa Catarina a compradores e locatários.';
+$pageDescription = 'Conheça o Habitou Imóveis: um portal novo, feito para conectar corretores e imobiliárias de todo o Brasil a compradores e locatários.';
 require __DIR__ . '/includes/header.php';
 ?>
 <div class="bg-brand-navy py-16 text-center text-white">
   <div class="mx-auto max-w-3xl px-4">
     <p class="text-sm font-semibold uppercase tracking-wide text-white/60">Quem somos</p>
-    <h1 class="mt-2 text-3xl font-bold sm:text-4xl">Um portal novo, feito para o corretor catarinense.</h1>
-    <p class="mt-4 text-white/70">O Habitou Imóveis acabou de nascer. Somos uma plataforma nova, construída do zero para conectar quem procura um imóvel em Santa Catarina diretamente com corretores e imobiliárias verificados pelo CRECI — sem intermediários e sem taxa para quem busca.</p>
+    <h1 class="mt-2 text-3xl font-bold sm:text-4xl">Um portal novo, feito para o corretor brasileiro.</h1>
+    <p class="mt-4 text-white/70">O Habitou Imóveis acabou de nascer. Somos uma plataforma nova, construída do zero para conectar quem procura um imóvel em qualquer lugar do Brasil diretamente com corretores e imobiliárias verificados pelo CRECI — sem intermediários e sem taxa para quem busca.</p>
   </div>
 </div>
 <div class="mx-auto max-w-5xl px-4 py-12 sm:px-6 lg:px-8">
@@ -41,7 +41,7 @@ require __DIR__ . '/includes/header.php';
   <p class="mb-6 text-sm text-brand-text-secondary">Toda locação e compra e venda de imóvel no Brasil é regulada pela Lei do Inquilinato (Lei nº 8.245/1991) e pelo Código Civil. No Habitou Imóveis, cada anúncio parte de um corretor ou imobiliária com CRECI verificado — a negociação, a documentação e o contrato seguem sempre os trâmites legais, combinados diretamente entre você e o profissional responsável pelo imóvel.</p>
 
   <h2 class="mb-2 mt-14 text-2xl font-bold">O corretor é o protagonista. Sempre foi.</h2>
-  <p class="mb-6 text-sm text-brand-text-secondary">O mercado imobiliário de Santa Catarina é construído por corretores e imobiliárias. O Habitou Imóveis existe para fortalecer esses profissionais — nunca para concorrer com eles.</p>
+  <p class="mb-6 text-sm text-brand-text-secondary">O mercado imobiliário brasileiro é construído por corretores e imobiliárias. O Habitou Imóveis existe para fortalecer esses profissionais — nunca para concorrer com eles.</p>
   <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
     <?php foreach ($values as [$title, $text]): ?>
       <div class="rounded-xl border border-brand-border bg-white p-5"><p class="font-semibold"><?= e($title) ?></p><p class="mt-1 text-sm text-brand-text-secondary"><?= e($text) ?></p></div>

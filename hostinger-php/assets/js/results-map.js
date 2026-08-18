@@ -4,10 +4,10 @@
   var mapEl = document.getElementById('results-map');
   if (!mapEl || !window.L) return;
 
-  // Centro padrão: Santa Catarina, usado quando não há nenhum pin com
+  // Centro padrão: Brasil inteiro, usado quando não há nenhum pin com
   // coordenadas (ex.: filtros sem resultados).
-  var DEFAULT_CENTER = [-27.24, -50.4];
-  var DEFAULT_ZOOM = 7;
+  var DEFAULT_CENTER = [-14.235004, -51.92528];
+  var DEFAULT_ZOOM = 4;
 
   var map = L.map('results-map', { scrollWheelZoom: true, zoomControl: true });
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
