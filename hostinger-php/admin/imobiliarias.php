@@ -10,8 +10,7 @@ $pageTitle = 'Imobiliárias (admin)';
 require __DIR__ . '/../includes/header.php';
 ?>
 <div class="mx-auto max-w-[1800px] px-4 py-8 sm:px-6 lg:px-8">
-  <div class="grid grid-cols-1 gap-8 lg:grid-cols-[220px_1fr]">
-    <aside><?php render_admin_nav('imobiliarias'); ?></aside>
+  <div class="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_220px]">
     <main>
       <h1 class="mb-6 text-2xl font-bold">Imobiliárias (<?= count($agencies) ?>)</h1>
       <div class="overflow-hidden rounded-xl border border-brand-border">
@@ -38,6 +37,7 @@ require __DIR__ . '/../includes/header.php';
         </table>
       </div>
     </main>
+    <aside><?php render_admin_nav('imobiliarias'); ?></aside>
   </div>
 </div>
 <?php require __DIR__ . '/../includes/footer.php'; ?>

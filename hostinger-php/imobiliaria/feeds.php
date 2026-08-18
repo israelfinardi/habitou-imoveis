@@ -74,15 +74,7 @@ require __DIR__ . '/../includes/header.php';
         </div>
       <?php endif; ?>
     </main>
-    <aside>
-      <p class="mb-3 text-xs font-semibold uppercase text-brand-text-secondary">Painel da imobiliária</p>
-      <nav class="flex flex-col gap-1">
-        <a href="<?= base_url('anunciante/imoveis.php') ?>" class="rounded-lg px-3 py-2 text-sm font-medium hover:bg-brand-bg-subtle">Imóveis</a>
-        <a href="<?= base_url('imobiliaria/feeds.php') ?>" class="rounded-lg px-3 py-2 text-sm font-medium text-brand-primary hover:bg-brand-bg-subtle">Feeds VRSync</a>
-        <a href="<?= base_url('contratos.php') ?>" class="rounded-lg px-3 py-2 text-sm font-medium hover:bg-brand-bg-subtle">Contratos</a>
-        <a href="<?= base_url('imobiliaria/perfil.php') ?>" class="rounded-lg px-3 py-2 text-sm font-medium hover:bg-brand-bg-subtle">Perfil</a>
-      </nav>
-    </aside>
+    <aside><?php render_account_nav('feeds'); ?></aside>
   </div>
 </div>
 <?php require __DIR__ . '/../includes/footer.php'; ?>

@@ -100,7 +100,7 @@ require __DIR__ . '/../includes/header.php';
         <button type="submit" class="rounded-full bg-brand-primary px-6 py-3 text-sm font-semibold text-white hover:bg-brand-primary-hover">Salvar alterações</button>
       </form>
     </main>
-    <aside><?php render_account_nav('anuncios', in_array($user['role'], ['AGENCY_ADMIN'], true)); ?></aside>
+    <aside><?php render_account_nav('anuncios'); ?></aside>
   </div>
 </div>
 

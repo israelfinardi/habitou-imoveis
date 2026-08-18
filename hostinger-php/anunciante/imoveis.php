@@ -64,7 +64,7 @@ require __DIR__ . '/../includes/header.php';
         </div>
       <?php endif; ?>
     </main>
-    <aside><?php render_account_nav('anuncios', in_array($user['role'], ['AGENCY_ADMIN'], true)); ?></aside>
+    <aside><?php render_account_nav('anuncios'); ?></aside>
   </div>
 </div>
 <?php require __DIR__ . '/../includes/footer.php'; ?>

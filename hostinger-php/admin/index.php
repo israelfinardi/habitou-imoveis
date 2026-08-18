@@ -17,8 +17,7 @@ $pageTitle = 'Administração';
 require __DIR__ . '/../includes/header.php';
 ?>
 <div class="mx-auto max-w-[1800px] px-4 py-8 sm:px-6 lg:px-8">
-  <div class="grid grid-cols-1 gap-8 lg:grid-cols-[220px_1fr]">
-    <aside><?php render_admin_nav('index'); ?></aside>
+  <div class="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_220px]">
     <main>
       <h1 class="mb-6 text-2xl font-bold">Visão geral</h1>
       <div class="grid grid-cols-2 gap-4 sm:grid-cols-3">
@@ -37,6 +36,7 @@ require __DIR__ . '/../includes/header.php';
         <code class="block break-all rounded-lg border border-brand-border bg-white px-3 py-2 text-xs"><?= e(AUTH_SECRET) ?></code>
       </div>
     </main>
+    <aside><?php render_admin_nav('index'); ?></aside>
   </div>
 </div>
 <?php require __DIR__ . '/../includes/footer.php'; ?>

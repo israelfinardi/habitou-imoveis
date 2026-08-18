@@ -108,10 +108,12 @@ body{font-family:'Plus Jakarta Sans',Arial,sans-serif}
 .filtros-pill-btn svg{width:16px;height:16px;flex:none}
 .nav-user-btn{display:flex;align-items:center;gap:10px;border:1px solid #DDDDDD;border-radius:999px;padding:6px 6px 6px 13px;background:#fff;cursor:pointer;transition:box-shadow .16s,border-color .16s}
 .nav-user-btn:hover{box-shadow:0 2px 10px rgba(0,0,0,.16);border-color:#EBEBEB}
-.nav-user-menu{position:absolute;top:calc(100% + 10px);right:0;background:#fff;border:1px solid #EBEBEB;border-radius:14px;box-shadow:0 10px 32px rgba(0,0,0,.18);min-width:220px;padding:8px;display:none;z-index:200}
+.nav-user-menu{position:absolute;top:calc(100% + 12px);right:0;background:#fff;border:1px solid #EBEBEB;border-radius:16px;box-shadow:0 12px 36px rgba(0,0,0,.18);min-width:260px;padding:8px;display:none;z-index:200}
 .nav-user-menu.on{display:block}
-.nav-user-menu a{display:block;padding:9px 12px;border-radius:8px;font-size:14px;font-weight:600;color:#222222;text-decoration:none}
+.nav-user-menu a{display:flex;align-items:center;gap:14px;padding:11px 14px;border-radius:10px;font-size:14.5px;font-weight:500;color:#222222;text-decoration:none}
+.nav-user-menu a svg{flex:none;width:20px;height:20px;color:#222222}
 .nav-user-menu a:hover{background:#F7F7F7}
+.nav-user-menu-divider{margin:8px 4px;border-top:1px solid #EBEBEB}
 .scrollbar-none{scrollbar-width:none}
 .scrollbar-none::-webkit-scrollbar{display:none}
 </style>
@@ -163,17 +165,27 @@ body{font-family:'Plus Jakarta Sans',Arial,sans-serif}
             <span class="flex h-7 w-7 items-center justify-center rounded-full bg-brand-primary text-xs font-semibold text-white"><?= e(mb_strtoupper(mb_substr($__user['first_name'], 0, 1))) ?></span>
             <span class="pr-2 text-sm font-medium"><?= e($__user['first_name']) ?></span>
           </button>
+          <?php
+          $__navItems = account_nav_items();
+          $__navPrimary = array_intersect_key($__navItems, array_flip(['overview', 'anuncios', 'favoritos', 'contratos']));
+          $__navSecondary = array_diff_key($__navItems, $__navPrimary);
+          ?>
           <div class="nav-user-menu" id="nav-user-menu">
-            <a href="<?= base_url('minha-conta.php') ?>">Minha conta</a>
-            <a href="<?= base_url('anunciante/imoveis.php') ?>">Meus anúncios</a>
-            <a href="<?= base_url('minha-conta-favoritos.php') ?>">Favoritos</a>
-            <?php if (in_array($__user['role'], ['AGENCY_ADMIN', 'AGENT'], true)): ?>
-              <a href="<?= base_url('imobiliaria/feeds.php') ?>">Painel da imobiliária</a>
+            <?php foreach ($__navPrimary as [$href, $label, $icon]): ?>
+              <a href="<?= base_url($href) ?>"><?= render_nav_icon($icon) ?><?= e($label) ?></a>
+            <?php endforeach; ?>
+            <?php if ($__navSecondary): ?>
+              <div class="nav-user-menu-divider"></div>
+              <?php foreach ($__navSecondary as [$href, $label, $icon]): ?>
+                <a href="<?= base_url($href) ?>"><?= render_nav_icon($icon) ?><?= e($label) ?></a>
+              <?php endforeach; ?>
             <?php endif; ?>
             <?php if ($__user['role'] === 'ADMIN'): ?>
-              <a href="<?= base_url('admin/index.php') ?>">Administração</a>
+              <div class="nav-user-menu-divider"></div>
+              <a href="<?= base_url('admin/index.php') ?>"><?= render_nav_icon('gear') ?>Administração</a>
             <?php endif; ?>
-            <a href="<?= base_url('logout.php') ?>" class="mt-1 border-t border-brand-border pt-2 text-brand-text-secondary">Sair</a>
+            <div class="nav-user-menu-divider"></div>
+            <a href="<?= base_url('logout.php') ?>">Sair</a>
           </div>
         </div>
       <?php else: ?>
@@ -196,6 +208,14 @@ body{font-family:'Plus Jakarta Sans',Arial,sans-serif}
       <div class="mb-3 rounded-lg bg-brand-bg-subtle p-3 text-sm">
         <p class="font-semibold"><?= e($__user['first_name'] . ' ' . $__user['last_name']) ?></p>
         <p class="text-brand-text-secondary"><?= e($__user['email']) ?></p>
+      </div>
+      <div class="mb-3 flex flex-col gap-1 border-b border-brand-border pb-3">
+        <?php foreach (account_nav_items() as [$href, $label, $icon]): ?>
+          <a href="<?= base_url($href) ?>" class="flex items-center gap-3 py-1.5 text-sm"><?= render_nav_icon($icon) ?><?= e($label) ?></a>
+        <?php endforeach; ?>
+        <?php if ($__user['role'] === 'ADMIN'): ?>
+          <a href="<?= base_url('admin/index.php') ?>" class="flex items-center gap-3 py-1.5 text-sm"><?= render_nav_icon('gear') ?>Administração</a>
+        <?php endif; ?>
       </div>
     <?php else: ?>
       <div class="mb-3 flex gap-2">
