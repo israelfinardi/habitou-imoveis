@@ -54,8 +54,8 @@ define('SMTP_FROM_NAME', 'Habitou Imóveis');
 // > Credenciais de produção. O Access Token dá acesso total à sua conta —
 // nunca cole essas chaves em nenhum outro lugar (chat, planilha, etc.) além
 // deste arquivo, que não é servido pelo navegador.
-define('MP_ACCESS_TOKEN', '');
-define('MP_PUBLIC_KEY', '');
+define('MP_ACCESS_TOKEN', 'APP_USR-6630885330388333-110502-12039fead3f9bfee39c7efdc4c86faae-150146897');
+define('MP_PUBLIC_KEY', 'APP_USR-eaed27b6-b742-4262-8cf5-bb32ceb80ee8');
 // Opcional: "Chave secreta" configurada em Webhooks no painel do Mercado
 // Pago, usada para validar a assinatura das notificações recebidas em
 // actions/mercadopago_webhook.php. Deixe em branco se ainda não configurou.
