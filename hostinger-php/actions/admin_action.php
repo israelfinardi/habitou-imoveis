@@ -70,6 +70,40 @@ switch ($action) {
         redirect(base_url('admin/planos.php'));
         break;
 
+    case 'delete_plan':
+        $id = (int) $_POST['id'];
+        $countStmt = $pdo->prepare('SELECT COUNT(*) FROM subscriptions WHERE plan_id = ?');
+        $countStmt->execute([$id]);
+        if ((int) $countStmt->fetchColumn() > 0) {
+            $_SESSION['admin_error'] = 'Não é possível excluir: existem assinaturas (ativas ou passadas) vinculadas a este plano. Desative-o em vez de excluir.';
+        } else {
+            $pdo->prepare('DELETE FROM plans WHERE id = ?')->execute([$id]);
+            $_SESSION['admin_success'] = 'Plano excluído.';
+        }
+        redirect(base_url('admin/planos.php'));
+        break;
+
+    case 'publish_plan_mp':
+        $id = (int) $_POST['id'];
+        $stmt = $pdo->prepare('SELECT * FROM plans WHERE id = ?');
+        $stmt->execute([$id]);
+        $plan = $stmt->fetch();
+        if (!$plan) {
+            redirect(base_url('admin/planos.php'));
+        }
+        if ($plan['mp_plan_id']) {
+            $_SESSION['admin_error'] = 'Este plano já está publicado no Mercado Pago.';
+        } else {
+            try {
+                publish_plan_to_mercadopago($plan);
+                $_SESSION['admin_success'] = 'Plano "' . $plan['name'] . '" publicado no Mercado Pago.';
+            } catch (\Throwable $e) {
+                $_SESSION['admin_error'] = 'Falha ao publicar no Mercado Pago: ' . $e->getMessage();
+            }
+        }
+        redirect(base_url('admin/planos.php'));
+        break;
+
     case 'sync_mp_plans':
         try {
             $result = sync_plans_from_mercadopago();

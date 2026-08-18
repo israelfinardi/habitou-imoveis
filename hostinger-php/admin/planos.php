@@ -47,7 +47,7 @@ require __DIR__ . '/../includes/header.php';
       </div>
       <div class="overflow-hidden rounded-xl border border-brand-border">
         <table class="w-full text-sm">
-          <thead class="bg-brand-bg-subtle text-left text-xs uppercase text-brand-text-secondary"><tr><th class="px-4 py-3">Nome</th><th class="px-4 py-3">Origem</th><th class="px-4 py-3">Preço</th><th class="px-4 py-3">Limite</th><th class="px-4 py-3">Status</th></tr></thead>
+          <thead class="bg-brand-bg-subtle text-left text-xs uppercase text-brand-text-secondary"><tr><th class="px-4 py-3">Nome</th><th class="px-4 py-3">Origem</th><th class="px-4 py-3">Preço</th><th class="px-4 py-3">Limite</th><th class="px-4 py-3">Status</th><th class="px-4 py-3">Ações</th></tr></thead>
           <tbody class="divide-y divide-brand-border">
             <?php foreach ($plans as $p): ?>
               <tr>
@@ -66,6 +66,20 @@ require __DIR__ . '/../includes/header.php';
                     <?= csrf_field() ?><input type="hidden" name="do" value="toggle_plan"><input type="hidden" name="id" value="<?= $p['id'] ?>"><input type="hidden" name="active" value="<?= $p['active'] ? 0 : 1 ?>">
                     <button class="rounded-full px-3 py-1 text-xs font-medium <?= $p['active'] ? 'bg-brand-green/10 text-brand-green-hover' : 'bg-brand-bg-subtle text-brand-text-secondary' ?>"><?= $p['active'] ? 'Ativo' : 'Inativo' ?></button>
                   </form>
+                </td>
+                <td class="px-4 py-3">
+                  <div class="flex flex-wrap items-center gap-3">
+                    <?php if (!$p['mp_plan_id']): ?>
+                      <form method="post" action="<?= base_url('actions/admin_action.php') ?>">
+                        <?= csrf_field() ?><input type="hidden" name="do" value="publish_plan_mp"><input type="hidden" name="id" value="<?= $p['id'] ?>">
+                        <button type="submit" <?= mp_configured() ? '' : 'disabled' ?> class="text-xs font-medium text-brand-primary hover:underline disabled:cursor-not-allowed disabled:text-brand-text-secondary disabled:no-underline" title="<?= mp_configured() ? '' : 'Configure MP_ACCESS_TOKEN para habilitar' ?>">Publicar no Mercado Pago</button>
+                      </form>
+                    <?php endif; ?>
+                    <form method="post" action="<?= base_url('actions/admin_action.php') ?>" onsubmit="return confirm('Excluir o plano <?= e(addslashes($p['name'])) ?> permanentemente?');">
+                      <?= csrf_field() ?><input type="hidden" name="do" value="delete_plan"><input type="hidden" name="id" value="<?= $p['id'] ?>">
+                      <button type="submit" class="text-xs font-medium text-red-600 hover:underline">Excluir</button>
+                    </form>
+                  </div>
                 </td>
               </tr>
             <?php endforeach; ?>

@@ -77,6 +77,16 @@ function mp_list_preapproval_plans(): array
     return $plans;
 }
 
+/** POST /preapproval_plan — cria um plano de assinatura na conta Mercado Pago. */
+function mp_create_preapproval_plan(array $data): array
+{
+    $res = mp_request('POST', '/preapproval_plan', $data);
+    if (!$res['ok']) {
+        throw new MercadoPagoException('Erro ao criar plano no Mercado Pago (HTTP ' . $res['status'] . '): ' . ($res['body']['message'] ?? 'erro desconhecido'));
+    }
+    return $res['body'];
+}
+
 /** POST /preapproval — cria a assinatura de um pagador para um plano específico. */
 function mp_create_preapproval(array $data): array
 {

@@ -72,6 +72,29 @@ function sync_plans_from_mercadopago(): array
 }
 
 /**
+ * Cria, na conta Mercado Pago, o plano de assinatura correspondente a um
+ * plano local criado manualmente pelo admin (nome/preço/etc já definidos
+ * aqui), e liga os dois salvando o mp_plan_id retornado — usado pelo botão
+ * "Publicar no Mercado Pago" em admin/planos.php, pra planos manuais que
+ * ainda não existem do lado do Mercado Pago.
+ */
+function publish_plan_to_mercadopago(array $plan): void
+{
+    $result = mp_create_preapproval_plan([
+        'reason' => $plan['name'],
+        'auto_recurring' => [
+            'frequency' => 1,
+            'frequency_type' => 'months',
+            'transaction_amount' => (float) $plan['price'],
+            'currency_id' => 'BRL',
+        ],
+        'back_url' => base_url('planos.php'),
+    ]);
+
+    db()->prepare('UPDATE plans SET mp_plan_id = ? WHERE id = ?')->execute([$result['id'], $plan['id']]);
+}
+
+/**
  * Cria a assinatura no Mercado Pago para o usuário/plano e devolve a URL de
  * checkout (init_point) pra onde o usuário deve ser redirecionado. Grava
  * uma linha local em status PENDING antes de chamar a API, pra já ter um id
