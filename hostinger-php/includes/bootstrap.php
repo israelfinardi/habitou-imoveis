@@ -8,3 +8,4 @@ require_once __DIR__ . '/property_repo.php';
 require_once __DIR__ . '/property_card.php';
 require_once __DIR__ . '/category_pills.php';
 require_once __DIR__ . '/account_nav.php';
+require_once __DIR__ . '/subscription_service.php';

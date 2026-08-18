@@ -49,6 +49,18 @@ define('SMTP_PASS', '');
 define('SMTP_FROM', 'no-reply@habitou.com.br');
 define('SMTP_FROM_NAME', 'Habitou Imóveis');
 
+// --- Mercado Pago (assinaturas): cole aqui as credenciais de PRODUÇÃO da
+// sua aplicação, em https://www.mercadopago.com.br/developers/panel/app
+// > Credenciais de produção. O Access Token dá acesso total à sua conta —
+// nunca cole essas chaves em nenhum outro lugar (chat, planilha, etc.) além
+// deste arquivo, que não é servido pelo navegador.
+define('MP_ACCESS_TOKEN', '');
+define('MP_PUBLIC_KEY', '');
+// Opcional: "Chave secreta" configurada em Webhooks no painel do Mercado
+// Pago, usada para validar a assinatura das notificações recebidas em
+// actions/mercadopago_webhook.php. Deixe em branco se ainda não configurou.
+define('MP_WEBHOOK_SECRET', '');
+
 define('UPLOAD_MAX_BYTES', 8 * 1024 * 1024);
 
 date_default_timezone_set('America/Sao_Paulo');

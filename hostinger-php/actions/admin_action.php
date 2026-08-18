@@ -70,6 +70,16 @@ switch ($action) {
         redirect(base_url('admin/planos.php'));
         break;
 
+    case 'sync_mp_plans':
+        try {
+            $result = sync_plans_from_mercadopago();
+            $_SESSION['admin_success'] = "Sincronizado: {$result['total']} plano(s) no Mercado Pago — {$result['created']} novo(s), {$result['updated']} atualizado(s).";
+        } catch (\Throwable $e) {
+            $_SESSION['admin_error'] = 'Falha ao sincronizar com o Mercado Pago: ' . $e->getMessage();
+        }
+        redirect(base_url('admin/planos.php'));
+        break;
+
     case 'update_subscription_status':
         $id = (int) $_POST['id'];
         $status = $_POST['status'];

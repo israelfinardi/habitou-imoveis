@@ -112,8 +112,10 @@ CREATE TABLE IF NOT EXISTS plans (
   max_listings INTEGER NULL,
   features TEXT NULL,
   active INTEGER NOT NULL DEFAULT 1,
+  mp_plan_id VARCHAR(120) NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+CREATE INDEX IF NOT EXISTS idx_plans_mp_plan_id ON plans (mp_plan_id);
 
 CREATE TABLE IF NOT EXISTS subscriptions (
   id INTEGER PRIMARY KEY AUTOINCREMENT,

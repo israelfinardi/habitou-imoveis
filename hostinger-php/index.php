@@ -5,9 +5,6 @@ $user = current_user();
 $featured = get_featured_properties(FEATURED_PROPERTIES_LIMIT);
 $favoriteIds = $user ? get_favorite_ids($user['id']) : [];
 
-$heroMain = $featured[0] ?? null;
-$heroMini = array_slice($featured, 1, 3);
-
 $heroCity = db()->query(
     'SELECT c.id, c.name, c.slug, c.state_code, COUNT(p.id) AS total
      FROM cities c LEFT JOIN properties p ON p.city_id = c.id AND p.status = "PUBLISHED"
@@ -65,8 +62,8 @@ require __DIR__ . '/includes/header.php';
     <div class="absolute right-24 bottom-6 h-24 w-24 rounded-[1.5rem] bg-brand-primary/10"></div>
   </div>
 
-  <div class="relative mx-auto grid max-w-[1800px] gap-10 px-4 sm:px-6 lg:grid-cols-2 lg:items-center lg:gap-6 lg:px-8">
-    <div>
+  <div class="relative mx-auto max-w-[1800px] px-4 sm:px-6 lg:px-8">
+    <div class="max-w-2xl">
       <span class="inline-flex items-center gap-2 rounded-full border border-brand-border bg-white px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-brand-text-secondary">
         <span class="h-1.5 w-1.5 rounded-full bg-brand-green"></span> O portal de imóveis do Brasil
       </span>
@@ -160,45 +157,16 @@ require __DIR__ . '/includes/header.php';
       </div>
     </div>
 
-    <?php if ($heroMain): ?>
-      <?php
-      $heroPrice = $heroMain['listing_type'] === 'RENT' ? ($heroMain['price_rent'] ?? null) : ($heroMain['price_sale'] ?? null);
-      $heroMeta = array_filter([
-          !empty($heroMain['bedrooms']) ? (int) $heroMain['bedrooms'] . ' qts' : null,
-          !empty($heroMain['total_area']) ? (int) $heroMain['total_area'] . 'm²' : null,
-          !empty($heroMain['parking_spaces']) ? (int) $heroMain['parking_spaces'] . ' vagas' : null,
-      ]);
-      ?>
-      <div class="hidden lg:ml-auto lg:block lg:w-full lg:max-w-[280px]">
-        <div class="relative overflow-hidden rounded-2xl border border-brand-border bg-white shadow-lg">
-          <span class="absolute left-2.5 top-2.5 z-10 rounded-full bg-white px-2.5 py-1 text-[11px] font-semibold text-brand-text shadow">✨ Destaque da semana</span>
-          <a href="<?= e(property_href($heroMain)) ?>" class="relative block aspect-[4/3] w-full bg-brand-bg-subtle">
-            <?php if (!empty($heroMain['image_url'])): ?>
-              <img src="<?= e($heroMain['image_url']) ?>" alt="<?= e($heroMain['title']) ?>" class="h-full w-full object-cover">
-            <?php endif; ?>
-          </a>
-          <div class="p-3">
-            <p class="flex items-center gap-1 text-xs text-brand-text-secondary">
-              <?= e(trim((!empty($heroMain['neighborhood_name']) ? $heroMain['neighborhood_name'] . ' · ' : '') . $heroMain['city_name'])) ?>
-            </p>
-            <a href="<?= e(property_href($heroMain)) ?>" class="mt-1 block truncate text-sm font-semibold text-brand-text"><?= e($heroMain['title']) ?></a>
-            <?php if ($heroMeta): ?><p class="mt-1 text-xs text-brand-text-secondary"><?= e(implode(' · ', $heroMeta)) ?></p><?php endif; ?>
-            <p class="mt-1.5 text-sm font-bold text-brand-text"><?= format_currency_brl($heroPrice) ?></p>
-          </div>
+    <?php if ($featured): ?>
+      <div class="mt-10">
+        <h2 class="mb-4 text-lg font-bold text-brand-text">✨ Destaques da semana</h2>
+        <div class="flex flex-wrap justify-center gap-5 lg:justify-start">
+          <?php foreach ($featured as $item): ?>
+            <div class="w-[350px] max-w-full shrink-0">
+              <?php render_property_card($item, in_array($item['id'], $favoriteIds, true)); ?>
+            </div>
+          <?php endforeach; ?>
         </div>
-
-        <?php if ($heroMini): ?>
-          <div class="mt-2.5 grid grid-cols-3 gap-2.5">
-            <?php foreach ($heroMini as $mini): $miniPrice = $mini['listing_type'] === 'RENT' ? ($mini['price_rent'] ?? null) : ($mini['price_sale'] ?? null); ?>
-              <a href="<?= e(property_href($mini)) ?>" class="group relative block aspect-square overflow-hidden rounded-xl border border-brand-border bg-brand-bg-subtle">
-                <?php if (!empty($mini['image_url'])): ?>
-                  <img src="<?= e($mini['image_url']) ?>" alt="<?= e($mini['title']) ?>" class="h-full w-full object-cover transition group-hover:scale-105">
-                <?php endif; ?>
-                <span class="absolute bottom-1.5 left-1.5 rounded-full bg-white/95 px-1.5 py-0.5 text-[10px] font-bold text-brand-text shadow"><?= format_price_short($miniPrice, $mini['listing_type'] === 'RENT') ?></span>
-              </a>
-            <?php endforeach; ?>
-          </div>
-        <?php endif; ?>
       </div>
     <?php endif; ?>
   </div>

@@ -46,6 +46,10 @@ function run_pending_migrations(PDO $pdo): void
     if (!in_array('is_featured', $columns('properties'), true)) {
         $pdo->exec('ALTER TABLE properties ADD COLUMN is_featured INTEGER NOT NULL DEFAULT 0');
     }
+    if (!in_array('mp_plan_id', $columns('plans'), true)) {
+        $pdo->exec('ALTER TABLE plans ADD COLUMN mp_plan_id VARCHAR(120) NULL');
+        $pdo->exec('CREATE INDEX IF NOT EXISTS idx_plans_mp_plan_id ON plans (mp_plan_id)');
+    }
 }
 
 /**
