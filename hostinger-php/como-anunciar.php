@@ -23,7 +23,7 @@ require __DIR__ . '/includes/header.php';
     </div>
   </div>
 </div>
-<div class="mx-auto max-w-6xl px-4 py-14 sm:px-6 lg:px-8">
+<div class="mx-auto max-w-5xl px-4 py-14 sm:px-6 lg:px-8">
   <h2 class="mb-6 text-2xl font-bold">Tudo que você precisa para anunciar e fechar negócios</h2>
   <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
     <?php foreach ($features as [$title, $text]): ?>

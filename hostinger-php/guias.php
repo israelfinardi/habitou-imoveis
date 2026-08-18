@@ -8,7 +8,7 @@ $pageTitle = 'Central de ajuda';
 $pageDescription = 'Guias e respostas para dúvidas frequentes sobre o Habitou Imóveis.';
 require __DIR__ . '/includes/header.php';
 ?>
-<div class="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
+<div class="mx-auto max-w-5xl px-4 py-12 sm:px-6 lg:px-8">
   <h1 class="mb-2 text-3xl font-bold">Como podemos te ajudar?</h1>
   <p class="mb-8 text-brand-text-secondary">Não encontrou o que procura? <a href="<?= base_url('fale-conosco.php') ?>" class="text-brand-primary hover:underline">Fale com a gente</a>.</p>
   <div class="mb-8 flex flex-wrap gap-2">

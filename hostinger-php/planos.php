@@ -15,7 +15,7 @@ if ($user) {
 $pageTitle = 'Planos';
 require __DIR__ . '/includes/header.php';
 ?>
-<div class="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
+<div class="mx-auto max-w-5xl px-4 py-12 sm:px-6 lg:px-8">
   <h1 class="mb-2 text-center text-3xl font-bold">Planos para anunciar mais imóveis</h1>
   <p class="mx-auto mb-2 max-w-xl text-center text-brand-text-secondary">Escolha quantos imóveis você precisa anunciar ao mesmo tempo. Sem fidelidade — mude ou cancele quando quiser.</p>
   <?php if (!$user): ?>
