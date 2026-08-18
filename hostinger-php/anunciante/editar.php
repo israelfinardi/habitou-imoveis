@@ -2,6 +2,7 @@
 require_once __DIR__ . '/../includes/bootstrap.php';
 require_once __DIR__ . '/../includes/property_form.php';
 require_once __DIR__ . '/../includes/property_mutations.php';
+require_once __DIR__ . '/../includes/account_nav.php';
 
 $user = require_login();
 $id = (int) ($_GET['id'] ?? 0);
@@ -47,13 +48,7 @@ $pageTitle = 'Editar imóvel';
 require __DIR__ . '/../includes/header.php';
 ?>
 <div class="mx-auto max-w-[1800px] px-4 py-8 sm:px-6 lg:px-8">
-  <div class="grid grid-cols-1 gap-8 lg:grid-cols-[220px_1fr]">
-    <aside>
-      <nav class="flex flex-col gap-1">
-        <a href="<?= base_url('anunciante/imoveis.php') ?>" class="rounded-lg px-3 py-2 text-sm font-medium hover:bg-brand-bg-subtle">Meus imóveis</a>
-        <a href="<?= base_url('anunciante/novo.php') ?>" class="rounded-lg px-3 py-2 text-sm font-medium hover:bg-brand-bg-subtle">+ Novo imóvel</a>
-      </nav>
-    </aside>
+  <div class="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_220px]">
     <main>
       <div class="mb-1 flex flex-wrap items-center justify-between gap-3">
         <h1 class="text-2xl font-bold">Editar imóvel</h1>
@@ -105,6 +100,7 @@ require __DIR__ . '/../includes/header.php';
         <button type="submit" class="rounded-full bg-brand-primary px-6 py-3 text-sm font-semibold text-white hover:bg-brand-primary-hover">Salvar alterações</button>
       </form>
     </main>
+    <aside><?php render_account_nav('anuncios', in_array($user['role'], ['AGENCY_ADMIN'], true)); ?></aside>
   </div>
 </div>
 

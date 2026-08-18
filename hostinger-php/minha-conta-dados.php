@@ -15,16 +15,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $website = trim($_POST['website'] ?? '');
     $serviceArea = trim($_POST['serviceArea'] ?? '');
     $bio = trim($_POST['bio'] ?? '');
+    $notifyEmail = trim($_POST['notifyEmail'] ?? '');
 
     if (mb_strlen($firstName) < 2) $fieldErrors['firstName'] = 'Informe seu nome.';
     if (mb_strlen($lastName) < 2) $fieldErrors['lastName'] = 'Informe seu sobrenome.';
+    if ($notifyEmail !== '' && !filter_var($notifyEmail, FILTER_VALIDATE_EMAIL)) $fieldErrors['notifyEmail'] = 'E-mail de notificação inválido.';
 
     if (empty($fieldErrors)) {
-        db()->prepare('UPDATE users SET first_name = ?, last_name = ?, phone = ?, whatsapp = ?, website = ?, service_area = ?, bio = ? WHERE id = ?')
-            ->execute([$firstName, $lastName, $phone ?: null, $whatsapp ?: null, $website ?: null, $serviceArea ?: null, $bio ?: null, $user['id']]);
+        db()->prepare('UPDATE users SET first_name = ?, last_name = ?, phone = ?, whatsapp = ?, website = ?, service_area = ?, bio = ?, notify_email = ? WHERE id = ?')
+            ->execute([$firstName, $lastName, $phone ?: null, $whatsapp ?: null, $website ?: null, $serviceArea ?: null, $bio ?: null, $notifyEmail ?: null, $user['id']]);
         $user = array_merge($user, [
             'first_name' => $firstName, 'last_name' => $lastName, 'phone' => $phone,
             'whatsapp' => $whatsapp, 'website' => $website, 'service_area' => $serviceArea, 'bio' => $bio,
+            'notify_email' => $notifyEmail,
         ]);
         $success = 'Dados atualizados com sucesso.';
     }
@@ -33,12 +36,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $pageTitle = 'Meus dados';
 require __DIR__ . '/includes/header.php';
 ?>
-<div class="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
-  <div class="grid grid-cols-1 gap-8 lg:grid-cols-[220px_1fr]">
-    <aside><?php render_account_nav('dados', in_array($user['role'], ['AGENCY_ADMIN'], true)); ?></aside>
+<div class="mx-auto max-w-[1800px] px-4 py-8 sm:px-6 lg:px-8">
+  <div class="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_220px]">
     <main>
       <h1 class="mb-6 text-2xl font-bold">Meus dados</h1>
       <?php if ($success): ?><p class="mb-4 rounded-lg bg-brand-green/10 px-3 py-2 text-sm text-brand-green-hover"><?= e($success) ?></p><?php endif; ?>
+      <?php if ($fieldErrors): ?><p class="mb-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700"><?= e(implode(' ', $fieldErrors)) ?></p><?php endif; ?>
 
       <div class="mb-6 flex items-center gap-4">
         <div class="relative h-20 w-20 shrink-0 overflow-hidden rounded-full bg-brand-bg-subtle">
@@ -91,15 +94,21 @@ require __DIR__ . '/includes/header.php';
         </div>
         <div class="mb-4">
           <label class="mb-1 block text-sm font-medium">Cidade(s) de atuação</label>
-          <input name="serviceArea" value="<?= e($user['service_area'] ?? '') ?>" placeholder="Ex.: Florianópolis, São José e Palhoça" class="w-full rounded-lg border border-brand-border px-3 py-2 text-sm">
+          <input name="serviceArea" value="<?= e($user['service_area'] ?? '') ?>" placeholder="Ex.: São Paulo, Guarulhos e Osasco" class="w-full rounded-lg border border-brand-border px-3 py-2 text-sm">
         </div>
         <div class="mb-4">
           <label class="mb-1 block text-sm font-medium">Sobre você</label>
           <textarea name="bio" rows="4" placeholder="Uma breve apresentação exibida no seu perfil público." class="w-full rounded-lg border border-brand-border px-3 py-2 text-sm"><?= e($user['bio'] ?? '') ?></textarea>
         </div>
+        <div class="mb-4 border-t border-brand-border pt-4">
+          <label class="mb-1 block text-sm font-medium">E-mail de notificação</label>
+          <input type="email" name="notifyEmail" value="<?= e($user['notify_email'] ?? '') ?>" placeholder="<?= e($user['email']) ?>" class="w-full rounded-lg border border-brand-border px-3 py-2 text-sm">
+          <p class="mt-1 text-xs text-brand-text-secondary">Para onde vão os avisos de novo contato. Deixe em branco para usar o e-mail da conta (<?= e($user['email']) ?>).</p>
+        </div>
         <button type="submit" class="rounded-full bg-brand-primary px-6 py-2.5 text-sm font-semibold text-white hover:bg-brand-primary-hover">Salvar alterações</button>
       </form>
     </main>
+    <aside><?php render_account_nav('dados', in_array($user['role'], ['AGENCY_ADMIN'], true)); ?></aside>
   </div>
 </div>
 <script>

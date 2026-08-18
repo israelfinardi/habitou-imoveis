@@ -24,8 +24,25 @@ function db(): PDO
     $pdo->exec('PRAGMA busy_timeout = 5000');
 
     provision_database_if_needed($pdo, $isNew);
+    run_pending_migrations($pdo);
 
     return $pdo;
+}
+
+/**
+ * Ajustes de schema pra bancos já provisionados antes da mudança (o site já
+ * está no ar) — sql/schema.sql sozinho só vale pra instalações novas, já que
+ * CREATE TABLE IF NOT EXISTS não adiciona coluna em tabela existente. Cada
+ * item aqui precisa ser idempotente (checa antes de alterar); a checagem em
+ * si (PRAGMA table_info) é barata o bastante pra rodar a cada request.
+ */
+function run_pending_migrations(PDO $pdo): void
+{
+    $columns = fn(string $table): array => array_column($pdo->query("PRAGMA table_info($table)")->fetchAll(), 'name');
+
+    if (!in_array('notify_email', $columns('users'), true)) {
+        $pdo->exec('ALTER TABLE users ADD COLUMN notify_email VARCHAR(255) NULL');
+    }
 }
 
 /**

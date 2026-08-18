@@ -30,9 +30,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $pageTitle = 'Alterar senha';
 require __DIR__ . '/includes/header.php';
 ?>
-<div class="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
-  <div class="grid grid-cols-1 gap-8 lg:grid-cols-[220px_1fr]">
-    <aside><?php render_account_nav('senha'); ?></aside>
+<div class="mx-auto max-w-[1800px] px-4 py-8 sm:px-6 lg:px-8">
+  <div class="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_220px]">
     <main>
       <h1 class="mb-6 text-2xl font-bold">Alterar senha</h1>
       <?php if ($success): ?><p class="mb-4 rounded-lg bg-brand-green/10 px-3 py-2 text-sm text-brand-green-hover"><?= e($success) ?></p><?php endif; ?>
@@ -54,6 +53,7 @@ require __DIR__ . '/includes/header.php';
         <button type="submit" class="rounded-full bg-brand-primary px-6 py-2.5 text-sm font-semibold text-white hover:bg-brand-primary-hover">Alterar senha</button>
       </form>
     </main>
+    <aside><?php render_account_nav('senha'); ?></aside>
   </div>
 </div>
 <?php require __DIR__ . '/includes/footer.php'; ?>

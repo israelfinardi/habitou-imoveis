@@ -1,12 +1,20 @@
 <?php
+/**
+ * Navegação lateral única, compartilhada por toda a área logada (Minha
+ * conta E Anunciante) — antes eram dois menus diferentes, com larguras de
+ * página diferentes, o que dava a impressão de um site inconsistente ao
+ * navegar entre eles. A lista de links espelha o dropdown "Minha conta" do
+ * header (includes/header.php).
+ */
 function render_account_nav(string $active, bool $showAgencyProfile = false): void
 {
     $items = [
         'overview' => ['minha-conta.php', 'Visão geral'],
-        'dados' => ['minha-conta-dados.php', 'Meus dados'],
-        'senha' => ['minha-conta-senha.php', 'Alterar senha'],
         'anuncios' => ['anunciante/imoveis.php', 'Meus anúncios'],
         'favoritos' => ['minha-conta-favoritos.php', 'Favoritos'],
+        'planos' => ['planos.php', 'Planos'],
+        'dados' => ['minha-conta-dados.php', 'Meus dados'],
+        'senha' => ['minha-conta-senha.php', 'Alterar senha'],
     ];
     if ($showAgencyProfile) {
         $items['imobiliaria'] = ['imobiliaria/perfil.php', 'Perfil da imobiliária'];

@@ -20,18 +20,8 @@ $subscription = $stmt->fetch();
 $pageTitle = 'Minha conta';
 require __DIR__ . '/includes/header.php';
 ?>
-<div class="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
-  <div class="grid grid-cols-1 gap-8 lg:grid-cols-[220px_1fr]">
-    <aside>
-      <div class="mb-4 flex items-center gap-3">
-        <span class="flex h-10 w-10 items-center justify-center rounded-full bg-brand-primary text-sm font-semibold text-white"><?= e(mb_strtoupper(mb_substr($user['first_name'], 0, 1))) ?></span>
-        <div>
-          <p class="text-sm font-semibold"><?= e($user['first_name'] . ' ' . $user['last_name']) ?></p>
-          <p class="text-xs text-brand-text-secondary"><?= e($user['email']) ?></p>
-        </div>
-      </div>
-      <?php render_account_nav('overview'); ?>
-    </aside>
+<div class="mx-auto max-w-[1800px] px-4 py-8 sm:px-6 lg:px-8">
+  <div class="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_220px]">
     <main>
       <h1 class="mb-6 text-2xl font-bold">Olá, <?= e($user['first_name']) ?>!</h1>
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
@@ -61,6 +51,16 @@ require __DIR__ . '/includes/header.php';
         <a href="<?= base_url('minha-conta-dados.php') ?>" class="mt-4 inline-block text-sm font-medium text-brand-primary hover:underline">Editar dados</a>
       </div>
     </main>
+    <aside>
+      <div class="mb-4 flex items-center gap-3">
+        <span class="flex h-10 w-10 items-center justify-center rounded-full bg-brand-primary text-sm font-semibold text-white"><?= e(mb_strtoupper(mb_substr($user['first_name'], 0, 1))) ?></span>
+        <div>
+          <p class="text-sm font-semibold"><?= e($user['first_name'] . ' ' . $user['last_name']) ?></p>
+          <p class="text-xs text-brand-text-secondary"><?= e($user['email']) ?></p>
+        </div>
+      </div>
+      <?php render_account_nav('overview'); ?>
+    </aside>
   </div>
 </div>
 <?php require __DIR__ . '/includes/footer.php'; ?>

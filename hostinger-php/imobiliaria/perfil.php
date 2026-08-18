@@ -50,16 +50,7 @@ $pageTitle = 'Perfil da imobiliária';
 require __DIR__ . '/../includes/header.php';
 ?>
 <div class="mx-auto max-w-[1800px] px-4 py-8 sm:px-6 lg:px-8">
-  <div class="grid grid-cols-1 gap-8 lg:grid-cols-[220px_1fr]">
-    <aside>
-      <p class="mb-3 text-xs font-semibold uppercase text-brand-text-secondary">Painel da imobiliária</p>
-      <nav class="flex flex-col gap-1">
-        <a href="<?= base_url('anunciante/imoveis.php') ?>" class="rounded-lg px-3 py-2 text-sm font-medium hover:bg-brand-bg-subtle">Imóveis</a>
-        <a href="<?= base_url('imobiliaria/feeds.php') ?>" class="rounded-lg px-3 py-2 text-sm font-medium hover:bg-brand-bg-subtle">Feeds VRSync</a>
-        <a href="<?= base_url('contratos.php') ?>" class="rounded-lg px-3 py-2 text-sm font-medium hover:bg-brand-bg-subtle">Contratos</a>
-        <a href="<?= base_url('imobiliaria/perfil.php') ?>" class="rounded-lg px-3 py-2 text-sm font-medium text-brand-primary hover:bg-brand-bg-subtle">Perfil</a>
-      </nav>
-    </aside>
+  <div class="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_220px]">
     <main>
       <h1 class="mb-1 text-2xl font-bold">Perfil da imobiliária</h1>
       <p class="mb-6 text-sm text-brand-text-secondary">Essas informações aparecem na página pública da imobiliária e nos anúncios dos seus corretores.</p>
@@ -106,11 +97,20 @@ require __DIR__ . '/../includes/header.php';
         </div>
         <div class="mb-4">
           <label class="mb-1 block text-sm font-medium">Cidades de atuação</label>
-          <input name="serviceArea" value="<?= e($agency['service_area'] ?? '') ?>" placeholder="Ex.: Florianópolis, São José e Palhoça" class="w-full rounded-lg border border-brand-border px-3 py-2 text-sm">
+          <input name="serviceArea" value="<?= e($agency['service_area'] ?? '') ?>" placeholder="Ex.: São Paulo, Guarulhos e Osasco" class="w-full rounded-lg border border-brand-border px-3 py-2 text-sm">
         </div>
         <button type="submit" class="rounded-full bg-brand-primary px-6 py-3 text-sm font-semibold text-white hover:bg-brand-primary-hover">Salvar alterações</button>
       </form>
     </main>
+    <aside>
+      <p class="mb-3 text-xs font-semibold uppercase text-brand-text-secondary">Painel da imobiliária</p>
+      <nav class="flex flex-col gap-1">
+        <a href="<?= base_url('anunciante/imoveis.php') ?>" class="rounded-lg px-3 py-2 text-sm font-medium hover:bg-brand-bg-subtle">Imóveis</a>
+        <a href="<?= base_url('imobiliaria/feeds.php') ?>" class="rounded-lg px-3 py-2 text-sm font-medium hover:bg-brand-bg-subtle">Feeds VRSync</a>
+        <a href="<?= base_url('contratos.php') ?>" class="rounded-lg px-3 py-2 text-sm font-medium hover:bg-brand-bg-subtle">Contratos</a>
+        <a href="<?= base_url('imobiliaria/perfil.php') ?>" class="rounded-lg px-3 py-2 text-sm font-medium text-brand-primary hover:bg-brand-bg-subtle">Perfil</a>
+      </nav>
+    </aside>
   </div>
 </div>
 <script>

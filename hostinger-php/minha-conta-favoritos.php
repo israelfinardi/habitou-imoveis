@@ -25,13 +25,13 @@ if ($ids) {
 $pageTitle = 'Favoritos';
 require __DIR__ . '/includes/header.php';
 ?>
-<div class="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
-  <div class="grid grid-cols-1 gap-8 lg:grid-cols-[220px_1fr]">
-    <aside><?php render_account_nav('favoritos'); ?></aside>
+<div class="mx-auto max-w-[1800px] px-4 py-8 sm:px-6 lg:px-8">
+  <div class="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_220px]">
     <main>
       <h1 class="mb-6 text-2xl font-bold">Meus favoritos</h1>
       <?php render_property_grid($properties, $ids, 'Você ainda não favoritou nenhum imóvel.'); ?>
     </main>
+    <aside><?php render_account_nav('favoritos'); ?></aside>
   </div>
 </div>
 <?php require __DIR__ . '/includes/footer.php'; ?>
