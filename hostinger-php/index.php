@@ -7,10 +7,6 @@ $favoriteIds = $user ? get_favorite_ids($user['id']) : [];
 
 $heroMain = $featured[0] ?? null;
 $heroMini = array_slice($featured, 1, 3);
-// Seção "Imóveis em destaque" abaixo do hero: os mesmos destaques do admin
-// primeiro, completados com publicados recentes — maior que o hero pra não
-// repetir exatamente os 4 mesmos cards duas vezes na página.
-$featuredGrid = get_featured_properties(8);
 
 $heroCity = db()->query(
     'SELECT c.id, c.name, c.slug, c.state_code, COUNT(p.id) AS total
@@ -173,10 +169,10 @@ require __DIR__ . '/includes/header.php';
           !empty($heroMain['parking_spaces']) ? (int) $heroMain['parking_spaces'] . ' vagas' : null,
       ]);
       ?>
-      <div class="hidden lg:block">
+      <div class="hidden lg:ml-auto lg:block lg:max-w-sm">
         <div class="relative overflow-hidden rounded-3xl border border-brand-border bg-white shadow-xl">
           <span class="absolute left-3 top-3 z-10 rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-brand-text shadow">✨ Destaque da semana</span>
-          <a href="<?= e(property_href($heroMain)) ?>" class="relative block aspect-[4/3] w-full bg-brand-bg-subtle">
+          <a href="<?= e(property_href($heroMain)) ?>" class="relative block aspect-[16/10] w-full bg-brand-bg-subtle">
             <?php if (!empty($heroMain['image_url'])): ?>
               <img src="<?= e($heroMain['image_url']) ?>" alt="<?= e($heroMain['title']) ?>" class="h-full w-full object-cover">
             <?php endif; ?>
@@ -248,23 +244,15 @@ document.getElementById('buscar-codigo-link')?.addEventListener('click', functio
   </div>
 </section>
 
+<?php if ($heroCity && $heroCityProperties): ?>
 <section class="mx-auto max-w-[1800px] px-4 py-12 sm:px-6 lg:px-8">
   <div class="mb-4 flex items-center justify-between">
-    <h2 class="text-xl font-bold">Imóveis em destaque</h2>
-    <a href="<?= base_url('imoveis.php') ?>" class="text-sm font-medium text-brand-primary hover:underline">Ver todos</a>
+    <h2 class="text-xl font-bold">Imóveis em <?= e($heroCity['name']) ?></h2>
+    <a href="<?= base_url('cidade.php?slug=' . $heroCity['slug']) ?>" class="text-sm font-medium text-brand-primary hover:underline">Ver mais</a>
   </div>
-  <?php render_property_grid($featuredGrid, $favoriteIds); ?>
-
-  <?php if ($heroCity && $heroCityProperties): ?>
-    <div class="mt-12">
-      <div class="mb-4 flex items-center justify-between">
-        <h2 class="text-xl font-bold">Imóveis em <?= e($heroCity['name']) ?></h2>
-        <a href="<?= base_url('cidade.php?slug=' . $heroCity['slug']) ?>" class="text-sm font-medium text-brand-primary hover:underline">Ver mais</a>
-      </div>
-      <?php render_property_grid($heroCityProperties, $favoriteIds); ?>
-    </div>
-  <?php endif; ?>
+  <?php render_property_grid($heroCityProperties, $favoriteIds); ?>
 </section>
+<?php endif; ?>
 
 <section class="relative overflow-hidden bg-brand-navy py-16">
   <div class="mx-auto max-w-[1800px] px-4 sm:px-6 lg:px-8">
