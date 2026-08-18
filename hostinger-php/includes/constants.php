@@ -96,6 +96,10 @@ const BRAZIL_REGIONS = [
 
 const PAGE_SIZE = 12;
 
+// Quantos imóveis o admin pode marcar como destaque (admin/imoveis.php) —
+// usado tanto pra travar a seleção quanto pelo limite padrão da home.
+const FEATURED_PROPERTIES_LIMIT = 4;
+
 const SORT_OPTIONS = [
     'recentes' => 'Mais recentes',
     'menor-preco' => 'Menor preço',

@@ -2,11 +2,15 @@
 require_once __DIR__ . '/includes/bootstrap.php';
 
 $user = current_user();
-$featured = get_featured_properties(6);
+$featured = get_featured_properties(FEATURED_PROPERTIES_LIMIT);
 $favoriteIds = $user ? get_favorite_ids($user['id']) : [];
 
 $heroMain = $featured[0] ?? null;
 $heroMini = array_slice($featured, 1, 3);
+// Seção "Imóveis em destaque" abaixo do hero: os mesmos destaques do admin
+// primeiro, completados com publicados recentes — maior que o hero pra não
+// repetir exatamente os 4 mesmos cards duas vezes na página.
+$featuredGrid = get_featured_properties(8);
 
 $heroCity = db()->query(
     'SELECT c.id, c.name, c.slug, c.state_code, COUNT(p.id) AS total
@@ -249,7 +253,7 @@ document.getElementById('buscar-codigo-link')?.addEventListener('click', functio
     <h2 class="text-xl font-bold">Imóveis em destaque</h2>
     <a href="<?= base_url('imoveis.php') ?>" class="text-sm font-medium text-brand-primary hover:underline">Ver todos</a>
   </div>
-  <?php render_property_grid($featured, $favoriteIds); ?>
+  <?php render_property_grid($featuredGrid, $favoriteIds); ?>
 
   <?php if ($heroCity && $heroCityProperties): ?>
     <div class="mt-12">

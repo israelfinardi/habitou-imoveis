@@ -57,6 +57,77 @@ function render_property_card(array $p, bool $isFavorite = false): void
     <?php
 }
 
+/**
+ * Galeria da página do imóvel, estilo Airbnb: grade (1 foto grande + até 4
+ * pequenas) no desktop, carrossel deslizável no mobile (reaproveitando o
+ * mesmo .js-carousel dos cards de listagem), e um lightbox em tela cheia
+ * (assets/js/property-gallery.js) aberto ao clicar em qualquer foto ou no
+ * botão "Mostrar todas as fotos".
+ */
+function render_property_gallery(array $images, string $title): void
+{
+    $count = count($images);
+    ?>
+    <div class="js-lightbox-root" data-title="<?= e($title) ?>">
+      <script type="application/json" class="js-lightbox-data"><?= json_encode(array_column($images, 'url'), JSON_UNESCAPED_SLASHES) ?></script>
+
+      <?php if ($count === 0): ?>
+        <div class="flex aspect-[16/9] w-full items-center justify-center rounded-xl bg-brand-bg-subtle text-brand-text-secondary lg:aspect-[21/9]">Sem fotos</div>
+      <?php else: ?>
+        <div class="js-carousel group relative block aspect-square w-full overflow-hidden rounded-xl bg-brand-bg-subtle sm:aspect-[4/3] lg:hidden">
+          <div class="js-carousel-track scrollbar-none flex h-full w-full snap-x snap-mandatory overflow-x-auto scroll-smooth">
+            <?php foreach ($images as $i => $img): ?>
+              <img src="<?= e($img['url']) ?>" data-index="<?= $i ?>" alt="<?= e($title) ?>" loading="<?= $i === 0 ? 'eager' : 'lazy' ?>" class="js-lightbox-trigger h-full w-full shrink-0 cursor-pointer snap-center object-cover">
+            <?php endforeach; ?>
+          </div>
+          <?php if ($count > 1): ?>
+            <button type="button" class="js-carousel-prev absolute left-2 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-brand-text opacity-0 shadow transition group-hover:opacity-100" aria-label="Foto anterior"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+            <button type="button" class="js-carousel-next absolute right-2 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-brand-text opacity-0 shadow transition group-hover:opacity-100" aria-label="Próxima foto"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
+            <div class="js-carousel-dots pointer-events-none absolute bottom-2 left-1/2 flex -translate-x-1/2 gap-1">
+              <?php foreach ($images as $i => $_): ?><span class="h-1.5 w-1.5 rounded-full <?= $i === 0 ? 'bg-white' : 'bg-white/50' ?>"></span><?php endforeach; ?>
+            </div>
+          <?php endif; ?>
+        </div>
+
+        <?php
+        $mainImages = array_slice($images, 0, 5);
+        $gridCols = $count === 1 ? 'lg:grid-cols-1' : ($count === 2 ? 'lg:grid-cols-2' : ($count === 3 ? 'lg:grid-cols-2 lg:grid-rows-2' : 'lg:grid-cols-4 lg:grid-rows-2'));
+        ?>
+        <div class="relative hidden overflow-hidden rounded-xl bg-brand-bg-subtle lg:grid lg:gap-1.5 <?= $gridCols ?>" style="aspect-ratio:<?= $count === 1 ? '16/8' : '16/7' ?>">
+          <?php foreach ($mainImages as $i => $img):
+              $span = ($count >= 4 && $i === 0) ? 'lg:col-span-2 lg:row-span-2' : (($count === 3 && $i === 0) ? 'lg:row-span-2' : '');
+          ?>
+            <div class="relative overflow-hidden <?= $span ?>">
+              <img src="<?= e($img['url']) ?>" data-index="<?= $i ?>" alt="<?= e($title) ?>" loading="<?= $i === 0 ? 'eager' : 'lazy' ?>" class="js-lightbox-trigger h-full w-full cursor-pointer object-cover">
+            </div>
+          <?php endforeach; ?>
+          <?php if ($count > 1): ?>
+            <button type="button" class="js-lightbox-trigger absolute bottom-4 right-4 flex items-center gap-2 rounded-lg border border-brand-text bg-white px-4 py-2 text-xs font-semibold shadow hover:bg-brand-bg-subtle" data-index="0">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+              Mostrar todas as fotos
+            </button>
+          <?php endif; ?>
+        </div>
+      <?php endif; ?>
+    </div>
+
+    <div id="lightbox-modal" class="fixed inset-0 z-[500] hidden flex-col bg-black">
+      <div class="flex shrink-0 items-center justify-between px-4 py-3">
+        <button type="button" id="lightbox-close" class="flex h-9 w-9 items-center justify-center rounded-full text-white hover:bg-white/10" aria-label="Fechar">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+        <span id="lightbox-counter" class="text-sm font-medium text-white"></span>
+        <span class="w-9"></span>
+      </div>
+      <div class="js-carousel group relative min-h-0 flex-1">
+        <div id="lightbox-track" class="js-carousel-track scrollbar-none flex h-full w-full snap-x snap-mandatory overflow-x-auto scroll-smooth"></div>
+        <button type="button" class="js-carousel-prev absolute left-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-brand-text shadow hover:bg-white" aria-label="Foto anterior"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+        <button type="button" class="js-carousel-next absolute right-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-brand-text shadow hover:bg-white" aria-label="Próxima foto"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
+      </div>
+    </div>
+    <?php
+}
+
 function render_property_grid(array $items, array $favoriteIds = [], string $emptyMessage = 'Nenhum imóvel encontrado com esses filtros.', ?string $gridId = null, bool $threeCols = true): void
 {
     if (empty($items)) {

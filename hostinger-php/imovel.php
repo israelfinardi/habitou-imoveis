@@ -54,7 +54,7 @@ if ($price) {
 ?>
 <script type="application/ld+json"><?= json_encode($jsonLd, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?></script>
 
-<div class="mx-auto max-w-[1800px] px-4 py-8 sm:px-6 lg:px-8">
+<div class="mx-auto max-w-[1800px] px-4 py-8 pb-24 sm:px-6 lg:px-8 lg:pb-8">
   <nav class="mb-4 text-sm text-brand-text-secondary">
     <a href="<?= base_url('/') ?>" class="hover:text-brand-primary">Início</a> /
     <a href="<?= base_url('cidade.php?slug=' . $property['city_slug']) ?>" class="hover:text-brand-primary"><?= e($property['city_name']) ?></a> /
@@ -64,28 +64,7 @@ if ($price) {
 
   <div class="grid grid-cols-1 gap-8 lg:grid-cols-3">
     <div class="lg:col-span-2">
-      <?php $images = $property['images']; ?>
-      <div class="js-gallery">
-        <div class="relative aspect-[16/10] w-full overflow-hidden rounded-xl bg-brand-bg-subtle js-gallery-main">
-          <?php if ($images): ?>
-            <img src="<?= e($images[0]['url']) ?>" alt="<?= e($property['title']) ?>" class="h-full w-full object-cover">
-          <?php else: ?>
-            <div class="flex h-full items-center justify-center text-brand-text-secondary">Sem fotos</div>
-          <?php endif; ?>
-          <?php if (count($images) > 1): ?>
-            <span class="js-gallery-counter absolute bottom-3 right-3 rounded-full bg-black/60 px-2 py-1 text-xs text-white">1 / <?= count($images) ?></span>
-          <?php endif; ?>
-        </div>
-        <?php if (count($images) > 1): ?>
-          <div class="mt-3 flex gap-2 overflow-x-auto pb-1">
-            <?php foreach ($images as $idx => $img): ?>
-              <button type="button" class="js-gallery-thumb relative h-16 w-24 shrink-0 overflow-hidden rounded-lg border-2 <?= $idx === 0 ? 'border-brand-primary' : 'border-transparent' ?>" data-full="<?= e($img['url']) ?>">
-                <img src="<?= e($img['url']) ?>" loading="lazy" class="h-full w-full object-cover" alt="">
-              </button>
-            <?php endforeach; ?>
-          </div>
-        <?php endif; ?>
-      </div>
+      <?php $images = $property['images']; render_property_gallery($images, $property['title']); ?>
 
       <div class="mt-6 flex items-start justify-between gap-4">
         <div>
@@ -121,7 +100,8 @@ if ($price) {
       <?php if ($property['description']): ?>
         <div class="mt-6">
           <h2 class="mb-2 text-lg font-bold">Descrição</h2>
-          <p class="whitespace-pre-line text-sm leading-relaxed text-brand-text-secondary"><?= nl2br(e($property['description'])) ?></p>
+          <p id="description-text" class="js-clamp line-clamp-6 whitespace-pre-line text-sm leading-relaxed text-brand-text-secondary"><?= nl2br(e($property['description'])) ?></p>
+          <button type="button" id="description-toggle" class="js-clamp-toggle mt-2 hidden text-sm font-semibold text-brand-text underline">Mostrar mais</button>
         </div>
       <?php endif; ?>
 
@@ -154,7 +134,7 @@ if ($price) {
     </div>
 
     <div class="lg:col-span-1">
-      <div class="sticky top-24 rounded-xl border border-brand-border bg-white p-5">
+      <div id="anunciante" class="sticky top-24 scroll-mt-24 rounded-xl border border-brand-border bg-white p-5">
         <?php
         $isAgent = !empty($property['agent_first_name']);
         $isAgency = !$isAgent && !empty($property['agency_name']);
@@ -168,20 +148,29 @@ if ($price) {
         $email = $property['contact_email'] ?: ($property['agent_email'] ?: ($property['agency_email'] ?: $property['advertiser_email']));
         $whatsappRaw = $property['contact_whatsapp'] ?: ($property['agent_whatsapp'] ?: ($property['agency_whatsapp'] ?: ($property['advertiser_whatsapp'] ?: $phone)));
         $whatsapp = $whatsappRaw ? preg_replace('/\D/', '', $whatsappRaw) : null;
+        $bio = $isAgent ? ($property['agent_bio'] ?? null) : ($isAgency ? ($property['agency_bio'] ?? null) : ($property['advertiser_bio'] ?? null));
+        $memberSince = $isAgent ? ($property['agent_created_at'] ?? null) : ($isAgency ? ($property['agency_created_at'] ?? null) : ($property['advertiser_created_at'] ?? null));
         ?>
         <div class="flex items-center gap-3">
           <?php if ($avatarUrl): ?>
-            <img src="<?= e($avatarUrl) ?>" alt="" class="h-12 w-12 shrink-0 rounded-full object-cover">
+            <img src="<?= e($avatarUrl) ?>" alt="" class="h-14 w-14 shrink-0 rounded-full object-cover">
           <?php else: ?>
-            <span class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-brand-primary text-lg font-semibold text-white"><?= e(mb_strtoupper(mb_substr($contactName, 0, 1))) ?></span>
+            <span class="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-brand-primary text-lg font-semibold text-white"><?= e(mb_strtoupper(mb_substr($contactName, 0, 1))) ?></span>
           <?php endif; ?>
           <div>
             <p class="text-xs font-semibold uppercase text-brand-text-secondary">Anunciado por</p>
             <p class="text-lg font-bold leading-tight"><?= e($contactName) ?></p>
+            <?php if ($memberSince): ?><p class="text-xs text-brand-text-secondary">No Habitou Imóveis desde <?= e(date('Y', strtotime($memberSince))) ?></p><?php endif; ?>
           </div>
         </div>
-        <?php if (!empty($property['agent_creci'])): ?><p class="mt-2 text-xs text-brand-text-secondary">CRECI <?= e($property['agent_creci']) ?> verificado</p><?php endif; ?>
+        <?php if (!empty($property['agent_creci'])): ?>
+          <p class="mt-2 flex items-center gap-1 text-xs text-brand-text-secondary">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#25D366" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
+            CRECI <?= e($property['agent_creci']) ?> verificado
+          </p>
+        <?php endif; ?>
         <?php if ($areaAtuacao): ?><p class="mt-1 text-xs text-brand-text-secondary">Atua em: <?= e($areaAtuacao) ?></p><?php endif; ?>
+        <?php if ($bio): ?><p class="mt-3 border-t border-brand-border pt-3 text-sm leading-relaxed text-brand-text-secondary"><?= nl2br(e($bio)) ?></p><?php endif; ?>
         <?php if ($isAgent): ?>
           <a href="<?= base_url('corretor.php?id=' . (int) $property['agent_id']) ?>" class="mt-2 block text-sm font-semibold text-brand-primary hover:underline">Ver perfil completo</a>
         <?php endif; ?>
@@ -207,6 +196,18 @@ if ($price) {
     </div>
   </div>
 
+  <div class="fixed inset-x-0 bottom-0 z-40 flex items-center justify-between gap-3 border-t border-brand-border bg-white px-4 py-3 shadow-[0_-4px_16px_rgba(0,0,0,0.08)] lg:hidden">
+    <div>
+      <p class="text-base font-bold text-brand-text"><?= format_currency_brl($price) ?><?= $property['listing_type'] === 'RENT' ? '<span class="text-xs font-normal text-brand-text-secondary">/mês</span>' : '' ?></p>
+      <a href="#anunciante" class="text-xs text-brand-text-secondary underline">Ver contato</a>
+    </div>
+    <?php if ($whatsapp): ?>
+      <a href="https://wa.me/55<?= e($whatsapp) ?>?text=<?= urlencode('Olá! Tenho interesse no imóvel "' . $property['title'] . '" (código ' . $property['code'] . ').') ?>" target="_blank" rel="noopener noreferrer" class="shrink-0 rounded-full bg-brand-green px-6 py-3 text-sm font-semibold text-white hover:bg-brand-green-hover">Conversar no WhatsApp</a>
+    <?php else: ?>
+      <a href="#anunciante" class="shrink-0 rounded-full bg-brand-primary px-6 py-3 text-sm font-semibold text-white hover:bg-brand-primary-hover">Entrar em contato</a>
+    <?php endif; ?>
+  </div>
+
   <?php if ($similar): ?>
     <div class="mt-12">
       <h2 class="mb-4 text-xl font-bold">Imóveis semelhantes</h2>
@@ -214,4 +215,19 @@ if ($price) {
     </div>
   <?php endif; ?>
 </div>
+<script src="<?= asset_url('assets/js/property-gallery.js') ?>"></script>
+<script>
+(function () {
+  var text = document.getElementById('description-text');
+  var toggle = document.getElementById('description-toggle');
+  if (!text || !toggle) return;
+  if (text.scrollHeight > text.clientHeight + 2) {
+    toggle.classList.remove('hidden');
+  }
+  toggle.addEventListener('click', function () {
+    var isClamped = text.classList.toggle('line-clamp-6');
+    toggle.textContent = isClamped ? 'Mostrar mais' : 'Mostrar menos';
+  });
+})();
+</script>
 <?php require __DIR__ . '/includes/footer.php'; ?>

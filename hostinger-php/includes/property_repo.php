@@ -174,11 +174,14 @@ function get_property_by_slug(string $slug): ?array
                ag.name AS agency_name, ag.slug AS agency_slug, ag.phone AS agency_phone, ag.whatsapp AS agency_whatsapp,
                ag.email AS agency_email, ag.website AS agency_website, ag.logo_url AS agency_logo,
                ag.city AS agency_city, ag.state AS agency_state, ag.service_area AS agency_service_area,
+               ag.description AS agency_bio, ag.created_at AS agency_created_at,
                au.first_name AS advertiser_first_name, au.last_name AS advertiser_last_name, au.phone AS advertiser_phone,
                au.whatsapp AS advertiser_whatsapp, au.email AS advertiser_email, au.avatar_url AS advertiser_avatar,
                au.website AS advertiser_website, au.service_area AS advertiser_service_area, au.bio AS advertiser_bio,
+               au.created_at AS advertiser_created_at,
                agu.first_name AS agent_first_name, agu.last_name AS agent_last_name, agu.phone AS agent_phone,
-               agu.whatsapp AS agent_whatsapp, agu.email AS agent_email, agu.avatar_url AS agent_avatar, agu.creci AS agent_creci
+               agu.whatsapp AS agent_whatsapp, agu.email AS agent_email, agu.avatar_url AS agent_avatar, agu.creci AS agent_creci,
+               agu.bio AS agent_bio, agu.created_at AS agent_created_at
         FROM properties p
         JOIN cities c ON c.id = p.city_id
         LEFT JOIN neighborhoods n ON n.id = p.neighborhood_id
@@ -239,12 +242,29 @@ function get_similar_properties(array $property): array
     return attach_primary_images($pdo, $items);
 }
 
+/**
+ * Prioriza os imóveis marcados como destaque pelo admin (admin/imoveis.php,
+ * até FEATURED_PROPERTIES_LIMIT) e completa o restante com os publicados
+ * mais recentes — assim a home nunca fica com menos de $limit cards, mesmo
+ * que o admin ainda não tenha escolhido nenhum destaque manualmente.
+ */
 function get_featured_properties(int $limit = 6): array
 {
     $pdo = db();
-    $stmt = $pdo->prepare('SELECT ' . PROPERTY_LIST_SELECT . PROPERTY_LIST_JOIN . " WHERE p.status = \"PUBLISHED\" ORDER BY p.published_at DESC LIMIT $limit");
+    $stmt = $pdo->prepare('SELECT ' . PROPERTY_LIST_SELECT . PROPERTY_LIST_JOIN . " WHERE p.status = \"PUBLISHED\" AND p.is_featured = 1 ORDER BY p.published_at DESC LIMIT $limit");
     $stmt->execute();
-    return attach_primary_images($pdo, $stmt->fetchAll());
+    $featured = $stmt->fetchAll();
+
+    $missing = $limit - count($featured);
+    if ($missing > 0) {
+        $excludeIds = array_column($featured, 'id') ?: [0];
+        $placeholders = implode(',', array_fill(0, count($excludeIds), '?'));
+        $stmt = $pdo->prepare('SELECT ' . PROPERTY_LIST_SELECT . PROPERTY_LIST_JOIN . " WHERE p.status = \"PUBLISHED\" AND p.id NOT IN ($placeholders) ORDER BY p.published_at DESC LIMIT $missing");
+        $stmt->execute($excludeIds);
+        $featured = array_merge($featured, $stmt->fetchAll());
+    }
+
+    return attach_primary_images($pdo, $featured);
 }
 
 function get_properties_by_city(string $citySlug, int $limit = 6): array

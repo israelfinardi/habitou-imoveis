@@ -29,6 +29,20 @@ switch ($action) {
         redirect(base_url('admin/imoveis.php'));
         break;
 
+    case 'toggle_featured':
+        $id = (int) $_POST['id'];
+        $featured = !empty($_POST['featured']);
+        if ($featured) {
+            $count = (int) $pdo->query('SELECT COUNT(*) FROM properties WHERE is_featured = 1')->fetchColumn();
+            if ($count >= FEATURED_PROPERTIES_LIMIT) {
+                $_SESSION['admin_error'] = 'Já existem ' . FEATURED_PROPERTIES_LIMIT . ' imóveis em destaque — remova um antes de adicionar outro.';
+                redirect(base_url('admin/imoveis.php'));
+            }
+        }
+        $pdo->prepare('UPDATE properties SET is_featured = ? WHERE id = ?')->execute([$featured ? 1 : 0, $id]);
+        redirect(base_url('admin/imoveis.php'));
+        break;
+
     case 'update_agency_status':
         $id = (int) $_POST['id'];
         $status = $_POST['status'];

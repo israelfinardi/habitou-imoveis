@@ -43,6 +43,9 @@ function run_pending_migrations(PDO $pdo): void
     if (!in_array('notify_email', $columns('users'), true)) {
         $pdo->exec('ALTER TABLE users ADD COLUMN notify_email VARCHAR(255) NULL');
     }
+    if (!in_array('is_featured', $columns('properties'), true)) {
+        $pdo->exec('ALTER TABLE properties ADD COLUMN is_featured INTEGER NOT NULL DEFAULT 0');
+    }
 }
 
 /**

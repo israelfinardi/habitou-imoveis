@@ -198,6 +198,7 @@ CREATE TABLE IF NOT EXISTS properties (
   parking_spaces INTEGER NULL,
   features TEXT NULL,
   status TEXT NOT NULL DEFAULT 'DRAFT',
+  is_featured INTEGER NOT NULL DEFAULT 0,
   published_at DATETIME NULL,
   deactivated_at DATETIME NULL,
   city_id INTEGER NOT NULL,

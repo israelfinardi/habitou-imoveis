@@ -110,19 +110,3 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 });
-
-// --- Galeria de fotos --------------------------------------------------
-function propertyGalleryInit(root) {
-  const mainImg = root.querySelector('.js-gallery-main img');
-  const thumbs = root.querySelectorAll('.js-gallery-thumb');
-  const counter = root.querySelector('.js-gallery-counter');
-  thumbs.forEach((thumb, idx) => {
-    thumb.addEventListener('click', () => {
-      mainImg.src = thumb.dataset.full;
-      thumbs.forEach((t) => t.classList.remove('border-brand-primary'));
-      thumb.classList.add('border-brand-primary');
-      if (counter) counter.textContent = idx + 1 + ' / ' + thumbs.length;
-    });
-  });
-}
-document.querySelectorAll('.js-gallery').forEach(propertyGalleryInit);
