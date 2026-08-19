@@ -5,6 +5,26 @@ $user = current_user();
 $featured = get_featured_properties(FEATURED_PROPERTIES_LIMIT);
 $favoriteIds = $user ? get_favorite_ids($user['id']) : [];
 
+// Pinos do minimapa da home: os mesmos imóveis de "Destaques da semana"
+// (já carregados acima), mantendo mapa e cards em sincronia visual sem
+// precisar de outra consulta ao banco.
+$minimapPins = [];
+foreach ($featured as $p) {
+    if (!$p['latitude'] || !$p['longitude']) {
+        continue;
+    }
+    $mPrice = $p['listing_type'] === 'RENT' ? ($p['price_rent'] ?? null) : ($p['price_sale'] ?? null);
+    $minimapPins[] = [
+        'lat' => (float) $p['latitude'],
+        'lng' => (float) $p['longitude'],
+        'label' => format_price_short($mPrice, $p['listing_type'] === 'RENT'),
+        'title' => (PROPERTY_TYPE_LABEL[$p['property_type']] ?? 'Imóvel') . ' · ' . $p['city_name'],
+        'price' => format_currency_brl($mPrice) . ($p['listing_type'] === 'RENT' ? '/mês' : ''),
+        'image' => $p['image_url'] ?? null,
+        'href' => property_href($p),
+    ];
+}
+
 $heroCity = db()->query(
     'SELECT c.id, c.name, c.slug, c.state_code, COUNT(p.id) AS total
      FROM cities c LEFT JOIN properties p ON p.city_id = c.id AND p.status = "PUBLISHED"
@@ -63,6 +83,7 @@ require __DIR__ . '/includes/header.php';
   </div>
 
   <div class="relative mx-auto max-w-[1800px] px-4 sm:px-6 lg:px-8">
+    <div class="flex flex-col gap-8 xl:flex-row xl:items-start xl:justify-between">
     <div class="max-w-2xl">
       <span class="inline-flex items-center gap-2 rounded-full border border-brand-border bg-white px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-brand-text-secondary">
         <span class="h-1.5 w-1.5 rounded-full bg-brand-green"></span> O portal de imóveis do Brasil
@@ -157,6 +178,11 @@ require __DIR__ . '/includes/header.php';
       </div>
     </div>
 
+    <div class="hidden shrink-0 xl:block xl:h-[550px] xl:w-[550px]">
+      <div id="home-minimap" class="h-full w-full overflow-hidden rounded-3xl border border-brand-border shadow-lg"></div>
+    </div>
+    </div>
+
     <?php if ($featured): ?>
       <div class="mt-10">
         <h2 class="mb-4 text-lg font-bold text-brand-text">✨ Destaques da semana</h2>
@@ -171,6 +197,10 @@ require __DIR__ . '/includes/header.php';
     <?php endif; ?>
   </div>
 </section>
+
+<script>window.__HOME_MINIMAP_PINS = <?= json_encode($minimapPins, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;</script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="<?= asset_url('assets/js/home-minimap.js') ?>"></script>
 
 <style>
 .hero-transacao-tab{display:inline-flex;flex:1}

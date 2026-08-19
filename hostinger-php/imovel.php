@@ -62,8 +62,8 @@ if ($price) {
     <span><?= e($property['title']) ?></span>
   </nav>
 
-  <div class="grid grid-cols-1 gap-8 lg:grid-cols-3">
-    <div class="lg:col-span-2">
+  <div class="grid grid-cols-1 gap-8 lg:grid-cols-4">
+    <div class="lg:col-span-3">
       <?php $images = $property['images']; render_property_gallery($images, $property['title']); ?>
 
       <div class="mt-6 flex items-start justify-between gap-4">
