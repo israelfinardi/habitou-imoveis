@@ -50,6 +50,9 @@ function run_pending_migrations(PDO $pdo): void
         $pdo->exec('ALTER TABLE plans ADD COLUMN mp_plan_id VARCHAR(120) NULL');
         $pdo->exec('CREATE INDEX IF NOT EXISTS idx_plans_mp_plan_id ON plans (mp_plan_id)');
     }
+    if (!in_array('expires_at', $columns('properties'), true)) {
+        $pdo->exec('ALTER TABLE properties ADD COLUMN expires_at DATETIME NULL');
+    }
     // Tabelas novas (não coluna em tabela existente) usam CREATE TABLE IF NOT
     // EXISTS direto — já é idempotente por natureza, sem precisar de checagem.
     $pdo->exec('CREATE TABLE IF NOT EXISTS login_attempts (

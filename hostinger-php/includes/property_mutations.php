@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/plan_limits.php';
 
 function get_or_create_neighborhood(int $cityId, string $name): int
 {
@@ -84,6 +85,8 @@ function resolve_city_slug(string $label): ?string
 
 function create_property(array $input, array $actor): int
 {
+    assert_can_create_listing($actor);
+
     $cityId = get_or_create_city($input['cidade']);
     if (!$cityId) {
         throw new \InvalidArgumentException('Cidade inválida.');
@@ -220,14 +223,23 @@ function set_property_status(int $propertyId, string $action, array $actor): voi
     if (!$property || !can_manage_property($actor, $property)) {
         throw new \RuntimeException('Você não pode alterar este imóvel.');
     }
-    $map = ['publish' => 'PUBLISHED', 'reactivate' => 'PUBLISHED', 'pause' => 'PAUSED', 'archive' => 'ARCHIVED'];
+    $map = ['publish' => 'PUBLISHED', 'reactivate' => 'PUBLISHED', 'renew' => 'PUBLISHED', 'pause' => 'PAUSED', 'archive' => 'ARCHIVED'];
     $status = $map[$action] ?? null;
     if (!$status) {
         return;
     }
     $pdo = db();
-    if ($status === 'PUBLISHED' && !$property['published_at']) {
-        $pdo->prepare('UPDATE properties SET status=?, published_at=CURRENT_TIMESTAMP WHERE id=?')->execute([$status, $propertyId]);
+    if ($status === 'PUBLISHED') {
+        // Publicar, reativar ou renovar recalcula a validade do anúncio: null
+        // (eterno) no plano pago, ou "agora + 30 dias" no grátis — mesmo se
+        // já tinha um expires_at antigo (evita que ele expire de novo quase
+        // na hora por causa de uma data antiga que ficou pra trás).
+        $expiresAt = compute_listing_expiration($actor);
+        if ($action === 'renew' || !$property['published_at']) {
+            $pdo->prepare('UPDATE properties SET status=?, published_at=CURRENT_TIMESTAMP, expires_at=? WHERE id=?')->execute([$status, $expiresAt, $propertyId]);
+        } else {
+            $pdo->prepare('UPDATE properties SET status=?, expires_at=? WHERE id=?')->execute([$status, $expiresAt, $propertyId]);
+        }
     } elseif ($status === 'ARCHIVED') {
         $pdo->prepare('UPDATE properties SET status=?, deactivated_at=CURRENT_TIMESTAMP WHERE id=?')->execute([$status, $propertyId]);
     } else {
@@ -241,6 +253,7 @@ function duplicate_property(int $propertyId, array $actor): int
     if (!$property || !can_manage_property($actor, $property)) {
         throw new \RuntimeException('Você não pode duplicar este imóvel.');
     }
+    assert_can_create_listing($actor);
     $pdo = db();
     $code = next_property_code($pdo);
     $slug = slugify($property['title'] . ' copia') . '-' . substr(bin2hex(random_bytes(4)), 0, 6);

@@ -33,6 +33,7 @@ const PROPERTY_STATUS_LABEL = [
     'PUBLISHED' => 'Publicado',
     'PAUSED' => 'Pausado',
     'ARCHIVED' => 'Arquivado',
+    'EXPIRED' => 'Expirado',
 ];
 
 const COMMON_FEATURES = [

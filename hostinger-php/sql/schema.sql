@@ -226,6 +226,7 @@ CREATE TABLE IF NOT EXISTS properties (
   is_featured INTEGER NOT NULL DEFAULT 0,
   published_at DATETIME NULL,
   deactivated_at DATETIME NULL,
+  expires_at DATETIME NULL,
   city_id INTEGER NOT NULL,
   neighborhood_id INTEGER NULL,
   street VARCHAR(255) NULL,

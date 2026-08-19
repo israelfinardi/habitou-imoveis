@@ -13,7 +13,10 @@ $stmtFav = $pdo->prepare('SELECT COUNT(*) FROM favorites WHERE user_id = ?');
 $stmtFav->execute([$user['id']]);
 $favCount = (int) $stmtFav->fetchColumn();
 
-$stmt = $pdo->prepare('SELECT s.*, pl.name AS plan_name FROM subscriptions s JOIN plans pl ON pl.id = s.plan_id WHERE s.user_id = ? AND s.status = "ACTIVE" LIMIT 1');
+// Aspas simples no literal: plans tem uma coluna `active`, e o SQLite
+// resolveria "ACTIVE" (aspas duplas) como referência a essa coluna em vez
+// do texto, quebrando a comparação sem erro nenhum — ver includes/plan_limits.php.
+$stmt = $pdo->prepare("SELECT s.*, pl.name AS plan_name FROM subscriptions s JOIN plans pl ON pl.id = s.plan_id WHERE s.user_id = ? AND s.status = 'ACTIVE' LIMIT 1");
 $stmt->execute([$user['id']]);
 $subscription = $stmt->fetch();
 

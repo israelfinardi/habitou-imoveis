@@ -8,8 +8,11 @@ unset($_SESSION['plans_error']);
 
 $currentSubscription = null;
 if ($user) {
-    $stmt = db()->prepare('SELECT s.*, p.name AS plan_name FROM subscriptions s JOIN plans p ON p.id = s.plan_id
-        WHERE (s.user_id = ? OR s.agency_id = ?) AND s.status IN ("ACTIVE","PENDING") ORDER BY s.created_at DESC LIMIT 1');
+    // Aspas simples nos literais: plans tem uma coluna `active`, e o SQLite
+    // resolveria "ACTIVE" (aspas duplas) como referência a essa coluna em vez
+    // do texto, quebrando a comparação sem erro nenhum — ver includes/plan_limits.php.
+    $stmt = db()->prepare("SELECT s.*, p.name AS plan_name FROM subscriptions s JOIN plans p ON p.id = s.plan_id
+        WHERE (s.user_id = ? OR s.agency_id = ?) AND s.status IN ('ACTIVE','PENDING') ORDER BY s.created_at DESC LIMIT 1");
     $stmt->execute([$user['id'], $user['agency_id'] ?? 0]);
     $currentSubscription = $stmt->fetch() ?: null;
 }

@@ -17,7 +17,7 @@ $sql .= ' ORDER BY p.created_at DESC LIMIT 100';
 $stmt = $pdo->prepare($sql);
 $stmt->execute($args);
 $properties = $stmt->fetchAll();
-$statuses = ['DRAFT', 'PUBLISHED', 'PAUSED', 'ARCHIVED'];
+$statuses = ['DRAFT', 'PUBLISHED', 'PAUSED', 'EXPIRED', 'ARCHIVED'];
 $featuredCount = (int) $pdo->query('SELECT COUNT(*) FROM properties WHERE is_featured = 1')->fetchColumn();
 $adminError = $_SESSION['admin_error'] ?? null;
 unset($_SESSION['admin_error']);

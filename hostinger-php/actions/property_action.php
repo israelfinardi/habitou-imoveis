@@ -14,6 +14,7 @@ try {
         case 'pause':
         case 'archive':
         case 'reactivate':
+        case 'renew':
             set_property_status($id, $action, $user);
             redirect(base_url('anunciante/imoveis.php'));
             break;
