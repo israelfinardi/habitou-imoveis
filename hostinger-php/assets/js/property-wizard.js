@@ -11,7 +11,7 @@
   if (!wizard) return;
   var csrf = wizard.dataset.csrf;
 
-  var STEPS = ['endereco', 'tipo', 'transacao', 'detalhes', 'mapa', 'comodidades', 'fotos', 'titulo', 'descricao', 'preco', 'contato', 'revisar'];
+  var STEPS = ['endereco', 'tipo', 'transacao', 'detalhes', 'comodidades', 'fotos', 'titulo', 'descricao', 'preco', 'contato', 'revisar'];
 
   var state = {
     propertyType: '', listingType: 'SALE',
@@ -72,7 +72,6 @@
       case 'tipo': return !!state.propertyType;
       case 'transacao': return !!state.listingType;
       case 'detalhes': return true;
-      case 'mapa': return !!(state.latitude && state.longitude);
       case 'comodidades': return true;
       case 'fotos': return photos.length >= 1;
       case 'titulo': return state.title.trim().length >= 10;
@@ -100,7 +99,7 @@
     nextBtn.textContent = key === 'revisar' ? 'Publicar' : 'Avançar';
 
     clearInterval(mapPollTimer);
-    if (key === 'mapa') {
+    if (key === 'endereco') {
       if (window.__propertyMap) {
         setTimeout(function () {
           window.__propertyMap.invalidateSize();

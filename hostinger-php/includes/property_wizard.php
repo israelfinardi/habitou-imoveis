@@ -34,15 +34,21 @@ function render_property_wizard(): void
 
           <!-- 1. Endereço ---------------------------------------------------->
           <section class="wizard-step" data-step="endereco">
-            <p class="mb-2 text-xs font-semibold uppercase tracking-wide text-brand-primary">Etapa 1 de 6 · Sobre o imóvel</p>
+            <p class="mb-2 text-xs font-semibold uppercase tracking-wide text-brand-primary">Etapa 1 de 5 · Sobre o imóvel</p>
             <h1 class="mb-2 text-3xl font-extrabold leading-tight">Qual é o endereço do imóvel?</h1>
-            <p class="mb-6 text-brand-text-secondary">O endereço exato só é compartilhado com quem confirmar interesse. Busque pelo endereço ou preencha manualmente.</p>
+            <p class="mb-6 text-brand-text-secondary">Busque o endereço, ou clique/arraste o pino no mapa — cidade, bairro, rua e CEP são preenchidos automaticamente. Você também pode preencher tudo manualmente.</p>
 
             <div class="mb-4 flex gap-2">
               <input type="text" id="wz-address-search" placeholder="Buscar endereço (rua, bairro, cidade)..." class="w-full rounded-xl border border-brand-border px-4 py-3 text-sm">
               <button type="button" id="wz-address-search-btn" class="shrink-0 rounded-xl border border-brand-border px-4 text-sm font-semibold hover:border-brand-primary">Buscar</button>
             </div>
             <p id="wz-address-status" class="mb-4 text-xs text-brand-text-secondary"></p>
+
+            <div class="mb-6">
+              <p class="mb-2 text-xs font-medium text-brand-text-secondary">Ou clique no mapa (ou arraste o pino) para marcar o local exato</p>
+              <div id="property-map" class="h-72 w-full rounded-xl border border-brand-border"></div>
+              <p id="property-map-status" class="mt-2 text-xs text-brand-text-secondary">Nenhum ponto marcado ainda.</p>
+            </div>
 
             <div class="mb-4">
               <label class="mb-1 block text-sm font-medium">Cidade</label>
@@ -65,7 +71,7 @@ function render_property_wizard(): void
 
           <!-- 2. Tipo de imóvel -------------------------------------------->
           <section class="wizard-step" data-step="tipo">
-            <p class="mb-2 text-xs font-semibold uppercase tracking-wide text-brand-primary">Etapa 1 de 6 · Sobre o imóvel</p>
+            <p class="mb-2 text-xs font-semibold uppercase tracking-wide text-brand-primary">Etapa 1 de 5 · Sobre o imóvel</p>
             <h1 class="mb-6 text-3xl font-extrabold leading-tight">Qual desses descreve melhor o seu imóvel?</h1>
             <div class="grid grid-cols-2 gap-3 sm:grid-cols-3">
               <?php foreach (PROPERTY_TYPE_SLUG as $type => $slug): ?>
@@ -82,7 +88,7 @@ function render_property_wizard(): void
 
           <!-- 3. Transação ---------------------------------------------------->
           <section class="wizard-step" data-step="transacao">
-            <p class="mb-2 text-xs font-semibold uppercase tracking-wide text-brand-primary">Etapa 1 de 6 · Sobre o imóvel</p>
+            <p class="mb-2 text-xs font-semibold uppercase tracking-wide text-brand-primary">Etapa 1 de 5 · Sobre o imóvel</p>
             <h1 class="mb-6 text-3xl font-extrabold leading-tight">O que você quer fazer com esse imóvel?</h1>
             <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <label class="wizard-choice-card">
@@ -106,7 +112,7 @@ function render_property_wizard(): void
 
           <!-- 4. Detalhes ---------------------------------------------------->
           <section class="wizard-step" data-step="detalhes">
-            <p class="mb-2 text-xs font-semibold uppercase tracking-wide text-brand-primary">Etapa 1 de 6 · Sobre o imóvel</p>
+            <p class="mb-2 text-xs font-semibold uppercase tracking-wide text-brand-primary">Etapa 1 de 5 · Sobre o imóvel</p>
             <h1 class="mb-6 text-3xl font-extrabold leading-tight">Compartilhe alguns detalhes básicos sobre o imóvel</h1>
             <div class="flex flex-col divide-y divide-brand-border rounded-xl border border-brand-border px-4">
               <?php
@@ -129,18 +135,9 @@ function render_property_wizard(): void
             </div>
           </section>
 
-          <!-- 5. Mapa ---------------------------------------------------------->
-          <section class="wizard-step" data-step="mapa">
-            <p class="mb-2 text-xs font-semibold uppercase tracking-wide text-brand-primary">Etapa 2 de 6 · Localização</p>
-            <h1 class="mb-2 text-3xl font-extrabold leading-tight">O marcador está no local certo?</h1>
-            <p class="mb-4 text-brand-text-secondary">Arraste o pino ou clique no mapa para ajustar o ponto exato do imóvel.</p>
-            <div id="property-map" class="h-96 w-full rounded-xl border border-brand-border"></div>
-            <p id="property-map-status" class="mt-2 text-xs text-brand-text-secondary">Nenhum ponto marcado ainda.</p>
-          </section>
-
-          <!-- 6. Comodidades ---------------------------------------------------->
+          <!-- 5. Comodidades ---------------------------------------------------->
           <section class="wizard-step" data-step="comodidades">
-            <p class="mb-2 text-xs font-semibold uppercase tracking-wide text-brand-primary">Etapa 3 de 6 · Destaque o imóvel</p>
+            <p class="mb-2 text-xs font-semibold uppercase tracking-wide text-brand-primary">Etapa 2 de 5 · Destaque o imóvel</p>
             <h1 class="mb-6 text-3xl font-extrabold leading-tight">Quais comodidades o imóvel oferece?</h1>
             <?php foreach (FEATURE_GROUPS as $group => $items): ?>
               <div class="mb-6">
@@ -157,9 +154,9 @@ function render_property_wizard(): void
             <?php endforeach; ?>
           </section>
 
-          <!-- 7. Fotos ---------------------------------------------------------->
+          <!-- 6. Fotos ---------------------------------------------------------->
           <section class="wizard-step" data-step="fotos">
-            <p class="mb-2 text-xs font-semibold uppercase tracking-wide text-brand-primary">Etapa 3 de 6 · Destaque o imóvel</p>
+            <p class="mb-2 text-xs font-semibold uppercase tracking-wide text-brand-primary">Etapa 2 de 5 · Destaque o imóvel</p>
             <h1 class="mb-2 text-3xl font-extrabold leading-tight">Adicione fotos do imóvel</h1>
             <p class="mb-6 text-brand-text-secondary">Você precisa de pelo menos 5 fotos para publicar. Arraste para reordenar — a primeira é a foto de capa.</p>
             <div id="wz-photo-drop" class="mb-4 flex min-h-[160px] cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-brand-border p-6 text-center hover:border-brand-primary">
@@ -172,26 +169,26 @@ function render_property_wizard(): void
             <div id="wz-photo-grid" class="grid grid-cols-2 gap-3 sm:grid-cols-3"></div>
           </section>
 
-          <!-- 8. Título ---------------------------------------------------------->
+          <!-- 7. Título ---------------------------------------------------------->
           <section class="wizard-step" data-step="titulo">
-            <p class="mb-2 text-xs font-semibold uppercase tracking-wide text-brand-primary">Etapa 4 de 6 · Título e descrição</p>
+            <p class="mb-2 text-xs font-semibold uppercase tracking-wide text-brand-primary">Etapa 3 de 5 · Título e descrição</p>
             <h1 class="mb-2 text-3xl font-extrabold leading-tight">Agora, vamos dar um título ao anúncio</h1>
             <p class="mb-6 text-brand-text-secondary">Títulos curtos e diretos funcionam melhor. Você pode alterar depois.</p>
             <textarea id="wz-title" maxlength="120" rows="3" class="wz-field w-full resize-none rounded-xl border border-brand-border px-4 py-3 text-lg" data-field="title" placeholder="Ex.: Apartamento 2 quartos com vista mar no Centro"></textarea>
             <p class="mt-1 text-right text-xs text-brand-text-secondary"><span id="wz-title-count">0</span>/120 · mínimo 10 caracteres</p>
           </section>
 
-          <!-- 9. Descrição ---------------------------------------------------->
+          <!-- 8. Descrição ---------------------------------------------------->
           <section class="wizard-step" data-step="descricao">
-            <p class="mb-2 text-xs font-semibold uppercase tracking-wide text-brand-primary">Etapa 4 de 6 · Título e descrição</p>
+            <p class="mb-2 text-xs font-semibold uppercase tracking-wide text-brand-primary">Etapa 3 de 5 · Título e descrição</p>
             <h1 class="mb-2 text-3xl font-extrabold leading-tight">Crie sua descrição</h1>
             <p class="mb-6 text-brand-text-secondary">Explique o que faz esse imóvel especial: cômodos, acabamentos, vista, proximidade de comércio, transporte.</p>
             <textarea id="wz-description" rows="8" class="wz-field w-full rounded-xl border border-brand-border px-4 py-3 text-sm" data-field="description" placeholder="Descreva o imóvel..."></textarea>
           </section>
 
-          <!-- 10. Preço ---------------------------------------------------------->
+          <!-- 9. Preço ---------------------------------------------------------->
           <section class="wizard-step" data-step="preco">
-            <p class="mb-2 text-xs font-semibold uppercase tracking-wide text-brand-primary">Etapa 5 de 6 · Preço</p>
+            <p class="mb-2 text-xs font-semibold uppercase tracking-wide text-brand-primary">Etapa 4 de 5 · Preço</p>
             <h1 class="mb-6 text-3xl font-extrabold leading-tight">Agora, defina o preço</h1>
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div id="wz-price-sale-wrap" class="hidden">
@@ -225,9 +222,9 @@ function render_property_wizard(): void
             </div>
           </section>
 
-          <!-- 11. Contato ---------------------------------------------------------->
+          <!-- 10. Contato ---------------------------------------------------------->
           <section class="wizard-step" data-step="contato">
-            <p class="mb-2 text-xs font-semibold uppercase tracking-wide text-brand-primary">Etapa 6 de 6 · Contato e revisão</p>
+            <p class="mb-2 text-xs font-semibold uppercase tracking-wide text-brand-primary">Etapa 5 de 5 · Contato e revisão</p>
             <h1 class="mb-2 text-3xl font-extrabold leading-tight">Contato deste anúncio</h1>
             <p class="mb-6 text-brand-text-secondary">Opcional — deixe em branco para usar o telefone, e-mail e WhatsApp do seu perfil. Preencha só se este anúncio específico deve usar um contato diferente.</p>
             <div class="mb-4"><label class="mb-1 block text-sm font-medium">Telefone</label><input type="text" id="wz-contactPhone" class="wz-field w-full rounded-xl border border-brand-border px-4 py-3 text-sm" data-field="contactPhone" placeholder="(00) 00000-0000"></div>
@@ -235,7 +232,7 @@ function render_property_wizard(): void
             <div class="mb-4"><label class="mb-1 block text-sm font-medium">E-mail</label><input type="email" id="wz-contactEmail" class="wz-field w-full rounded-xl border border-brand-border px-4 py-3 text-sm" data-field="contactEmail" placeholder="contato@..."></div>
           </section>
 
-          <!-- 12. Revisar e publicar ---------------------------------------------->
+          <!-- 11. Revisar e publicar ---------------------------------------------->
           <section class="wizard-step" data-step="revisar">
             <h1 class="mb-2 text-3xl font-extrabold leading-tight">Eba! É hora de publicar o anúncio</h1>
             <p class="mb-6 text-brand-text-secondary">Confira as informações antes de publicar. Depois de publicado, o imóvel aparece na busca e nos filtros do site.</p>

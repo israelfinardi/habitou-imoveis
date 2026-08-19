@@ -182,7 +182,9 @@ body{font-family:'Plus Jakarta Sans',Arial,sans-serif}
             <?php endif; ?>
             <?php if ($__user['role'] === 'ADMIN'): ?>
               <div class="nav-user-menu-divider"></div>
-              <a href="<?= base_url('admin/index.php') ?>"><?= render_nav_icon('gear') ?>Administração</a>
+              <?php foreach (admin_nav_items() as [$href, $label, $icon]): ?>
+                <a href="<?= base_url($href) ?>"><?= render_nav_icon($icon) ?><?= e($label) ?></a>
+              <?php endforeach; ?>
             <?php endif; ?>
             <div class="nav-user-menu-divider"></div>
             <a href="<?= base_url('logout.php') ?>">Sair</a>
@@ -214,7 +216,10 @@ body{font-family:'Plus Jakarta Sans',Arial,sans-serif}
           <a href="<?= base_url($href) ?>" class="flex items-center gap-3 py-1.5 text-sm"><?= render_nav_icon($icon) ?><?= e($label) ?></a>
         <?php endforeach; ?>
         <?php if ($__user['role'] === 'ADMIN'): ?>
-          <a href="<?= base_url('admin/index.php') ?>" class="flex items-center gap-3 py-1.5 text-sm"><?= render_nav_icon('gear') ?>Administração</a>
+          <p class="mb-1 mt-2 text-xs font-semibold uppercase text-brand-text-secondary">Administração</p>
+          <?php foreach (admin_nav_items() as [$href, $label, $icon]): ?>
+            <a href="<?= base_url($href) ?>" class="flex items-center gap-3 py-1.5 text-sm"><?= render_nav_icon($icon) ?><?= e($label) ?></a>
+          <?php endforeach; ?>
         <?php endif; ?>
       </div>
     <?php else: ?>

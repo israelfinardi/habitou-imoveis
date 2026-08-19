@@ -1,20 +1,27 @@
 <?php
+/**
+ * Itens do menu de administração — mesclados por render_account_nav()
+ * (includes/account_nav.php) dentro do MESMO menu lateral unificado sempre
+ * que o usuário logado é ADMIN, assim a sidebar mostra as mesmas opções
+ * (pessoais + administração) no mesmo lugar em qualquer página do site,
+ * seja de conta, de anunciante ou de administração.
+ */
+function admin_nav_items(): array
+{
+    return [
+        'admin_index' => ['admin/index.php', 'Visão geral', 'grid'],
+        'admin_usuarios' => ['admin/usuarios.php', 'Usuários', 'users'],
+        'admin_imoveis' => ['admin/imoveis.php', 'Imóveis', 'house'],
+        'admin_imobiliarias' => ['admin/imobiliarias.php', 'Imobiliárias', 'building'],
+        'admin_planos' => ['admin/planos.php', 'Planos', 'tag'],
+        'admin_assinaturas' => ['admin/assinaturas.php', 'Assinaturas', 'card'],
+        'admin_feeds' => ['admin/feeds.php', 'Feeds VRSync', 'sync'],
+        'admin_contratos' => ['admin/contratos.php', 'Contratos', 'document'],
+    ];
+}
+
+/** Compatibilidade: as páginas admin/*.php chamam render_admin_nav('imoveis'), etc. — traduz pra chave prefixada do menu unificado. */
 function render_admin_nav(string $active): void
 {
-    $items = [
-        'index' => ['admin/index.php', 'Visão geral'],
-        'usuarios' => ['admin/usuarios.php', 'Usuários'],
-        'imoveis' => ['admin/imoveis.php', 'Imóveis'],
-        'imobiliarias' => ['admin/imobiliarias.php', 'Imobiliárias'],
-        'planos' => ['admin/planos.php', 'Planos'],
-        'assinaturas' => ['admin/assinaturas.php', 'Assinaturas'],
-        'feeds' => ['admin/feeds.php', 'Feeds VRSync'],
-        'contratos' => ['admin/contratos.php', 'Contratos'],
-    ];
-    echo '<p class="mb-3 text-xs font-semibold uppercase text-brand-text-secondary">Administração</p><nav class="flex flex-col gap-1">';
-    foreach ($items as $key => [$href, $label]) {
-        $cls = $key === $active ? 'text-brand-primary font-semibold' : '';
-        echo '<a href="' . e(base_url($href)) . '" class="rounded-lg px-3 py-2 text-sm ' . $cls . ' hover:bg-brand-bg-subtle">' . e($label) . '</a>';
-    }
-    echo '</nav>';
+    render_account_nav('admin_' . $active);
 }
