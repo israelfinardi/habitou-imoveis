@@ -45,7 +45,7 @@ define('CRON_SECRET', habitou_secret('cron'));
 define('SMTP_HOST', 'smtp.hostinger.com');
 define('SMTP_PORT', 587);
 define('SMTP_USER', 'contato@habitou.com.br');
-define('SMTP_PASS', 'liberdade@W159h');
+define('SMTP_PASS', '44b20760acf8db6f54d9358f1cb0b0a6c6ca79cd4b8cd5b5251e046225b58312'); // token API da Hostinger, não a senha da caixa de e-mail
 define('SMTP_FROM', 'contato@habitou.com.br');
 define('SMTP_FROM_NAME', 'Habitou Imóveis');
 
