@@ -37,29 +37,29 @@ require __DIR__ . '/../includes/header.php';
         <?php render_csv_export_button(); ?>
       </div>
       <form class="mb-4 max-w-sm"><input name="q" value="<?= e($q) ?>" placeholder="Buscar por nome ou e-mail" class="w-full rounded-lg border border-brand-border px-3 py-2 text-sm"></form>
-      <div class="overflow-hidden rounded-xl border border-brand-border">
-        <table class="w-full text-sm">
-          <thead class="bg-brand-bg-subtle text-left text-xs uppercase text-brand-text-secondary">
-            <tr><th class="px-4 py-3">Nome</th><th class="px-4 py-3">E-mail</th><th class="px-4 py-3">Imobiliária</th><th class="px-4 py-3">Papel / Status</th></tr>
-          </thead>
-          <tbody class="divide-y divide-brand-border">
-            <?php foreach ($users as $u): ?>
-              <tr>
-                <td class="px-4 py-3"><?= e($u['first_name'] . ' ' . $u['last_name']) ?></td>
-                <td class="px-4 py-3 text-xs text-brand-text-secondary"><?= e($u['email']) ?></td>
-                <td class="px-4 py-3 text-xs text-brand-text-secondary"><?= e($u['agency_name'] ?? '—') ?></td>
-                <td class="px-4 py-3">
-                  <form method="post" action="<?= base_url('actions/admin_action.php') ?>" class="flex items-center gap-2" onchange="this.submit()">
-                    <?= csrf_field() ?><input type="hidden" name="do" value="update_user"><input type="hidden" name="id" value="<?= $u['id'] ?>">
-                    <select name="role" class="rounded-lg border border-brand-border px-2 py-1 text-xs"><?php foreach ($roles as $r): ?><option value="<?= $r ?>" <?= $u['role'] === $r ? 'selected' : '' ?>><?= $r ?></option><?php endforeach; ?></select>
-                    <select name="status" class="rounded-lg border border-brand-border px-2 py-1 text-xs"><?php foreach ($statuses as $s): ?><option value="<?= $s ?>" <?= $u['status'] === $s ? 'selected' : '' ?>><?= $s ?></option><?php endforeach; ?></select>
-                  </form>
-                </td>
-              </tr>
-            <?php endforeach; ?>
-          </tbody>
-        </table>
-      </div>
+      <?php if (empty($users)): ?>
+        <div class="rounded-xl border border-dashed border-brand-border p-12 text-center text-brand-text-secondary">Nenhum usuário encontrado.</div>
+      <?php else: ?>
+        <div class="<?= CARD_GRID_CLASS ?>">
+          <?php foreach ($users as $u): ?>
+            <div class="rounded-2xl border border-brand-border bg-white p-4">
+              <div class="mb-3 flex items-center gap-2.5">
+                <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-primary text-sm font-semibold text-white"><?= e(mb_strtoupper(mb_substr($u['first_name'], 0, 1))) ?></span>
+                <div class="min-w-0">
+                  <p class="truncate text-sm font-semibold text-brand-text"><?= e($u['first_name'] . ' ' . $u['last_name']) ?></p>
+                  <p class="truncate text-xs text-brand-text-secondary"><?= e($u['email']) ?></p>
+                </div>
+              </div>
+              <p class="mb-3 text-xs text-brand-text-secondary">Imobiliária: <?= e($u['agency_name'] ?? '—') ?></p>
+              <form method="post" action="<?= base_url('actions/admin_action.php') ?>" class="flex flex-wrap gap-2" onchange="this.submit()">
+                <?= csrf_field() ?><input type="hidden" name="do" value="update_user"><input type="hidden" name="id" value="<?= $u['id'] ?>">
+                <select name="role" class="rounded-lg border border-brand-border px-2 py-1.5 text-xs"><?php foreach ($roles as $r): ?><option value="<?= $r ?>" <?= $u['role'] === $r ? 'selected' : '' ?>><?= $r ?></option><?php endforeach; ?></select>
+                <select name="status" class="rounded-lg border border-brand-border px-2 py-1.5 text-xs"><?php foreach ($statuses as $s): ?><option value="<?= $s ?>" <?= $u['status'] === $s ? 'selected' : '' ?>><?= $s ?></option><?php endforeach; ?></select>
+              </form>
+            </div>
+          <?php endforeach; ?>
+        </div>
+      <?php endif; ?>
     </main>
     <aside><?php render_admin_nav('usuarios'); ?></aside>
   </div>

@@ -24,29 +24,26 @@ require __DIR__ . '/../includes/header.php';
         <h1 class="text-2xl font-bold">Imobiliárias (<?= count($agencies) ?>)</h1>
         <?php render_csv_export_button(); ?>
       </div>
-      <div class="overflow-hidden rounded-xl border border-brand-border">
-        <table class="w-full text-sm">
-          <thead class="bg-brand-bg-subtle text-left text-xs uppercase text-brand-text-secondary">
-            <tr><th class="px-4 py-3">Nome</th><th class="px-4 py-3">Imóveis</th><th class="px-4 py-3">Usuários</th><th class="px-4 py-3">Feeds</th><th class="px-4 py-3">Status</th></tr>
-          </thead>
-          <tbody class="divide-y divide-brand-border">
-            <?php foreach ($agencies as $a): ?>
-              <tr>
-                <td class="px-4 py-3"><a href="<?= base_url('imobiliaria.php?slug=' . $a['slug']) ?>" class="font-medium hover:text-brand-primary"><?= e($a['name']) ?></a></td>
-                <td class="px-4 py-3 text-xs"><?= $a['pc'] ?></td>
-                <td class="px-4 py-3 text-xs"><?= $a['uc'] ?></td>
-                <td class="px-4 py-3 text-xs"><?= $a['fc'] ?></td>
-                <td class="px-4 py-3">
-                  <form method="post" action="<?= base_url('actions/admin_action.php') ?>" onchange="this.submit()">
-                    <?= csrf_field() ?><input type="hidden" name="do" value="update_agency_status"><input type="hidden" name="id" value="<?= $a['id'] ?>">
-                    <select name="status" class="rounded-lg border border-brand-border px-2 py-1 text-xs"><?php foreach ($statuses as $s): ?><option value="<?= $s ?>" <?= $a['status'] === $s ? 'selected' : '' ?>><?= $s ?></option><?php endforeach; ?></select>
-                  </form>
-                </td>
-              </tr>
-            <?php endforeach; ?>
-          </tbody>
-        </table>
-      </div>
+      <?php if (empty($agencies)): ?>
+        <div class="rounded-xl border border-dashed border-brand-border p-12 text-center text-brand-text-secondary">Nenhuma imobiliária cadastrada.</div>
+      <?php else: ?>
+        <div class="<?= CARD_GRID_CLASS ?>">
+          <?php foreach ($agencies as $a): ?>
+            <div class="rounded-2xl border border-brand-border bg-white p-4">
+              <a href="<?= base_url('imobiliaria.php?slug=' . $a['slug']) ?>" class="mb-2 block truncate text-sm font-semibold text-brand-text hover:text-brand-primary"><?= e($a['name']) ?></a>
+              <p class="mb-3 flex gap-3 text-xs text-brand-text-secondary">
+                <span><?= $a['pc'] ?> imóve<?= $a['pc'] === 1 ? 'l' : 'is' ?></span>
+                <span><?= $a['uc'] ?> usuário<?= $a['uc'] === 1 ? '' : 's' ?></span>
+                <span><?= $a['fc'] ?> feed<?= $a['fc'] === 1 ? '' : 's' ?></span>
+              </p>
+              <form method="post" action="<?= base_url('actions/admin_action.php') ?>" onchange="this.submit()">
+                <?= csrf_field() ?><input type="hidden" name="do" value="update_agency_status"><input type="hidden" name="id" value="<?= $a['id'] ?>">
+                <select name="status" class="w-full rounded-lg border border-brand-border px-2 py-1.5 text-xs"><?php foreach ($statuses as $s): ?><option value="<?= $s ?>" <?= $a['status'] === $s ? 'selected' : '' ?>><?= $s ?></option><?php endforeach; ?></select>
+              </form>
+            </div>
+          <?php endforeach; ?>
+        </div>
+      <?php endif; ?>
     </main>
     <aside><?php render_admin_nav('imobiliarias'); ?></aside>
   </div>

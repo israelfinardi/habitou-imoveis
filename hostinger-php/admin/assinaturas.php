@@ -28,27 +28,26 @@ require __DIR__ . '/../includes/header.php';
         <?php render_csv_export_button(); ?>
       </div>
       <p class="mb-4 text-sm text-brand-text-secondary">Assinaturas com um plano do Mercado Pago são ativadas/canceladas automaticamente pelo checkout e pelo webhook. O status abaixo também pode ser ajustado manualmente aqui (útil para planos sem gateway).</p>
-      <div class="overflow-hidden rounded-xl border border-brand-border">
-        <table class="w-full text-sm">
-          <thead class="bg-brand-bg-subtle text-left text-xs uppercase text-brand-text-secondary"><tr><th class="px-4 py-3">Assinante</th><th class="px-4 py-3">Plano</th><th class="px-4 py-3">Origem</th><th class="px-4 py-3">Criada em</th><th class="px-4 py-3">Status</th></tr></thead>
-          <tbody class="divide-y divide-brand-border">
-            <?php foreach ($subs as $s): ?>
-              <tr>
-                <td class="px-4 py-3 text-xs text-brand-text-secondary"><?= e($s['agency_name'] ?? ($s['first_name'] . ' ' . $s['last_name'] . ' (' . $s['email'] . ')')) ?></td>
-                <td class="px-4 py-3"><?= e($s['plan_name']) ?></td>
-                <td class="px-4 py-3 text-xs text-brand-text-secondary"><?= $s['external_id'] ? e($s['external_id']) : 'Manual' ?></td>
-                <td class="px-4 py-3 text-xs text-brand-text-secondary"><?= format_date($s['created_at']) ?></td>
-                <td class="px-4 py-3">
-                  <form method="post" action="<?= base_url('actions/admin_action.php') ?>" onchange="this.submit()">
-                    <?= csrf_field() ?><input type="hidden" name="do" value="update_subscription_status"><input type="hidden" name="id" value="<?= $s['id'] ?>">
-                    <select name="status" class="rounded-lg border border-brand-border px-2 py-1 text-xs"><?php foreach ($statuses as $st): ?><option value="<?= $st ?>" <?= $s['status'] === $st ? 'selected' : '' ?>><?= $st ?></option><?php endforeach; ?></select>
-                  </form>
-                </td>
-              </tr>
-            <?php endforeach; ?>
-          </tbody>
-        </table>
-      </div>
+      <?php if (empty($subs)): ?>
+        <div class="rounded-xl border border-dashed border-brand-border p-12 text-center text-brand-text-secondary">Nenhuma assinatura encontrada.</div>
+      <?php else: ?>
+        <div class="<?= CARD_GRID_CLASS ?>">
+          <?php foreach ($subs as $s): ?>
+            <div class="rounded-2xl border border-brand-border bg-white p-4">
+              <p class="mb-0.5 truncate text-sm font-semibold text-brand-text"><?= e($s['agency_name'] ?? ($s['first_name'] . ' ' . $s['last_name'])) ?></p>
+              <?php if (!$s['agency_name']): ?><p class="mb-2 truncate text-xs text-brand-text-secondary"><?= e($s['email']) ?></p><?php endif; ?>
+              <p class="mb-1 text-sm text-brand-text"><?= e($s['plan_name']) ?></p>
+              <p class="mb-3 text-xs text-brand-text-secondary">
+                <?= $s['external_id'] ? e($s['external_id']) : 'Manual' ?> · <?= format_date($s['created_at']) ?>
+              </p>
+              <form method="post" action="<?= base_url('actions/admin_action.php') ?>" onchange="this.submit()">
+                <?= csrf_field() ?><input type="hidden" name="do" value="update_subscription_status"><input type="hidden" name="id" value="<?= $s['id'] ?>">
+                <select name="status" class="w-full rounded-lg border border-brand-border px-2 py-1.5 text-xs"><?php foreach ($statuses as $st): ?><option value="<?= $st ?>" <?= $s['status'] === $st ? 'selected' : '' ?>><?= $st ?></option><?php endforeach; ?></select>
+              </form>
+            </div>
+          <?php endforeach; ?>
+        </div>
+      <?php endif; ?>
     </main>
     <aside><?php render_admin_nav('assinaturas'); ?></aside>
   </div>

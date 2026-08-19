@@ -57,47 +57,42 @@ require __DIR__ . '/../includes/header.php';
           <button type="submit" class="sm:col-span-2 rounded-full bg-brand-primary px-4 py-2 text-sm font-semibold text-white hover:bg-brand-primary-hover">Criar plano</button>
         </form>
       </div>
-      <div class="overflow-hidden rounded-xl border border-brand-border">
-        <table class="w-full text-sm">
-          <thead class="bg-brand-bg-subtle text-left text-xs uppercase text-brand-text-secondary"><tr><th class="px-4 py-3">Nome</th><th class="px-4 py-3">Origem</th><th class="px-4 py-3">Preço</th><th class="px-4 py-3">Limite</th><th class="px-4 py-3">Status</th><th class="px-4 py-3">Ações</th></tr></thead>
-          <tbody class="divide-y divide-brand-border">
-            <?php foreach ($plans as $p): ?>
-              <tr>
-                <td class="px-4 py-3 font-medium"><?= e($p['name']) ?></td>
-                <td class="px-4 py-3">
-                  <?php if ($p['mp_plan_id']): ?>
-                    <span class="rounded-full bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700" title="ID: <?= e($p['mp_plan_id']) ?>">Mercado Pago</span>
-                  <?php else: ?>
-                    <span class="rounded-full bg-brand-bg-subtle px-2 py-1 text-xs font-medium text-brand-text-secondary">Manual</span>
-                  <?php endif; ?>
-                </td>
-                <td class="px-4 py-3 text-xs"><?= format_currency_brl($p['price']) ?></td>
-                <td class="px-4 py-3 text-xs"><?= $p['max_listings'] ?? 'Ilimitado' ?></td>
-                <td class="px-4 py-3">
+      <?php if (empty($plans)): ?>
+        <div class="rounded-xl border border-dashed border-brand-border p-12 text-center text-brand-text-secondary">Nenhum plano cadastrado.</div>
+      <?php else: ?>
+        <div class="<?= CARD_GRID_CLASS ?>">
+          <?php foreach ($plans as $p): ?>
+            <div class="flex flex-col rounded-2xl border border-brand-border bg-white p-4">
+              <div class="mb-2 flex items-start justify-between gap-2">
+                <p class="text-sm font-semibold text-brand-text"><?= e($p['name']) ?></p>
+                <?php if ($p['mp_plan_id']): ?>
+                  <span class="shrink-0 rounded-full bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700" title="ID: <?= e($p['mp_plan_id']) ?>">Mercado Pago</span>
+                <?php else: ?>
+                  <span class="shrink-0 rounded-full bg-brand-bg-subtle px-2 py-1 text-xs font-medium text-brand-text-secondary">Manual</span>
+                <?php endif; ?>
+              </div>
+              <p class="mb-1 text-lg font-bold text-brand-primary"><?= format_currency_brl($p['price']) ?></p>
+              <p class="mb-3 text-xs text-brand-text-secondary">Limite: <?= $p['max_listings'] ?? 'Ilimitado' ?> anúncios</p>
+              <form method="post" action="<?= base_url('actions/admin_action.php') ?>" class="mb-3">
+                <?= csrf_field() ?><input type="hidden" name="do" value="toggle_plan"><input type="hidden" name="id" value="<?= $p['id'] ?>"><input type="hidden" name="active" value="<?= $p['active'] ? 0 : 1 ?>">
+                <button class="w-full rounded-full px-3 py-1.5 text-xs font-medium <?= $p['active'] ? 'bg-brand-green/10 text-brand-green-hover' : 'bg-brand-bg-subtle text-brand-text-secondary' ?>"><?= $p['active'] ? 'Ativo' : 'Inativo' ?></button>
+              </form>
+              <div class="mt-auto flex flex-wrap items-center gap-3 border-t border-brand-border pt-3">
+                <?php if (!$p['mp_plan_id']): ?>
                   <form method="post" action="<?= base_url('actions/admin_action.php') ?>">
-                    <?= csrf_field() ?><input type="hidden" name="do" value="toggle_plan"><input type="hidden" name="id" value="<?= $p['id'] ?>"><input type="hidden" name="active" value="<?= $p['active'] ? 0 : 1 ?>">
-                    <button class="rounded-full px-3 py-1 text-xs font-medium <?= $p['active'] ? 'bg-brand-green/10 text-brand-green-hover' : 'bg-brand-bg-subtle text-brand-text-secondary' ?>"><?= $p['active'] ? 'Ativo' : 'Inativo' ?></button>
+                    <?= csrf_field() ?><input type="hidden" name="do" value="publish_plan_mp"><input type="hidden" name="id" value="<?= $p['id'] ?>">
+                    <button type="submit" <?= mp_configured() ? '' : 'disabled' ?> class="text-xs font-medium text-brand-primary hover:underline disabled:cursor-not-allowed disabled:text-brand-text-secondary disabled:no-underline" title="<?= mp_configured() ? '' : 'Configure MP_ACCESS_TOKEN para habilitar' ?>">Publicar no Mercado Pago</button>
                   </form>
-                </td>
-                <td class="px-4 py-3">
-                  <div class="flex flex-wrap items-center gap-3">
-                    <?php if (!$p['mp_plan_id']): ?>
-                      <form method="post" action="<?= base_url('actions/admin_action.php') ?>">
-                        <?= csrf_field() ?><input type="hidden" name="do" value="publish_plan_mp"><input type="hidden" name="id" value="<?= $p['id'] ?>">
-                        <button type="submit" <?= mp_configured() ? '' : 'disabled' ?> class="text-xs font-medium text-brand-primary hover:underline disabled:cursor-not-allowed disabled:text-brand-text-secondary disabled:no-underline" title="<?= mp_configured() ? '' : 'Configure MP_ACCESS_TOKEN para habilitar' ?>">Publicar no Mercado Pago</button>
-                      </form>
-                    <?php endif; ?>
-                    <form method="post" action="<?= base_url('actions/admin_action.php') ?>" onsubmit="return confirm('Excluir o plano <?= e(addslashes($p['name'])) ?> permanentemente?');">
-                      <?= csrf_field() ?><input type="hidden" name="do" value="delete_plan"><input type="hidden" name="id" value="<?= $p['id'] ?>">
-                      <button type="submit" class="text-xs font-medium text-red-600 hover:underline">Excluir</button>
-                    </form>
-                  </div>
-                </td>
-              </tr>
-            <?php endforeach; ?>
-          </tbody>
-        </table>
-      </div>
+                <?php endif; ?>
+                <form method="post" action="<?= base_url('actions/admin_action.php') ?>" onsubmit="return confirm('Excluir o plano <?= e(addslashes($p['name'])) ?> permanentemente?');">
+                  <?= csrf_field() ?><input type="hidden" name="do" value="delete_plan"><input type="hidden" name="id" value="<?= $p['id'] ?>">
+                  <button type="submit" class="text-xs font-medium text-red-600 hover:underline">Excluir</button>
+                </form>
+              </div>
+            </div>
+          <?php endforeach; ?>
+        </div>
+      <?php endif; ?>
     </main>
     <aside><?php render_admin_nav('planos'); ?></aside>
   </div>

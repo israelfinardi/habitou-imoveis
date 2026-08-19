@@ -24,22 +24,20 @@ require __DIR__ . '/../includes/header.php';
         <h1 class="text-2xl font-bold">Feeds VRSync (<?= count($feeds) ?>)</h1>
         <?php render_csv_export_button(); ?>
       </div>
-      <div class="overflow-hidden rounded-xl border border-brand-border">
-        <table class="w-full text-sm">
-          <thead class="bg-brand-bg-subtle text-left text-xs uppercase text-brand-text-secondary"><tr><th class="px-4 py-3">Feed</th><th class="px-4 py-3">Imobiliária</th><th class="px-4 py-3">Status</th><th class="px-4 py-3">Última sinc.</th><th class="px-4 py-3">Imóveis</th></tr></thead>
-          <tbody class="divide-y divide-brand-border">
-            <?php foreach ($feeds as $f): ?>
-              <tr>
-                <td class="px-4 py-3"><a href="<?= base_url('imobiliaria/feed.php?id=' . $f['id']) ?>" class="font-medium hover:text-brand-primary"><?= e($f['name']) ?></a></td>
-                <td class="px-4 py-3 text-xs text-brand-text-secondary"><?= e($f['agency_name']) ?></td>
-                <td class="px-4 py-3 text-xs"><?= e($f['status']) ?></td>
-                <td class="px-4 py-3 text-xs text-brand-text-secondary"><?= $f['last_sync_at'] ? format_date($f['last_sync_at']) : 'Nunca' ?></td>
-                <td class="px-4 py-3 text-xs"><?= $f['pc'] ?></td>
-              </tr>
-            <?php endforeach; ?>
-          </tbody>
-        </table>
-      </div>
+      <?php if (empty($feeds)): ?>
+        <div class="rounded-xl border border-dashed border-brand-border p-12 text-center text-brand-text-secondary">Nenhum feed cadastrado.</div>
+      <?php else: ?>
+        <div class="<?= CARD_GRID_CLASS ?>">
+          <?php foreach ($feeds as $f): ?>
+            <a href="<?= base_url('imobiliaria/feed.php?id=' . $f['id']) ?>" class="block rounded-2xl border border-brand-border bg-white p-4 hover:border-brand-primary">
+              <p class="mb-1 truncate text-sm font-semibold text-brand-text"><?= e($f['name']) ?></p>
+              <p class="mb-3 truncate text-xs text-brand-text-secondary"><?= e($f['agency_name']) ?></p>
+              <p class="mb-1 text-xs"><span class="rounded-full bg-brand-bg-subtle px-2 py-1 font-medium"><?= e($f['status']) ?></span></p>
+              <p class="mt-2 text-xs text-brand-text-secondary"><?= $f['pc'] ?> imóve<?= $f['pc'] === 1 ? 'l' : 'is' ?> · última sinc.: <?= $f['last_sync_at'] ? format_date($f['last_sync_at']) : 'nunca' ?></p>
+            </a>
+          <?php endforeach; ?>
+        </div>
+      <?php endif; ?>
     </main>
     <aside><?php render_admin_nav('feeds'); ?></aside>
   </div>
