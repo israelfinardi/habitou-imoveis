@@ -197,14 +197,11 @@ function render_results_map(array $items, array $favoriteIds = []): void
         ];
     }
     // O mapa é sempre renderizado (mesmo sem pins), com uma vista padrão do
-    // Brasil inteiro — assim a coluna do mapa nunca fica em branco.
+    // Brasil inteiro — assim a coluna do mapa nunca fica em branco. No
+    // celular ele fica fixo em tela cheia por trás da lista, que vira uma
+    // bandeja arrastável por cima (ver assets/js/results-map.js).
     ?>
-    <button type="button" id="map-toggle-btn" class="mb-3 flex items-center gap-2 rounded-full border border-brand-border px-4 py-2 text-sm font-semibold hover:border-brand-primary lg:hidden">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 20l-6-3V4l6 3 6-3 6 3v13l-6-3-6 3z"/><path d="M9 4v13M15 7v13"/></svg>
-      Ver no mapa
-    </button>
-    <div id="results-map-wrap" class="hidden overflow-hidden rounded-xl border border-brand-border lg:sticky lg:top-24 lg:block" style="height:calc(100vh - 7rem)">
-      <button type="button" id="map-close-btn" class="absolute right-3 top-3 z-[1000] hidden h-9 w-9 items-center justify-center rounded-full bg-white shadow lg:hidden" aria-label="Fechar mapa">&times;</button>
+    <div id="results-map-wrap" class="h-[60vh] overflow-hidden rounded-xl border border-brand-border lg:sticky lg:top-24 lg:h-[calc(100vh-7rem)]">
       <div id="results-map" class="w-full" style="height:100%"></div>
     </div>
     <script>window.__RESULTS_MAP_PINS = <?= json_encode($pins, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;</script>

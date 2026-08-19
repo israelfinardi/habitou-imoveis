@@ -111,42 +111,149 @@
     });
   }
 
-  // --- Alternar mapa em tela cheia no celular -------------------------------
+  // --- Celular: mapa fixo em tela cheia + lista em bandeja arrastável -------
+  // (estilo Airbnb) por cima dele, com o texto "N imóveis nesta área"
+  // atualizado conforme o usuário arrasta/dá zoom no mapa.
   var wrap = document.getElementById('results-map-wrap');
-  var toggleBtn = document.getElementById('map-toggle-btn');
-  var closeBtn = document.getElementById('map-close-btn');
+  var sheet = document.getElementById('results-list-col');
+  var handleWrap = document.getElementById('sheet-handle-wrap');
+  var countText = document.getElementById('sheet-count-text');
+  var isMobileLayout = false;
 
-  function openMobileMap() {
-    if (!wrap) return;
-    wrap.classList.remove('hidden');
+  // Estados da bandeja: recolhida (só o cabeçalho + topo do 1º card),
+  // metade da tela, e quase tela cheia (cobrindo o mapa).
+  var SHEET_STATES = { collapsed: 132, half: null, full: null };
+
+  function headerHeight() {
+    var header = document.querySelector('header');
+    return header ? header.offsetHeight : 0;
+  }
+
+  function computeStates() {
+    var vh = window.innerHeight;
+    SHEET_STATES.half = Math.round(vh * 0.5);
+    SHEET_STATES.full = vh - headerHeight() - 12;
+  }
+
+  function applySheetHeight(px, animate) {
+    if (!sheet) return;
+    sheet.style.transition = animate ? 'height .22s ease' : 'none';
+    sheet.style.height = px + 'px';
+  }
+
+  function setState(state) {
+    applySheetHeight(SHEET_STATES[state], true);
+  }
+
+  function enableMobileLayout() {
+    if (isMobileLayout || !wrap || !sheet) return;
+    isMobileLayout = true;
+    computeStates();
+
     wrap.style.position = 'fixed';
-    wrap.style.inset = '0';
-    wrap.style.zIndex = '50';
+    wrap.style.top = headerHeight() + 'px';
+    wrap.style.left = '0';
+    wrap.style.right = '0';
+    wrap.style.bottom = '0';
+    wrap.style.zIndex = '10';
     wrap.style.borderRadius = '0';
-    wrap.style.height = '100%';
-    if (closeBtn) closeBtn.classList.remove('hidden');
+    wrap.style.border = 'none';
+    wrap.style.height = 'auto';
+
+    sheet.style.position = 'fixed';
+    sheet.style.left = '0';
+    sheet.style.right = '0';
+    sheet.style.bottom = '0';
+    sheet.style.zIndex = '20';
+    sheet.style.background = '#fff';
+    sheet.style.borderTopLeftRadius = '20px';
+    sheet.style.borderTopRightRadius = '20px';
+    sheet.style.boxShadow = '0 -8px 30px rgba(0,0,0,.15)';
+    sheet.style.overflowY = 'auto';
+    sheet.style.overscrollBehavior = 'contain';
+    sheet.style.padding = '0 16px 16px';
+
     document.body.style.overflow = 'hidden';
-    setTimeout(function () { map.invalidateSize(); }, 50);
+    setState('half');
+    setTimeout(function () { map.invalidateSize(); }, 60);
   }
 
-  function closeMobileMap() {
-    if (!wrap) return;
-    wrap.classList.add('hidden');
-    wrap.style.position = '';
-    wrap.style.inset = '';
-    wrap.style.zIndex = '';
-    wrap.style.borderRadius = '';
-    wrap.style.height = '70vh';
-    if (closeBtn) closeBtn.classList.add('hidden');
+  function disableMobileLayout() {
+    if (!isMobileLayout || !wrap || !sheet) return;
+    isMobileLayout = false;
+    ['position', 'top', 'left', 'right', 'bottom', 'zIndex', 'borderRadius', 'border', 'height'].forEach(function (k) { wrap.style[k] = ''; });
+    ['position', 'left', 'right', 'bottom', 'zIndex', 'background', 'borderTopLeftRadius', 'borderTopRightRadius', 'boxShadow', 'overflowY', 'overscrollBehavior', 'padding', 'transition', 'height'].forEach(function (k) { sheet.style[k] = ''; });
+    grid && Array.prototype.forEach.call(grid.children, function (card) { card.style.display = ''; });
     document.body.style.overflow = '';
+    setTimeout(function () { map.invalidateSize(); }, 60);
   }
 
-  if (toggleBtn) toggleBtn.addEventListener('click', openMobileMap);
-  if (closeBtn) closeBtn.addEventListener('click', closeMobileMap);
+  // --- Arrastar a bandeja pelo cabeçalho (Pointer Events cobrem toque) ------
+  var dragStartY = null;
+  var dragStartHeight = 0;
 
-  window.addEventListener('resize', function () {
-    if (window.innerWidth >= 1024 && wrap && wrap.style.position === 'fixed') {
-      closeMobileMap();
+  function onDragStart(e) {
+    if (!isMobileLayout) return;
+    dragStartY = e.clientY;
+    dragStartHeight = sheet.getBoundingClientRect().height;
+    sheet.style.transition = 'none';
+    document.addEventListener('pointermove', onDragMove);
+    document.addEventListener('pointerup', onDragEnd);
+  }
+
+  function onDragMove(e) {
+    if (dragStartY === null) return;
+    if (e.cancelable) e.preventDefault();
+    var delta = dragStartY - e.clientY;
+    var next = Math.min(SHEET_STATES.full, Math.max(80, dragStartHeight + delta));
+    applySheetHeight(next, false);
+  }
+
+  function onDragEnd() {
+    if (dragStartY === null) return;
+    dragStartY = null;
+    document.removeEventListener('pointermove', onDragMove);
+    document.removeEventListener('pointerup', onDragEnd);
+
+    var h = sheet.getBoundingClientRect().height;
+    var candidates = [['collapsed', SHEET_STATES.collapsed], ['half', SHEET_STATES.half], ['full', SHEET_STATES.full]];
+    candidates.sort(function (a, b) { return Math.abs(h - a[1]) - Math.abs(h - b[1]); });
+    setState(candidates[0][0]);
+  }
+
+  if (handleWrap) {
+    handleWrap.style.touchAction = 'none';
+    handleWrap.addEventListener('pointerdown', onDragStart);
+  }
+
+  // --- Só mostra, na bandeja, os imóveis dentro da área visível do mapa ----
+  function updateVisibleByBounds() {
+    if (!isMobileLayout || !grid) return;
+    var b = map.getBounds();
+    var visibleCount = 0;
+    pins.forEach(function (p) {
+      var card = grid.querySelector('[data-property-id="' + p.id + '"]');
+      if (!card) return;
+      var within = b.contains([p.lat, p.lng]);
+      card.style.display = within ? '' : 'none';
+      if (within) visibleCount++;
+    });
+    if (countText) {
+      countText.textContent = visibleCount + (visibleCount === 1 ? ' imóvel nesta área' : ' imóveis nesta área');
     }
-  });
+  }
+
+  map.on('moveend', updateVisibleByBounds);
+
+  function syncLayout() {
+    if (window.innerWidth < 1024) {
+      enableMobileLayout();
+      updateVisibleByBounds();
+    } else {
+      disableMobileLayout();
+    }
+  }
+
+  syncLayout();
+  window.addEventListener('resize', syncLayout);
 })();

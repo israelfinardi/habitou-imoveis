@@ -19,7 +19,13 @@ require __DIR__ . '/includes/header.php';
   <h1 class="sr-only">Busca de imóveis</h1>
 
   <div id="results-layout" class="lg:grid lg:grid-cols-2 lg:items-start lg:gap-6">
-    <div>
+    <div id="results-list-col">
+      <div id="sheet-handle-wrap" class="sticky top-0 z-10 -mx-4 mb-3 bg-white px-4 pb-2 pt-1 lg:hidden">
+        <button type="button" id="sheet-drag-handle" class="mx-auto block h-1.5 w-10 rounded-full bg-brand-border" aria-label="Arrastar lista"></button>
+        <p id="sheet-count-text" class="mt-2 text-center text-sm font-semibold text-brand-text">
+          <?= count($result['items']) ?> imóve<?= count($result['items']) === 1 ? 'l' : 'is' ?> nesta área
+        </p>
+      </div>
       <?php render_property_list($result['items'], $favoriteIds); ?>
       <?php
       $baseQuery = 'imoveis.php?' . http_build_query(array_diff_key($_GET, ['pagina' => '']));
