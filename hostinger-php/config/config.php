@@ -42,11 +42,11 @@ define('AUTH_SECRET', habitou_secret('auth'));
 define('CRON_SECRET', habitou_secret('cron'));
 
 // --- E-mail (opcional): deixe em branco para usar a função mail() nativa do PHP ---
-define('SMTP_HOST', '');
+define('SMTP_HOST', 'smtp.hostinger.com');
 define('SMTP_PORT', 587);
-define('SMTP_USER', '');
-define('SMTP_PASS', '');
-define('SMTP_FROM', 'no-reply@habitou.com.br');
+define('SMTP_USER', 'contato@habitou.com.br');
+define('SMTP_PASS', 'liberdade@W159h');
+define('SMTP_FROM', 'contato@habitou.com.br');
 define('SMTP_FROM_NAME', 'Habitou Imóveis');
 
 // --- Mercado Pago (assinaturas): cole aqui as credenciais de PRODUÇÃO da
