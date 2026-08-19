@@ -61,6 +61,14 @@ define('MP_PUBLIC_KEY', 'APP_USR-eaed27b6-b742-4262-8cf5-bb32ceb80ee8');
 // actions/mercadopago_webhook.php. Deixe em branco se ainda não configurou.
 define('MP_WEBHOOK_SECRET', '');
 
+// --- Cloudflare Turnstile (opcional): desafio invisível anti-bot no login
+// e cadastro. Crie um site em https://dash.cloudflare.com/?to=/:account/turnstile
+// (modo "Managed" ou "Invisible") e cole as duas chaves abaixo. Em branco,
+// o desafio simplesmente não aparece — login/cadastro continuam funcionando
+// normalmente, só sem essa camada extra.
+define('TURNSTILE_SITE_KEY', '');
+define('TURNSTILE_SECRET_KEY', '');
+
 define('UPLOAD_MAX_BYTES', 8 * 1024 * 1024);
 
 date_default_timezone_set('America/Sao_Paulo');

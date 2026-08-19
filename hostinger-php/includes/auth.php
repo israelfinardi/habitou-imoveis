@@ -4,6 +4,20 @@ require_once __DIR__ . '/functions.php';
 
 if (session_status() === PHP_SESSION_NONE) {
     session_name('habitou_session');
+    $isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || (($_SERVER['SERVER_PORT'] ?? '') == 443)
+        || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https');
+    // HttpOnly bloqueia leitura do cookie por JS (mitiga roubo de sessão via
+    // XSS); SameSite=Strict impede que ele seja enviado em navegação vinda
+    // de outro site (mitiga CSRF, complementar ao token já usado nos
+    // formulários); Secure só quando o acesso já é HTTPS — exigir sempre
+    // quebraria o login em ambiente de desenvolvimento local sem HTTPS.
+    session_set_cookie_params([
+        'lifetime' => 0,
+        'path' => '/',
+        'secure' => $isHttps,
+        'httponly' => true,
+        'samesite' => 'Strict',
+    ]);
     session_start();
 }
 

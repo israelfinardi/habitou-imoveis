@@ -7,17 +7,25 @@ $redirect = $_GET['redirect'] ?? $_POST['redirect'] ?? '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     verify_csrf();
+    rate_limit_enforce('login_ip', client_ip(), 20, 600); // 20 tentativas / 10 min por IP, qualquer e-mail
     $email = trim(strtolower($_POST['email'] ?? ''));
     $password = $_POST['password'] ?? '';
 
     if (!$email || !$password) {
         $error = 'Preencha e-mail e senha.';
+    } elseif (!verify_captcha()) {
+        $error = 'Não foi possível confirmar que você não é um robô. Tente novamente.';
+    } elseif (($wait = login_lockout_seconds_remaining($email)) > 0) {
+        $error = 'Muitas tentativas de login com este e-mail. Tente novamente em ' . ceil($wait / 60) . ' minuto(s).';
     } else {
+        rate_limit_hit('login_ip', client_ip());
         try {
             $user = authenticate_user($email, $password);
+            record_login_attempt($email, true);
             login_user((int) $user['id']);
             redirect($redirect && str_starts_with($redirect, '/') ? $redirect : base_url('minha-conta.php'));
         } catch (AuthServiceError $e) {
+            record_login_attempt($email, false);
             $error = $e->getMessage();
         }
     }
@@ -52,6 +60,7 @@ require __DIR__ . '/includes/header.php';
       <div class="mb-4 text-right">
         <a href="<?= base_url('esqueci-senha.php') ?>" class="text-xs font-medium text-brand-primary hover:underline">Esqueci minha senha</a>
       </div>
+      <?= render_captcha_widget() ?>
       <button type="submit" class="w-full rounded-full bg-brand-primary py-2.5 text-sm font-semibold text-white hover:bg-brand-primary-hover">Entrar</button>
       <p class="mt-4 text-center text-sm text-brand-text-secondary">Não tem uma conta? <a href="<?= base_url('cadastro.php') ?>" class="font-medium text-brand-primary hover:underline">Cadastre-se</a></p>
     </form>

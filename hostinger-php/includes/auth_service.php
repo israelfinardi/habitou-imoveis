@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/mailer.php';
+require_once __DIR__ . '/password.php';
 
 class AuthServiceError extends \RuntimeException {}
 
@@ -36,7 +37,7 @@ function register_user(string $firstName, string $lastName, string $email, strin
         $role = 'AGENCY_ADMIN';
     }
 
-    $hash = password_hash($password, PASSWORD_BCRYPT);
+    $hash = hash_password($password);
     $stmt = $pdo->prepare('INSERT INTO users (first_name, last_name, email, phone, password_hash, role, status, creci, agency_id) VALUES (?,?,?,?,?,?,"ACTIVE",?,?)');
     $stmt->execute([$firstName, $lastName, $email, $phone ?: null, $hash, $role, $creci, $agencyId]);
     return (int) $pdo->lastInsertId();
@@ -83,8 +84,12 @@ function authenticate_user(string $email, string $password): array
     if ($user['status'] !== 'ACTIVE') {
         throw new AuthServiceError('Esta conta está inativa.');
     }
-    if (!password_verify($password, $user['password_hash'])) {
+    $check = verify_password($password, $user['password_hash']);
+    if (!$check['valid']) {
         throw new AuthServiceError('E-mail ou senha inválidos.');
+    }
+    if ($check['rehash']) {
+        $pdo->prepare('UPDATE users SET password_hash = ? WHERE id = ?')->execute([$check['rehash'], $user['id']]);
     }
     $pdo->prepare('UPDATE users SET last_login_at = CURRENT_TIMESTAMP WHERE id = ?')->execute([$user['id']]);
     return $user;
@@ -99,6 +104,12 @@ function request_password_reset(string $email): void
     if (!$user) {
         return; // nunca revela se o e-mail existe
     }
+
+    // Invalida qualquer link de recuperação anterior ainda não usado —
+    // só o mais recente deve funcionar, senão um link antigo esquecido
+    // aberto (num e-mail antigo, por exemplo) continuaria válido.
+    $pdo->prepare('UPDATE password_reset_tokens SET used_at = CURRENT_TIMESTAMP WHERE user_id = ? AND used_at IS NULL')
+        ->execute([$user['id']]);
 
     $rawToken = random_token(32);
     $tokenHash = hash('sha256', $rawToken);
@@ -128,7 +139,7 @@ function reset_password(string $rawToken, string $newPassword): void
         throw new AuthServiceError('Este link de redefinição é inválido ou expirou.');
     }
 
-    $hash = password_hash($newPassword, PASSWORD_BCRYPT);
+    $hash = hash_password($newPassword);
     $pdo->beginTransaction();
     $pdo->prepare('UPDATE users SET password_hash = ? WHERE id = ?')->execute([$hash, $token['user_id']]);
     $pdo->prepare('UPDATE password_reset_tokens SET used_at = CURRENT_TIMESTAMP WHERE id = ?')->execute([$token['id']]);
@@ -141,9 +152,9 @@ function change_password(int $userId, string $currentPassword, string $newPasswo
     $stmt = $pdo->prepare('SELECT password_hash FROM users WHERE id = ?');
     $stmt->execute([$userId]);
     $hash = $stmt->fetchColumn();
-    if (!$hash || !password_verify($currentPassword, $hash)) {
+    if (!$hash || !verify_password($currentPassword, $hash)['valid']) {
         throw new AuthServiceError('Senha atual incorreta.');
     }
-    $newHash = password_hash($newPassword, PASSWORD_BCRYPT);
+    $newHash = hash_password($newPassword);
     $pdo->prepare('UPDATE users SET password_hash = ? WHERE id = ?')->execute([$newHash, $userId]);
 }

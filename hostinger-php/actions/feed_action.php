@@ -27,7 +27,7 @@ switch ($action) {
         $freq = (int) ($_POST['frequency_minutes'] ?? 1440);
         if ($name && filter_var($url, FILTER_VALIDATE_URL)) {
             $stmt = $pdo->prepare('INSERT INTO feeds (agency_id, name, url, frequency_minutes, next_sync_at) VALUES (?,?,?,?,CURRENT_TIMESTAMP)');
-            $stmt->execute([$user['agency_id'], $name, $url, $freq]);
+            $stmt->execute([$user['agency_id'], $name, encrypt_value($url), $freq]);
             redirect(base_url('imobiliaria/feed.php?id=' . $pdo->lastInsertId()));
         }
         redirect(base_url('imobiliaria/feeds.php'));

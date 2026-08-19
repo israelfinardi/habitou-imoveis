@@ -11,6 +11,12 @@ require_once __DIR__ . '/../includes/bootstrap.php';
 
 header('Content-Type: application/json');
 
+// Generoso o bastante pra não interferir num pico legítimo de notificações
+// do Mercado Pago, mas suficiente pra barrar alguém tentando inundar esse
+// endpoint público (ele não exige login).
+rate_limit_enforce('mp_webhook_ip', client_ip(), 120, 60);
+rate_limit_hit('mp_webhook_ip', client_ip());
+
 $raw = file_get_contents('php://input');
 $body = json_decode($raw, true);
 $body = is_array($body) ? $body : [];
@@ -24,6 +30,12 @@ if (defined('MP_WEBHOOK_SECRET') && MP_WEBHOOK_SECRET !== '') {
         echo json_encode(['error' => 'invalid signature']);
         exit;
     }
+} else {
+    // Sem chave secreta configurada não dá pra validar a origem — a
+    // notificação é aceita mesmo assim (a ativação real depende sempre de
+    // consultar o status na API, nunca do corpo dessa requisição), mas fica
+    // registrado pra quem administra o site notar e configurar a chave.
+    error_log('mercadopago_webhook: MP_WEBHOOK_SECRET não configurado — assinatura da notificação não verificada.');
 }
 
 if (in_array($type, ['preapproval', 'subscription_preapproval'], true) && $preapprovalId) {

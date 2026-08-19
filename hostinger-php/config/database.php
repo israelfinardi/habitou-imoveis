@@ -50,6 +50,24 @@ function run_pending_migrations(PDO $pdo): void
         $pdo->exec('ALTER TABLE plans ADD COLUMN mp_plan_id VARCHAR(120) NULL');
         $pdo->exec('CREATE INDEX IF NOT EXISTS idx_plans_mp_plan_id ON plans (mp_plan_id)');
     }
+    // Tabelas novas (não coluna em tabela existente) usam CREATE TABLE IF NOT
+    // EXISTS direto — já é idempotente por natureza, sem precisar de checagem.
+    $pdo->exec('CREATE TABLE IF NOT EXISTS login_attempts (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        email VARCHAR(255) NOT NULL,
+        ip VARCHAR(64) NOT NULL,
+        success INTEGER NOT NULL,
+        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+    )');
+    $pdo->exec('CREATE INDEX IF NOT EXISTS idx_login_attempts_email ON login_attempts (email, created_at)');
+    $pdo->exec('CREATE INDEX IF NOT EXISTS idx_login_attempts_ip ON login_attempts (ip, created_at)');
+    $pdo->exec('CREATE TABLE IF NOT EXISTS rate_limit_hits (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        bucket VARCHAR(60) NOT NULL,
+        rkey VARCHAR(120) NOT NULL,
+        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+    )');
+    $pdo->exec('CREATE INDEX IF NOT EXISTS idx_rate_limit_hits ON rate_limit_hits (bucket, rkey, created_at)');
 }
 
 /**
@@ -98,6 +116,7 @@ function run_provisioning(PDO $pdo): void
 
     require_once __DIR__ . '/../includes/functions.php';
     require_once __DIR__ . '/../includes/constants.php';
+    require_once __DIR__ . '/../includes/password.php';
     require_once __DIR__ . '/../includes/seed.php';
     seed_database($pdo);
 }

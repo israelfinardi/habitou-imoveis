@@ -8,6 +8,7 @@ $accountType = in_array($_GET['tipo'] ?? '', ['corretor', 'imobiliaria'], true) 
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     verify_csrf();
+    rate_limit_enforce('cadastro_ip', client_ip(), 10, 3600); // 10 cadastros / hora por IP
     $firstName = trim($_POST['firstName'] ?? '');
     $lastName = trim($_POST['lastName'] ?? '');
     $email = trim(strtolower($_POST['email'] ?? ''));
@@ -28,8 +29,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($password !== $passwordConfirmation) $fieldErrors['passwordConfirmation'] = 'As senhas não coincidem.';
     if ($accountType === 'corretor' && $creci === '') $fieldErrors['creci'] = 'Informe seu número de CRECI.';
     if ($accountType === 'imobiliaria' && mb_strlen($agencyName) < 3) $fieldErrors['agencyName'] = 'Informe o nome da imobiliária.';
+    if (!verify_captcha()) $fieldErrors['captcha'] = 'Não foi possível confirmar que você não é um robô. Tente novamente.';
 
     if (empty($fieldErrors)) {
+        rate_limit_hit('cadastro_ip', client_ip());
         try {
             $userId = register_user($firstName, $lastName, $email, $phone, $password, [
                 'type' => $accountType,
@@ -136,6 +139,8 @@ require __DIR__ . '/includes/header.php';
         <input type="password" name="passwordConfirmation" required class="w-full rounded-lg border border-brand-border px-3 py-2 text-sm">
         <?php if (!empty($fieldErrors['passwordConfirmation'])): ?><p class="mt-1 text-xs text-red-600"><?= e($fieldErrors['passwordConfirmation']) ?></p><?php endif; ?>
       </div>
+      <?= render_captcha_widget() ?>
+      <?php if (!empty($fieldErrors['captcha'])): ?><p class="mb-4 text-xs text-red-600"><?= e($fieldErrors['captcha']) ?></p><?php endif; ?>
       <button type="submit" class="w-full rounded-full bg-brand-primary py-2.5 text-sm font-semibold text-white hover:bg-brand-primary-hover">Criar conta</button>
       <p class="mt-4 text-center text-sm text-brand-text-secondary">Já tem uma conta? <a href="<?= base_url('login.php') ?>" class="font-medium text-brand-primary hover:underline">Entrar</a></p>
     </form>

@@ -56,6 +56,29 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE INDEX IF NOT EXISTS idx_users_agency ON users (agency_id);
 CREATE INDEX IF NOT EXISTS idx_users_role ON users (role);
 
+-- ---------------------------------------------------------------------
+-- Segurança: histórico de tentativas de login (bloqueio progressivo de
+-- conta) e contador genérico de limite de requisições por IP (rate
+-- limiting em recuperação de senha, webhooks, etc).
+-- ---------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS login_attempts (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  email VARCHAR(255) NOT NULL,
+  ip VARCHAR(64) NOT NULL,
+  success INTEGER NOT NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_login_attempts_email ON login_attempts (email, created_at);
+CREATE INDEX IF NOT EXISTS idx_login_attempts_ip ON login_attempts (ip, created_at);
+
+CREATE TABLE IF NOT EXISTS rate_limit_hits (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  bucket VARCHAR(60) NOT NULL,
+  rkey VARCHAR(120) NOT NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_rate_limit_hits ON rate_limit_hits (bucket, rkey, created_at);
+
 CREATE TABLE IF NOT EXISTS password_reset_tokens (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   user_id INTEGER NOT NULL,
@@ -144,7 +167,7 @@ CREATE TABLE IF NOT EXISTS feeds (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   agency_id INTEGER NOT NULL,
   name VARCHAR(160) NOT NULL,
-  url VARCHAR(500) NOT NULL,
+  url TEXT NOT NULL,
   status TEXT NOT NULL DEFAULT 'ACTIVE',
   frequency_minutes INTEGER NOT NULL DEFAULT 1440,
   last_sync_at DATETIME NULL,

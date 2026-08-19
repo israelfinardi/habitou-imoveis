@@ -57,7 +57,7 @@ function vrsync_ensure_feed_advertiser(int $agencyId): int
     $email = 'vrsync+' . $agency['slug'] . '@habitou.com.br';
     $pdo->prepare('INSERT INTO users (first_name, last_name, email, password_hash, role, status, agency_id) VALUES (?,?,?,?,"AGENCY_ADMIN","ACTIVE",?)
         ON CONFLICT(email) DO UPDATE SET agency_id = excluded.agency_id')
-        ->execute([explode(' ', $agency['name'])[0] ?: 'Imobiliária', 'VRSync', $email, password_hash(bin2hex(random_bytes(16)), PASSWORD_BCRYPT), $agencyId]);
+        ->execute([explode(' ', $agency['name'])[0] ?: 'Imobiliária', 'VRSync', $email, hash_password(bin2hex(random_bytes(16))), $agencyId]);
     $stmt->execute([$agencyId]);
     return (int) $stmt->fetchColumn();
 }
@@ -79,7 +79,7 @@ function run_feed_sync(int $feedId): array
     $errorMessage = null;
 
     try {
-        $xml = vrsync_fetch_xml($feed['url']);
+        $xml = vrsync_fetch_xml(decrypt_value($feed['url']));
         $result = parse_vrsync_xml($xml);
         $listings = $result['listings'];
         $issues = $result['issues'];

@@ -36,7 +36,7 @@ require __DIR__ . '/../includes/header.php';
       <a href="<?= base_url('imobiliaria/feeds.php') ?>" class="mb-4 inline-block text-sm text-brand-primary hover:underline">← Voltar para feeds</a>
       <div class="mb-6 rounded-xl border border-brand-border bg-white p-5">
         <div class="mb-3 flex items-start justify-between">
-          <div><h1 class="text-xl font-bold"><?= e($feed['name']) ?></h1><p class="break-all text-xs text-brand-text-secondary"><?= e($feed['url']) ?></p></div>
+          <div><h1 class="text-xl font-bold"><?= e($feed['name']) ?></h1><p class="break-all text-xs text-brand-text-secondary"><?= e(decrypt_value($feed['url'])) ?></p></div>
           <span class="shrink-0 rounded-full px-2 py-1 text-xs font-medium <?= $feed['status'] === 'ACTIVE' ? 'bg-brand-green/10 text-brand-green-hover' : 'bg-brand-bg-subtle text-brand-text-secondary' ?>"><?= $feed['status'] === 'ACTIVE' ? 'Ativo' : 'Inativo' ?></span>
         </div>
         <div class="mb-4 grid grid-cols-2 gap-3 text-sm sm:grid-cols-4">

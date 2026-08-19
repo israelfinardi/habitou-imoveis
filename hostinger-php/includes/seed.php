@@ -31,7 +31,7 @@ function seed_database(PDO $pdo): void
     }
 
     // --- Administrador ---------------------------------------------------------
-    $adminHash = password_hash('Admin@12345', PASSWORD_BCRYPT);
+    $adminHash = hash_password('Admin@12345');
     $stmt = $pdo->prepare('INSERT INTO users (first_name, last_name, email, password_hash, role, status) VALUES (?,?,?,?,?,?)
         ON CONFLICT(email) DO UPDATE SET first_name = excluded.first_name');
     $stmt->execute(['Administrador', 'Habitou', 'admin@habitou.com.br', $adminHash, 'ADMIN', 'ACTIVE']);
