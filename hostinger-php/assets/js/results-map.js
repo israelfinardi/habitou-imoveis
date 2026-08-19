@@ -226,9 +226,11 @@
     handleWrap.addEventListener('pointerdown', onDragStart);
   }
 
-  // --- Só mostra, na bandeja, os imóveis dentro da área visível do mapa ----
+  // --- Só mostra, na lista, os imóveis dentro da área visível do mapa ------
+  // (tanto na bandeja do celular quanto na lista lateral do desktop — ao dar
+  // zoom/arrastar o mapa, a lista acompanha a área visível na tela).
   function updateVisibleByBounds() {
-    if (!isMobileLayout || !grid) return;
+    if (!grid) return;
     var b = map.getBounds();
     var visibleCount = 0;
     pins.forEach(function (p) {
@@ -238,7 +240,7 @@
       card.style.display = within ? '' : 'none';
       if (within) visibleCount++;
     });
-    if (countText) {
+    if (countText && isMobileLayout) {
       countText.textContent = visibleCount + (visibleCount === 1 ? ' imóvel nesta área' : ' imóveis nesta área');
     }
   }
@@ -248,10 +250,10 @@
   function syncLayout() {
     if (window.innerWidth < 1024) {
       enableMobileLayout();
-      updateVisibleByBounds();
     } else {
       disableMobileLayout();
     }
+    updateVisibleByBounds();
   }
 
   syncLayout();
