@@ -41,11 +41,22 @@ function habitou_secret(string $name): string
 define('AUTH_SECRET', habitou_secret('auth'));
 define('CRON_SECRET', habitou_secret('cron'));
 
-// --- E-mail (opcional): deixe em branco para usar a função mail() nativa do PHP ---
-define('SMTP_HOST', 'smtp.hostinger.com');
+// --- E-mail: API de e-mail da Hostinger (https://developers.hostinger.com/),
+// mesmo token usado no painel deles em E-mails > sua caixa > API. Testado e
+// confirmado funcionando (envio real entregue na caixa em 19/08/2026). ---
+define('HOSTINGER_EMAIL_API_TOKEN', '44b20760acf8db6f54d9358f1cb0b0a6c6ca79cd4b8cd5b5251e046225b58312');
+define('HOSTINGER_MAILBOX_RESOURCE_ID', 'AC94d162b525fe4511e3aa4d7fe42f'); // contato@habitou.com.br
+
+// --- SMTP (opcional, usado só se a API acima falhar): esse token NÃO
+// funciona como senha de SMTP_PASS — a Hostinger usa autenticação
+// diferente pra API (Bearer token) e pra SMTP (senha real da caixa). Se
+// quiser esse caminho como reserva, troque SMTP_PASS pela senha de verdade
+// da caixa contato@habitou.com.br. Em branco, cai direto no mail() nativo
+// do PHP como segunda reserva.
+define('SMTP_HOST', '');
 define('SMTP_PORT', 587);
 define('SMTP_USER', 'contato@habitou.com.br');
-define('SMTP_PASS', '44b20760acf8db6f54d9358f1cb0b0a6c6ca79cd4b8cd5b5251e046225b58312'); // token API da Hostinger, não a senha da caixa de e-mail
+define('SMTP_PASS', '');
 define('SMTP_FROM', 'contato@habitou.com.br');
 define('SMTP_FROM_NAME', 'Habitou Imóveis');
 

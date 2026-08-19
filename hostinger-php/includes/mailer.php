@@ -1,12 +1,22 @@
 <?php
 /**
- * Envio de e-mail simples. Usa SMTP se configurado em config.php (SMTP_HOST),
- * caso contrário tenta a função mail() nativa do PHP (disponível na maioria
- * das hospedagens compartilhadas, incluindo a Hostinger). Se nada estiver
- * disponível, apenas registra no log — nunca quebra o fluxo do usuário.
+ * Envio de e-mail simples, em ordem de preferência: 1) API de e-mail da
+ * Hostinger (HOSTINGER_EMAIL_API_TOKEN) — a mais confiável, entrega direto
+ * na caixa via HTTPS; 2) SMTP se configurado (SMTP_HOST); 3) mail() nativo
+ * do PHP como último recurso (mais propenso a cair em spam por não ter
+ * SPF/DKIM alinhados). Se nada funcionar, só registra no log — nunca
+ * quebra o fluxo do usuário.
  */
 function send_mail(string $to, string $subject, string $html): bool
 {
+    if (defined('HOSTINGER_EMAIL_API_TOKEN') && HOSTINGER_EMAIL_API_TOKEN && defined('HOSTINGER_MAILBOX_RESOURCE_ID') && HOSTINGER_MAILBOX_RESOURCE_ID) {
+        try {
+            return hostinger_email_api_send($to, $subject, $html);
+        } catch (\Throwable $e) {
+            error_log('[mailer] Falha na API de e-mail da Hostinger: ' . $e->getMessage());
+        }
+    }
+
     if (defined('SMTP_HOST') && SMTP_HOST) {
         try {
             return smtp_send(SMTP_HOST, (int) SMTP_PORT, SMTP_USER, SMTP_PASS, SMTP_FROM, SMTP_FROM_NAME, $to, $subject, $html);
@@ -26,6 +36,42 @@ function send_mail(string $to, string $subject, string $html): bool
 
     error_log("[mailer] E-mail não enviado (nenhum transporte disponível) para {$to}: {$subject}");
     return false;
+}
+
+/**
+ * Envia via https://developers.hostinger.com/ (produto de e-mail — mesma
+ * API do painel hPanel > E-mails). Bearer token, HTTPS puro: mais provável
+ * de funcionar em hospedagem compartilhada do que SMTP direto, que alguns
+ * provedores restringem em portas de saída. Confirmado funcionando via
+ * teste real em 19/08/2026.
+ */
+function hostinger_email_api_send(string $to, string $subject, string $html): bool
+{
+    $url = 'https://api.mail.hostinger.com/api/v1/mailboxes/' . rawurlencode(HOSTINGER_MAILBOX_RESOURCE_ID) . '/send';
+    $ch = curl_init($url);
+    curl_setopt_array($ch, [
+        CURLOPT_POST => true,
+        CURLOPT_HTTPHEADER => [
+            'Authorization: Bearer ' . HOSTINGER_EMAIL_API_TOKEN,
+            'Content-Type: application/json',
+        ],
+        CURLOPT_POSTFIELDS => json_encode(['to' => [$to], 'subject' => $subject, 'html' => $html], JSON_UNESCAPED_UNICODE),
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_TIMEOUT => 15,
+    ]);
+    $raw = curl_exec($ch);
+    if ($raw === false) {
+        $error = curl_error($ch);
+        curl_close($ch);
+        throw new \RuntimeException('Falha de conexão: ' . $error);
+    }
+    $status = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+
+    if ($status !== 204) {
+        throw new \RuntimeException('HTTP ' . $status . ': ' . $raw);
+    }
+    return true;
 }
 
 function smtp_send(string $host, int $port, string $user, string $pass, string $from, string $fromName, string $to, string $subject, string $html): bool
