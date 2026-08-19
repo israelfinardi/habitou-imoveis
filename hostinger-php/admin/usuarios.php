@@ -17,13 +17,25 @@ $users = $stmt->fetchAll();
 $roles = ['USER', 'ADVERTISER', 'OWNER', 'AGENT', 'AGENCY_ADMIN', 'ADMIN'];
 $statuses = ['ACTIVE', 'INACTIVE', 'SUSPENDED', 'PENDING'];
 
+if (($_GET['export'] ?? '') === 'csv') {
+    export_csv('usuarios.csv', [
+        'name' => 'Nome', 'email' => 'E-mail', 'agency_name' => 'Imobiliária', 'role' => 'Papel', 'status' => 'Status', 'created_at' => 'Cadastrado em',
+    ], array_map(fn($u) => [
+        'name' => $u['first_name'] . ' ' . $u['last_name'], 'email' => $u['email'], 'agency_name' => $u['agency_name'],
+        'role' => $u['role'], 'status' => $u['status'], 'created_at' => $u['created_at'],
+    ], $users));
+}
+
 $pageTitle = 'Usuários (admin)';
 require __DIR__ . '/../includes/header.php';
 ?>
 <div class="mx-auto max-w-[1800px] px-4 py-8 sm:px-6 lg:px-8">
   <div class="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_220px]">
     <main>
-      <h1 class="mb-6 text-2xl font-bold">Usuários (<?= count($users) ?>)</h1>
+      <div class="mb-6 flex items-center justify-between gap-3">
+        <h1 class="text-2xl font-bold">Usuários (<?= count($users) ?>)</h1>
+        <?php render_csv_export_button(); ?>
+      </div>
       <form class="mb-4 max-w-sm"><input name="q" value="<?= e($q) ?>" placeholder="Buscar por nome ou e-mail" class="w-full rounded-lg border border-brand-border px-3 py-2 text-sm"></form>
       <div class="overflow-hidden rounded-xl border border-brand-border">
         <table class="w-full text-sm">

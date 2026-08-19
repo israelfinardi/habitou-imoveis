@@ -8,13 +8,25 @@ $adminSuccess = $_SESSION['admin_success'] ?? null;
 $adminError = $_SESSION['admin_error'] ?? null;
 unset($_SESSION['admin_success'], $_SESSION['admin_error']);
 
+if (($_GET['export'] ?? '') === 'csv') {
+    export_csv('planos.csv', [
+        'name' => 'Nome', 'origin' => 'Origem', 'price' => 'Preço', 'max_listings' => 'Limite de anúncios', 'active' => 'Ativo',
+    ], array_map(fn($p) => [
+        'name' => $p['name'], 'origin' => $p['mp_plan_id'] ? 'Mercado Pago' : 'Manual',
+        'price' => $p['price'], 'max_listings' => $p['max_listings'] ?? 'Ilimitado', 'active' => (bool) $p['active'],
+    ], $plans));
+}
+
 $pageTitle = 'Planos (admin)';
 require __DIR__ . '/../includes/header.php';
 ?>
 <div class="mx-auto max-w-[1800px] px-4 py-8 sm:px-6 lg:px-8">
   <div class="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_220px]">
     <main>
-      <h1 class="mb-6 text-2xl font-bold">Planos</h1>
+      <div class="mb-6 flex items-center justify-between gap-3">
+        <h1 class="text-2xl font-bold">Planos</h1>
+        <?php render_csv_export_button(); ?>
+      </div>
       <?php if ($adminSuccess): ?><p class="mb-4 rounded-lg bg-brand-green/10 px-3 py-2 text-sm text-brand-green-hover"><?= e($adminSuccess) ?></p><?php endif; ?>
       <?php if ($adminError): ?><p class="mb-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700"><?= e($adminError) ?></p><?php endif; ?>
 

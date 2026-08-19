@@ -22,13 +22,28 @@ $featuredCount = (int) $pdo->query('SELECT COUNT(*) FROM properties WHERE is_fea
 $adminError = $_SESSION['admin_error'] ?? null;
 unset($_SESSION['admin_error']);
 
+if (($_GET['export'] ?? '') === 'csv') {
+    export_csv('imoveis.csv', [
+        'code' => 'Código', 'title' => 'Título', 'city_name' => 'Cidade', 'agency_name' => 'Anunciante',
+        'price_sale' => 'Preço venda', 'price_rent' => 'Preço aluguel', 'status' => 'Status', 'origin' => 'Origem',
+    ], array_map(fn($p) => [
+        'code' => $p['code'], 'title' => $p['title'], 'city_name' => $p['city_name'],
+        'agency_name' => $p['agency_name'] ?? ($p['first_name'] . ' ' . $p['last_name']),
+        'price_sale' => $p['price_sale'], 'price_rent' => $p['price_rent'],
+        'status' => PROPERTY_STATUS_LABEL[$p['status']] ?? $p['status'], 'origin' => $p['origin'],
+    ], $properties));
+}
+
 $pageTitle = 'Imóveis (admin)';
 require __DIR__ . '/../includes/header.php';
 ?>
 <div class="mx-auto max-w-[1800px] px-4 py-8 sm:px-6 lg:px-8">
   <div class="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_220px]">
     <main>
-      <h1 class="mb-1 text-2xl font-bold">Imóveis (<?= count($properties) ?>)</h1>
+      <div class="mb-1 flex items-center justify-between gap-3">
+        <h1 class="text-2xl font-bold">Imóveis (<?= count($properties) ?>)</h1>
+        <?php render_csv_export_button(); ?>
+      </div>
       <p class="mb-4 text-sm text-brand-text-secondary">Destaques na home: <?= $featuredCount ?> / <?= FEATURED_PROPERTIES_LIMIT ?></p>
       <?php if ($adminError): ?><p class="mb-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700"><?= e($adminError) ?></p><?php endif; ?>
       <form class="mb-4 max-w-sm"><input name="q" value="<?= e($q) ?>" placeholder="Buscar por título" class="w-full rounded-lg border border-brand-border px-3 py-2 text-sm"></form>

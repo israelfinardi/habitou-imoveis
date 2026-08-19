@@ -12,19 +12,33 @@ $plan = get_effective_plan_for_actor($user);
 $listingCount = count_active_listings_for_actor($user);
 $atCap = $user['role'] !== 'ADMIN' && $plan['max_listings'] !== null && $listingCount >= $plan['max_listings'];
 
+if (($_GET['export'] ?? '') === 'csv') {
+    export_csv('meus-imoveis.csv', [
+        'code' => 'Código', 'title' => 'Título', 'status' => 'Status', 'property_type' => 'Tipo',
+        'city_name' => 'Cidade', 'price_sale' => 'Preço venda', 'price_rent' => 'Preço aluguel', 'published_at' => 'Publicado em',
+    ], array_map(fn($p) => [
+        'code' => $p['code'], 'title' => $p['title'], 'status' => PROPERTY_STATUS_LABEL[$p['status']] ?? $p['status'],
+        'property_type' => PROPERTY_TYPE_LABEL[$p['property_type']] ?? $p['property_type'], 'city_name' => $p['city_name'],
+        'price_sale' => $p['price_sale'], 'price_rent' => $p['price_rent'], 'published_at' => $p['published_at'],
+    ], $properties));
+}
+
 $pageTitle = 'Meus imóveis';
 require __DIR__ . '/../includes/header.php';
 ?>
 <div class="mx-auto max-w-[1800px] px-4 py-8 sm:px-6 lg:px-8">
   <div class="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_220px]">
     <main>
-      <div class="mb-3 flex items-center justify-between">
+      <div class="mb-3 flex items-center justify-between gap-3">
         <h1 class="text-2xl font-bold">Meus imóveis</h1>
-        <?php if ($atCap): ?>
-          <a href="<?= base_url('planos.php') ?>" class="rounded-full border border-brand-primary px-4 py-2 text-sm font-semibold text-brand-primary hover:bg-brand-primary/5">Assinar plano</a>
-        <?php else: ?>
-          <a href="<?= base_url('anunciante/novo.php') ?>" class="rounded-full bg-brand-primary px-4 py-2 text-sm font-semibold text-white hover:bg-brand-primary-hover">+ Novo imóvel</a>
-        <?php endif; ?>
+        <div class="flex items-center gap-2">
+          <?php render_csv_export_button(); ?>
+          <?php if ($atCap): ?>
+            <a href="<?= base_url('planos.php') ?>" class="rounded-full border border-brand-primary px-4 py-2 text-sm font-semibold text-brand-primary hover:bg-brand-primary/5">Assinar plano</a>
+          <?php else: ?>
+            <a href="<?= base_url('anunciante/novo.php') ?>" class="rounded-full bg-brand-primary px-4 py-2 text-sm font-semibold text-white hover:bg-brand-primary-hover">+ Novo imóvel</a>
+          <?php endif; ?>
+        </div>
       </div>
       <?php if ($user['role'] !== 'ADMIN'): ?>
         <p class="mb-6 text-sm text-brand-text-secondary">

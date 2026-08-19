@@ -8,13 +8,25 @@ $subs = db()->query("SELECT s.*, p.name AS plan_name, u.first_name, u.last_name,
     ORDER BY s.created_at DESC LIMIT 200")->fetchAll();
 $statuses = ['PENDING', 'ACTIVE', 'CANCELED', 'EXPIRED'];
 
+if (($_GET['export'] ?? '') === 'csv') {
+    export_csv('assinaturas.csv', [
+        'subscriber' => 'Assinante', 'plan_name' => 'Plano', 'origin' => 'Origem', 'created_at' => 'Criada em', 'status' => 'Status',
+    ], array_map(fn($s) => [
+        'subscriber' => $s['agency_name'] ?? ($s['first_name'] . ' ' . $s['last_name'] . ' (' . $s['email'] . ')'),
+        'plan_name' => $s['plan_name'], 'origin' => $s['external_id'] ?: 'Manual', 'created_at' => $s['created_at'], 'status' => $s['status'],
+    ], $subs));
+}
+
 $pageTitle = 'Assinaturas (admin)';
 require __DIR__ . '/../includes/header.php';
 ?>
 <div class="mx-auto max-w-[1800px] px-4 py-8 sm:px-6 lg:px-8">
   <div class="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_220px]">
     <main>
-      <h1 class="mb-6 text-2xl font-bold">Assinaturas (<?= count($subs) ?>)</h1>
+      <div class="mb-6 flex items-center justify-between gap-3">
+        <h1 class="text-2xl font-bold">Assinaturas (<?= count($subs) ?>)</h1>
+        <?php render_csv_export_button(); ?>
+      </div>
       <p class="mb-4 text-sm text-brand-text-secondary">Assinaturas com um plano do Mercado Pago são ativadas/canceladas automaticamente pelo checkout e pelo webhook. O status abaixo também pode ser ajustado manualmente aqui (útil para planos sem gateway).</p>
       <div class="overflow-hidden rounded-xl border border-brand-border">
         <table class="w-full text-sm">

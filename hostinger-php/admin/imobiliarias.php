@@ -6,13 +6,24 @@ $user = require_role(['ADMIN']);
 $agencies = db()->query('SELECT a.*, (SELECT COUNT(*) FROM properties p WHERE p.agency_id=a.id) AS pc, (SELECT COUNT(*) FROM users u WHERE u.agency_id=a.id) AS uc, (SELECT COUNT(*) FROM feeds f WHERE f.agency_id=a.id) AS fc FROM agencies a ORDER BY name')->fetchAll();
 $statuses = ['ACTIVE', 'INACTIVE', 'PENDING'];
 
+if (($_GET['export'] ?? '') === 'csv') {
+    export_csv('imobiliarias.csv', [
+        'name' => 'Nome', 'properties' => 'Imóveis', 'users' => 'Usuários', 'feeds' => 'Feeds', 'status' => 'Status',
+    ], array_map(fn($a) => [
+        'name' => $a['name'], 'properties' => $a['pc'], 'users' => $a['uc'], 'feeds' => $a['fc'], 'status' => $a['status'],
+    ], $agencies));
+}
+
 $pageTitle = 'Imobiliárias (admin)';
 require __DIR__ . '/../includes/header.php';
 ?>
 <div class="mx-auto max-w-[1800px] px-4 py-8 sm:px-6 lg:px-8">
   <div class="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_220px]">
     <main>
-      <h1 class="mb-6 text-2xl font-bold">Imobiliárias (<?= count($agencies) ?>)</h1>
+      <div class="mb-6 flex items-center justify-between gap-3">
+        <h1 class="text-2xl font-bold">Imobiliárias (<?= count($agencies) ?>)</h1>
+        <?php render_csv_export_button(); ?>
+      </div>
       <div class="overflow-hidden rounded-xl border border-brand-border">
         <table class="w-full text-sm">
           <thead class="bg-brand-bg-subtle text-left text-xs uppercase text-brand-text-secondary">
