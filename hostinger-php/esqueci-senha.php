@@ -5,7 +5,7 @@ require_once __DIR__ . '/includes/auth_service.php';
 $success = null;
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     verify_csrf();
-    rate_limit_enforce('password_reset_ip', client_ip(), 5, 3600); // 5 pedidos / hora por IP
+    rate_limit_enforce('password_reset_ip', client_ip(), 15, 3600); // 15 pedidos / hora por IP
     rate_limit_hit('password_reset_ip', client_ip());
     $email = trim(strtolower($_POST['email'] ?? ''));
     if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
