@@ -10,7 +10,6 @@ $stats = [
     'Imobiliárias' => $pdo->query('SELECT COUNT(*) FROM agencies')->fetchColumn(),
     'Contratos' => $pdo->query('SELECT COUNT(*) FROM contracts')->fetchColumn(),
     'Assinaturas ativas' => $pdo->query('SELECT COUNT(*) FROM subscriptions WHERE status = "ACTIVE"')->fetchColumn(),
-    'Feeds VRSync' => $pdo->query('SELECT COUNT(*) FROM feeds')->fetchColumn(),
 ];
 
 $pageTitle = 'Administração';

@@ -25,12 +25,12 @@ unset($_SESSION['admin_error']);
 if (($_GET['export'] ?? '') === 'csv') {
     export_csv('imoveis.csv', [
         'code' => 'Código', 'title' => 'Título', 'city_name' => 'Cidade', 'agency_name' => 'Anunciante',
-        'price_sale' => 'Preço venda', 'price_rent' => 'Preço aluguel', 'status' => 'Status', 'origin' => 'Origem',
+        'price_sale' => 'Preço venda', 'price_rent' => 'Preço aluguel', 'status' => 'Status',
     ], array_map(fn($p) => [
         'code' => $p['code'], 'title' => $p['title'], 'city_name' => $p['city_name'],
         'agency_name' => $p['agency_name'] ?? ($p['first_name'] . ' ' . $p['last_name']),
         'price_sale' => $p['price_sale'], 'price_rent' => $p['price_rent'],
-        'status' => PROPERTY_STATUS_LABEL[$p['status']] ?? $p['status'], 'origin' => $p['origin'],
+        'status' => PROPERTY_STATUS_LABEL[$p['status']] ?? $p['status'],
     ], $properties));
 }
 
@@ -50,13 +50,12 @@ require __DIR__ . '/../includes/header.php';
       <div class="overflow-hidden rounded-xl border border-brand-border">
         <table class="w-full text-sm">
           <thead class="bg-brand-bg-subtle text-left text-xs uppercase text-brand-text-secondary">
-            <tr><th class="px-4 py-3">Título</th><th class="px-4 py-3">Origem</th><th class="px-4 py-3">Anunciante</th><th class="px-4 py-3">Preço</th><th class="px-4 py-3">Status</th><th class="px-4 py-3">Destaque</th><th class="px-4 py-3">Ações</th></tr>
+            <tr><th class="px-4 py-3">Título</th><th class="px-4 py-3">Anunciante</th><th class="px-4 py-3">Preço</th><th class="px-4 py-3">Status</th><th class="px-4 py-3">Destaque</th><th class="px-4 py-3">Ações</th></tr>
           </thead>
           <tbody class="divide-y divide-brand-border">
             <?php foreach ($properties as $p): ?>
               <tr>
                 <td class="px-4 py-3"><p class="font-medium"><?= e($p['title']) ?></p><p class="text-xs text-brand-text-secondary"><?= e($p['code']) ?> · <?= e($p['city_name']) ?></p></td>
-                <td class="px-4 py-3 text-xs"><?= e($p['origin']) ?></td>
                 <td class="px-4 py-3 text-xs text-brand-text-secondary"><?= e($p['agency_name'] ?? ($p['first_name'] . ' ' . $p['last_name'])) ?></td>
                 <td class="px-4 py-3 text-xs"><?= format_currency_brl($p['price_sale'] ?? $p['price_rent']) ?></td>
                 <td class="px-4 py-3">

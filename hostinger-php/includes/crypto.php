@@ -1,9 +1,9 @@
 <?php
 /**
  * Criptografia simétrica (AES-256-GCM) para blindar valores sensíveis em
- * repouso no banco — usada hoje em feeds.url (URLs de feed VRSync podem
- * trazer credenciais embutidas na query string). A chave nunca fica no
- * código: é derivada (SHA-256) do segredo "encryption" gerado e guardado em
+ * repouso no banco, disponível para qualquer campo que precise disso no
+ * futuro. A chave nunca fica no código: é derivada (SHA-256) do segredo
+ * "encryption" gerado e guardado em
  * data/.secrets.php na primeira execução, pelo mesmo mecanismo já usado
  * para AUTH_SECRET/CRON_SECRET (habitou_secret(), em config/config.php).
  *

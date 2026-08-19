@@ -90,6 +90,12 @@ function run_pending_migrations(PDO $pdo): void
         last_property_ids TEXT NULL,
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
     )');
+    // Remoção do VRSync: corrige o texto do plano-100 em bancos já
+    // provisionados antes da remoção (sql/schema.sql/seed.php só valem para
+    // instalações novas) — WHERE garante que isso só roda uma vez, até o
+    // texto antigo não existir mais.
+    $pdo->prepare("UPDATE plans SET description = 'Para imobiliárias com grande carteira de imóveis.',
+        features = '[\"Até 100 anúncios ativos\"]' WHERE slug = 'plano-100' AND description LIKE '%VRSync%'")->execute();
 }
 
 /**

@@ -43,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'agencyCity' => $agencyCity,
             ]);
             login_user($userId);
-            redirect(base_url($accountType === 'imobiliaria' ? 'imobiliaria/feeds.php?bemvindo=1' : 'minha-conta.php'));
+            redirect(base_url($accountType === 'imobiliaria' ? 'imobiliaria/perfil.php' : 'minha-conta.php'));
         } catch (AuthServiceError $e) {
             $error = $e->getMessage();
         }

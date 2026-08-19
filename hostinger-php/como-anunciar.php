@@ -3,7 +3,7 @@ require_once __DIR__ . '/includes/bootstrap.php';
 
 $features = [
     ['Anúncios com fotos e vídeos', 'Publique seus imóveis com galeria completa e atraia compradores com apresentações de qualidade.'],
-    ['Cadastro manual ou por integração', 'Importe seus anúncios diretamente do seu CRM via feed VRSync ou cadastre manualmente em poucos minutos.'],
+    ['Cadastro rápido e simples', 'Cadastre seus imóveis manualmente em poucos minutos, com um passo a passo guiado.'],
     ['Leads onde você preferir', 'Receba contatos por WhatsApp, telefone ou e-mail — sem intermediários.'],
     ['Sua página no portal', 'Tenha um espaço próprio com todos os seus imóveis, dados de contato e identidade profissional.'],
 ];

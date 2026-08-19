@@ -24,9 +24,6 @@ function account_nav_items(): array
         'favoritos' => ['minha-conta-favoritos.php', 'Favoritos', 'heart'],
         'contratos' => ['contratos.php', 'Contratos', 'document'],
     ];
-    if (in_array($user['role'], AGENCY_ROLES, true) || $user['role'] === 'ADMIN') {
-        $items['feeds'] = ['imobiliaria/feeds.php', 'Feeds VRSync', 'sync'];
-    }
     $items['planos'] = ['planos.php', 'Planos', 'tag'];
     $items['dados'] = ['minha-conta-dados.php', 'Meus dados', 'user'];
     $items['senha'] = ['minha-conta-senha.php', 'Alterar senha', 'lock'];

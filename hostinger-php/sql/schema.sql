@@ -160,52 +160,12 @@ CREATE INDEX IF NOT EXISTS idx_sub_user ON subscriptions (user_id);
 CREATE INDEX IF NOT EXISTS idx_sub_agency ON subscriptions (agency_id);
 
 -- ---------------------------------------------------------------------
--- VRSync — feeds (precisa existir antes de properties por causa da FK)
--- ---------------------------------------------------------------------
-
-CREATE TABLE IF NOT EXISTS feeds (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  agency_id INTEGER NOT NULL,
-  name VARCHAR(160) NOT NULL,
-  url TEXT NOT NULL,
-  status TEXT NOT NULL DEFAULT 'ACTIVE',
-  frequency_minutes INTEGER NOT NULL DEFAULT 1440,
-  last_sync_at DATETIME NULL,
-  next_sync_at DATETIME NULL,
-  last_run_status TEXT NULL,
-  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  CONSTRAINT fk_feed_agency FOREIGN KEY (agency_id) REFERENCES agencies(id) ON DELETE CASCADE
-);
-CREATE INDEX IF NOT EXISTS idx_feed_agency ON feeds (agency_id);
-
-CREATE TABLE IF NOT EXISTS feed_sync_logs (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  feed_id INTEGER NOT NULL,
-  started_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  finished_at DATETIME NULL,
-  status TEXT NOT NULL DEFAULT 'RUNNING',
-  total_found INTEGER NOT NULL DEFAULT 0,
-  total_created INTEGER NOT NULL DEFAULT 0,
-  total_updated INTEGER NOT NULL DEFAULT 0,
-  total_deactivated INTEGER NOT NULL DEFAULT 0,
-  total_unchanged INTEGER NOT NULL DEFAULT 0,
-  total_errors INTEGER NOT NULL DEFAULT 0,
-  error_message TEXT NULL,
-  CONSTRAINT fk_log_feed FOREIGN KEY (feed_id) REFERENCES feeds(id) ON DELETE CASCADE
-);
-CREATE INDEX IF NOT EXISTS idx_log_feed ON feed_sync_logs (feed_id);
-
--- ---------------------------------------------------------------------
 -- Imóveis
 -- ---------------------------------------------------------------------
 
 CREATE TABLE IF NOT EXISTS properties (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   code VARCHAR(32) NOT NULL UNIQUE,
-  external_code VARCHAR(64) NULL,
-  origin TEXT NOT NULL DEFAULT 'MANUAL',
-  source_feed_id INTEGER NULL,
   title VARCHAR(255) NOT NULL,
   slug VARCHAR(255) NOT NULL UNIQUE,
   description TEXT NULL,
@@ -249,8 +209,7 @@ CREATE TABLE IF NOT EXISTS properties (
   CONSTRAINT fk_prop_advertiser FOREIGN KEY (advertiser_id) REFERENCES users(id),
   CONSTRAINT fk_prop_owner FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE SET NULL,
   CONSTRAINT fk_prop_agent FOREIGN KEY (agent_id) REFERENCES users(id) ON DELETE SET NULL,
-  CONSTRAINT fk_prop_agency FOREIGN KEY (agency_id) REFERENCES agencies(id) ON DELETE SET NULL,
-  CONSTRAINT fk_prop_feed FOREIGN KEY (source_feed_id) REFERENCES feeds(id) ON DELETE SET NULL
+  CONSTRAINT fk_prop_agency FOREIGN KEY (agency_id) REFERENCES agencies(id) ON DELETE SET NULL
 );
 CREATE INDEX IF NOT EXISTS idx_listing ON properties (city_id, listing_type, property_type, status);
 CREATE INDEX IF NOT EXISTS idx_prop_neighborhood ON properties (neighborhood_id);
@@ -259,7 +218,6 @@ CREATE INDEX IF NOT EXISTS idx_prop_price_rent ON properties (price_rent);
 CREATE INDEX IF NOT EXISTS idx_prop_status_published ON properties (status, published_at);
 CREATE INDEX IF NOT EXISTS idx_prop_advertiser ON properties (advertiser_id);
 CREATE INDEX IF NOT EXISTS idx_prop_agency ON properties (agency_id);
-CREATE INDEX IF NOT EXISTS idx_prop_source ON properties (origin, source_feed_id, external_code);
 
 CREATE TABLE IF NOT EXISTS property_images (
   id INTEGER PRIMARY KEY AUTOINCREMENT,

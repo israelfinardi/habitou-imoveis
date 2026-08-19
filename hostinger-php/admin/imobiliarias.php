@@ -3,14 +3,14 @@ require_once __DIR__ . '/../includes/bootstrap.php';
 require_once __DIR__ . '/../includes/admin_nav.php';
 
 $user = require_role(['ADMIN']);
-$agencies = db()->query('SELECT a.*, (SELECT COUNT(*) FROM properties p WHERE p.agency_id=a.id) AS pc, (SELECT COUNT(*) FROM users u WHERE u.agency_id=a.id) AS uc, (SELECT COUNT(*) FROM feeds f WHERE f.agency_id=a.id) AS fc FROM agencies a ORDER BY name')->fetchAll();
+$agencies = db()->query('SELECT a.*, (SELECT COUNT(*) FROM properties p WHERE p.agency_id=a.id) AS pc, (SELECT COUNT(*) FROM users u WHERE u.agency_id=a.id) AS uc FROM agencies a ORDER BY name')->fetchAll();
 $statuses = ['ACTIVE', 'INACTIVE', 'PENDING'];
 
 if (($_GET['export'] ?? '') === 'csv') {
     export_csv('imobiliarias.csv', [
-        'name' => 'Nome', 'properties' => 'Imóveis', 'users' => 'Usuários', 'feeds' => 'Feeds', 'status' => 'Status',
+        'name' => 'Nome', 'properties' => 'Imóveis', 'users' => 'Usuários', 'status' => 'Status',
     ], array_map(fn($a) => [
-        'name' => $a['name'], 'properties' => $a['pc'], 'users' => $a['uc'], 'feeds' => $a['fc'], 'status' => $a['status'],
+        'name' => $a['name'], 'properties' => $a['pc'], 'users' => $a['uc'], 'status' => $a['status'],
     ], $agencies));
 }
 
@@ -34,7 +34,6 @@ require __DIR__ . '/../includes/header.php';
               <p class="mb-3 flex gap-3 text-xs text-brand-text-secondary">
                 <span><?= $a['pc'] ?> imóve<?= $a['pc'] === 1 ? 'l' : 'is' ?></span>
                 <span><?= $a['uc'] ?> usuário<?= $a['uc'] === 1 ? '' : 's' ?></span>
-                <span><?= $a['fc'] ?> feed<?= $a['fc'] === 1 ? '' : 's' ?></span>
               </p>
               <form method="post" action="<?= base_url('actions/admin_action.php') ?>" onchange="this.submit()">
                 <?= csrf_field() ?><input type="hidden" name="do" value="update_agency_status"><input type="hidden" name="id" value="<?= $a['id'] ?>">

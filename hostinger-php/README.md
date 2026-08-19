@@ -1,6 +1,6 @@
 # Habitou Imóveis — versão PHP/SQLite (Hostinger)
 
-Portal imobiliário completo (compra, aluguel, anunciantes, imobiliárias, VRSync, painel
+Portal imobiliário completo (compra, aluguel, anunciantes, imobiliárias, painel
 administrativo) em **PHP puro + SQLite**, sem dependência de Node.js e sem passo de build —
 feito para rodar em hospedagem compartilhada como a Hostinger.
 
@@ -16,7 +16,7 @@ página.
 
 Pronto — é isso. Na primeira visita, o site detecta que ainda não tem banco, cria as tabelas
 e popula um catálogo de exemplo (leva menos de 2 segundos). Os segredos de segurança
-(`AUTH_SECRET`/`CRON_SECRET`, usados para proteger `limpar-dados.php` e o cron do VRSync) são
+(`AUTH_SECRET`/`CRON_SECRET`, usados para proteger `limpar-dados.php` e os crons agendados) são
 gerados sozinhos nesse momento e guardados em `data/.secrets.php` — arquivo que fica fora do
 alcance do navegador (bloqueado por `.htaccess`, igual ao restante da pasta `data/`).
 
@@ -46,7 +46,7 @@ https://seudominio.com.br/limpar-dados.php?token=SEU_TOKEN
 
 A página mostra um aviso e o link exato de confirmação (com `&confirmar=sim`) — é preciso
 visitar esse segundo link pra realmente apagar. Isso remove todos os imóveis, imobiliárias,
-cidades, bairros, contratos, feeds VRSync e as contas de demonstração criadas pelo seed
+cidades, bairros, contratos e as contas de demonstração criadas pelo seed
 (imobiliárias parceiras de exemplo e o anunciante demo). **A conta `admin@habitou.com.br` e
 qualquer conta real que você já tenha criado não são apagadas.** Não pode ser desfeito —
 apague o arquivo `limpar-dados.php` do servidor depois de usar.
@@ -60,16 +60,6 @@ criadas automaticamente na primeira vez que alguém anuncia um imóvel nelas).
 Quando eu (ou você) mandar uma nova versão do sistema, é só sobrescrever os arquivos PHP —
 **nunca sobrescreva a pasta `data/`** (é lá que ficam o banco SQLite e os segredos gerados).
 Sobrescrever só o código PHP não apaga nem altera nada do que já está cadastrado.
-
-## Sincronização automática de feeds VRSync (opcional)
-
-No hPanel: **Avançado → Cron Jobs**, crie uma tarefa (ex.: a cada hora) executando:
-
-```
-php /home/SEU_USUARIO/public_html/cron/vrsync_sync.php
-```
-
-Isso sincroniza automaticamente os feeds VRSync das imobiliárias cadastradas.
 
 ## E-mail (recuperação de senha, formulário de contato)
 
@@ -88,10 +78,9 @@ includes/seed.php popula os dados de demonstração, chamado automaticamente no 
 data/             banco SQLite, segredos e uploads de dados — tudo bloqueado por .htaccess
 actions/          endpoints que processam formulários (POST)
 anunciante/        área do anunciante (CRUD de imóveis, fotos)
-imobiliaria/       painel da imobiliária (feeds VRSync)
+imobiliaria/       painel da imobiliária (perfil)
 admin/             painel administrativo
-feeds/vrsync.php   exportação pública do catálogo em XML (VRSync)
-cron/              scripts para agendamento (sincronização automática)
+cron/              scripts para agendamento (expiração de anúncios, recomendações)
 uploads/           fotos enviadas pelos anunciantes (gravável pelo PHP)
 assets/            CSS/JS/imagens/dados (cidades-br.json)
 limpar-dados.php   apaga o catálogo de demonstração (apagar depois de usar)
@@ -114,8 +103,8 @@ limpar-dados.php   apaga o catálogo de demonstração (apagar depois de usar)
 
 Em `/cadastro.php` a pessoa escolhe o tipo de conta: comprador/anunciante, corretor autônomo
 (CRECI) ou imobiliária. Ao se cadastrar como imobiliária, o sistema já cria a conta ativa
-(pode anunciar e configurar feeds VRSync na hora), mas o **perfil público** da imobiliária
-fica com status `PENDING` até o administrador aprovar em `/admin/imobiliarias.php`.
+(pode anunciar na hora), mas o **perfil público** da imobiliária fica com status `PENDING`
+até o administrador aprovar em `/admin/imobiliarias.php`.
 
 ## Mapa interativo na busca
 
@@ -147,7 +136,7 @@ partir de um estado limpo (extração simulada do zip), cadastro (incluindo corr
 imobiliária, com aprovação de imobiliária pelo admin), login, listagem com filtros reais no
 banco e mapa interativo lateral, página de imóvel com galeria/mapa, favoritos, criação e
 publicação de imóvel pelo anunciante (incluindo criação de cidade nova em tempo real), upload
-de fotos, VRSync, painel administrativo, `limpar-dados.php` de ponta a ponta (com o site
+de fotos, painel administrativo, `limpar-dados.php` de ponta a ponta (com o site
 continuando a funcionar normalmente depois), e requisições simultâneas (sem erro de banco
 travado) — tudo funcionando antes do empacotamento.
 

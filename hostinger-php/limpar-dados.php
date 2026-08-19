@@ -1,10 +1,10 @@
 <?php
 /**
  * Apaga TODOS os dados de demonstração: imóveis, fotos, favoritos, contratos,
- * feeds/logs VRSync, imobiliárias, bairros e cidades — além das contas de
- * usuário criadas pelo seed (imobiliárias parceiras de exemplo e o anunciante
- * demo). A conta admin@habitou.com.br e qualquer conta real que você já
- * tenha criado NÃO são apagadas.
+ * imobiliárias, bairros e cidades — além das contas de usuário criadas pelo
+ * seed (imobiliárias parceiras de exemplo e o anunciante demo). A conta
+ * admin@habitou.com.br e qualquer conta real que você já tenha criado NÃO
+ * são apagadas.
  *
  * Acesse: https://seu-dominio/limpar-dados.php?token=SEU_AUTH_SECRET
  *
@@ -25,7 +25,7 @@ if (!hash_equals(AUTH_SECRET, $token)) {
     exit;
 }
 if (($_GET['confirmar'] ?? '') !== 'sim') {
-    echo "Isso vai apagar TODOS os imóveis, imobiliárias, cidades, bairros, contratos e feeds VRSync do banco.\n";
+    echo "Isso vai apagar TODOS os imóveis, imobiliárias, cidades, bairros e contratos do banco.\n";
     echo "Não pode ser desfeito. Para confirmar, adicione &confirmar=sim na mesma URL:\n\n";
     echo $_SERVER['REQUEST_URI'] . "&confirmar=sim\n";
     exit;
@@ -45,7 +45,6 @@ $antes = [
     'cities' => contar($pdo, 'cities'),
     'neighborhoods' => contar($pdo, 'neighborhoods'),
     'contracts' => contar($pdo, 'contracts'),
-    'feeds' => contar($pdo, 'feeds'),
 ];
 
 $pdo->beginTransaction();
@@ -57,7 +56,6 @@ try {
     // Bairros e cidades só podem sair depois que nenhum imóvel os referencia.
     $pdo->exec('DELETE FROM neighborhoods');
     $pdo->exec('DELETE FROM cities');
-    // Imobiliárias: feeds e logs VRSync saem junto (ON DELETE CASCADE).
     $pdo->exec('DELETE FROM agencies');
     // Contas criadas pelo seed de demonstração (imobiliárias parceiras de exemplo e anunciante demo).
     $stmtUsers = $pdo->prepare("DELETE FROM users WHERE email LIKE 'contato+%@habitou.com.br' OR email = 'anunciante-demo@habitou.com.br'");
@@ -82,7 +80,6 @@ printf("Imobiliárias removidas: %d\n", $antes['agencies']);
 printf("Cidades removidas: %d\n", $antes['cities']);
 printf("Bairros removidos: %d\n", $antes['neighborhoods']);
 printf("Contratos removidos: %d\n", $antes['contracts']);
-printf("Feeds VRSync removidos: %d\n", $antes['feeds']);
 printf("Contas de demonstração removidas: %d\n", $usersRemovidos);
 
 echo "\n== Limpeza concluída. ==\n";
