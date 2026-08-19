@@ -22,3 +22,4 @@ require_once __DIR__ . '/subscription_service.php';
 require_once __DIR__ . '/crypto.php';
 require_once __DIR__ . '/rate_limit.php';
 require_once __DIR__ . '/captcha.php';
+require_once __DIR__ . '/recommendation_service.php';

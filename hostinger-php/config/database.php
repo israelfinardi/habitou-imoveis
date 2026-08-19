@@ -68,6 +68,25 @@ function run_pending_migrations(PDO $pdo): void
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
     )');
     $pdo->exec('CREATE INDEX IF NOT EXISTS idx_rate_limit_hits ON rate_limit_hits (bucket, rkey, created_at)');
+    $pdo->exec('CREATE TABLE IF NOT EXISTS search_history (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL,
+        city_id INTEGER NULL,
+        listing_type TEXT NULL,
+        property_type TEXT NULL,
+        min_price DECIMAL(14,2) NULL,
+        max_price DECIMAL(14,2) NULL,
+        bedrooms INTEGER NULL,
+        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+    )');
+    $pdo->exec('CREATE INDEX IF NOT EXISTS idx_search_history_user ON search_history (user_id, created_at)');
+    $pdo->exec('CREATE TABLE IF NOT EXISTS recommendation_email_log (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL UNIQUE,
+        last_sent_at DATETIME NULL,
+        last_property_ids TEXT NULL,
+        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+    )');
 }
 
 /**

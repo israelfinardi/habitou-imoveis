@@ -13,8 +13,10 @@ if (!empty($_SERVER['HTTP_HOST'])) {
         || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https');
     define('APP_URL', ($__isHttps ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST']);
 } else {
-    // contexto de linha de comando (cron) — sem efeito prático nos links gerados
-    define('APP_URL', 'http://localhost');
+    // contexto de linha de comando (cron): sem HTTP_HOST pra detectar, então
+    // usa o domínio de produção fixo — necessário pra links corretos em
+    // e-mails disparados via cron (ex.: cron/property_recommendations.php).
+    define('APP_URL', 'https://habitou.com.br');
 }
 
 // --- Segredos de segurança: gerados automaticamente e guardados em

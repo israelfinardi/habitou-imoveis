@@ -287,6 +287,33 @@ CREATE TABLE IF NOT EXISTS favorites (
 CREATE INDEX IF NOT EXISTS idx_fav_property ON favorites (property_id);
 
 -- ---------------------------------------------------------------------
+-- Recomendações por e-mail: histórico de buscas (sinal de interesse, junto
+-- com favorites) e throttle do disparo diário (cron/property_recommendations.php).
+-- ---------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS search_history (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id INTEGER NOT NULL,
+  city_id INTEGER NULL,
+  listing_type TEXT NULL,
+  property_type TEXT NULL,
+  min_price DECIMAL(14,2) NULL,
+  max_price DECIMAL(14,2) NULL,
+  bedrooms INTEGER NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_search_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+CREATE INDEX IF NOT EXISTS idx_search_history_user ON search_history (user_id, created_at);
+
+CREATE TABLE IF NOT EXISTS recommendation_email_log (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id INTEGER NOT NULL UNIQUE,
+  last_sent_at DATETIME NULL,
+  last_property_ids TEXT NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_rec_email_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- ---------------------------------------------------------------------
 -- Contratos
 -- ---------------------------------------------------------------------
 

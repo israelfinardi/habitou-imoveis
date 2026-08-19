@@ -10,6 +10,9 @@ if (!empty($params['cidade_nome']) && empty($params['cidade'])) {
 $result = list_properties($params);
 $user = current_user();
 $favoriteIds = $user ? get_favorite_ids($user['id']) : [];
+if ($user) {
+    log_search_history((int) $user['id'], $params);
+}
 
 $pageTitle = 'Busca de imóveis';
 $pageDescription = 'Busque apartamentos, casas e terrenos para comprar ou alugar em todo o Brasil.';
