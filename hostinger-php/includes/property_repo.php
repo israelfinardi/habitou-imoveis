@@ -204,6 +204,27 @@ function get_property_by_slug(string $slug): ?array
     return $row;
 }
 
+/**
+ * Resolve telefone/e-mail/whatsapp de contato de um imóvel (retornado por
+ * get_property_by_slug — precisa dos campos advertiser_, agent_ e agency_),
+ * na mesma ordem de prioridade usada em imovel.php: contato customizado do
+ * anúncio > corretor > imobiliária > anunciante. Compartilhado com
+ * actions/property_contact.php pra nunca confiar num e-mail de destino vindo
+ * do cliente — o servidor sempre recalcula o alvo real a partir do imóvel.
+ * @return array{phone: ?string, email: ?string, whatsapp: ?string}
+ */
+function property_contact_info(array $property): array
+{
+    $phone = $property['contact_phone'] ?: ($property['agent_phone'] ?: ($property['agency_phone'] ?: $property['advertiser_phone']));
+    $email = $property['contact_email'] ?: ($property['agent_email'] ?: ($property['agency_email'] ?: $property['advertiser_email']));
+    $whatsappRaw = $property['contact_whatsapp'] ?: ($property['agent_whatsapp'] ?: ($property['agency_whatsapp'] ?: ($property['advertiser_whatsapp'] ?: $phone)));
+    return [
+        'phone' => $phone,
+        'email' => $email,
+        'whatsapp' => $whatsappRaw ? preg_replace('/\D/', '', $whatsappRaw) : null,
+    ];
+}
+
 function get_property_by_id(int $id): ?array
 {
     $stmt = db()->prepare('SELECT * FROM properties WHERE id = ?');

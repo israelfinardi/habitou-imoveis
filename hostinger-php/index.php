@@ -83,7 +83,7 @@ require __DIR__ . '/includes/header.php';
   </div>
 
   <div class="relative mx-auto max-w-[1800px] px-4 sm:px-6 lg:px-8">
-    <div class="flex flex-col gap-8 xl:flex-row xl:items-start xl:justify-between">
+    <div class="flex flex-col gap-8 xl:flex-row xl:items-start xl:gap-16">
     <div class="max-w-2xl">
       <span class="inline-flex items-center gap-2 rounded-full border border-brand-border bg-white px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-brand-text-secondary">
         <span class="h-1.5 w-1.5 rounded-full bg-brand-green"></span> O portal de imóveis do Brasil

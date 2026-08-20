@@ -74,9 +74,17 @@ if ($price) {
             <?= !empty($property['street']) ? ' · ' . e($property['street']) : '' ?>
           </p>
         </div>
-        <button type="button" class="js-favorite-btn <?= $isFavorite ? 'is-favorite' : '' ?> flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white shadow ring-1 ring-brand-border" data-property-id="<?= (int) $property['id'] ?>" aria-label="Favoritar">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="<?= $isFavorite ? '#C1502E' : 'none' ?>" stroke="<?= $isFavorite ? '#C1502E' : '#717171' ?>" stroke-width="1.8"><path d="M12 21s-7.5-4.6-10-9.3C.4 8.1 2 4.5 5.6 4c2-.3 3.8.6 6.4 3 2.6-2.4 4.4-3.3 6.4-3 3.6.5 5.2 4.1 3.6 7.7C19.5 16.4 12 21 12 21z"/></svg>
-        </button>
+        <div class="flex shrink-0 items-center gap-2">
+          <?php if ($user && can_manage_property($user, $property)): ?>
+            <a href="<?= base_url('anunciante/editar.php?id=' . (int) $property['id']) ?>" class="flex h-9 items-center gap-1.5 rounded-full bg-white px-3 text-sm font-semibold shadow ring-1 ring-brand-border hover:ring-brand-primary">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              Editar
+            </a>
+          <?php endif; ?>
+          <button type="button" class="js-favorite-btn <?= $isFavorite ? 'is-favorite' : '' ?> flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white shadow ring-1 ring-brand-border" data-property-id="<?= (int) $property['id'] ?>" aria-label="Favoritar">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="<?= $isFavorite ? '#C1502E' : 'none' ?>" stroke="<?= $isFavorite ? '#C1502E' : '#717171' ?>" stroke-width="1.8"><path d="M12 21s-7.5-4.6-10-9.3C.4 8.1 2 4.5 5.6 4c2-.3 3.8.6 6.4 3 2.6-2.4 4.4-3.3 6.4-3 3.6.5 5.2 4.1 3.6 7.7C19.5 16.4 12 21 12 21z"/></svg>
+          </button>
+        </div>
       </div>
 
       <p class="mt-4 text-3xl font-bold text-brand-primary"><?= format_currency_brl($price) ?></p>
@@ -144,10 +152,7 @@ if ($price) {
         $avatarUrl = $isAgent ? ($property['agent_avatar'] ?? null) : ($isAgency ? ($property['agency_logo'] ?? null) : ($property['advertiser_avatar'] ?? null));
         $areaAtuacao = $isAgency ? ($property['agency_service_area'] ?: trim(($property['agency_city'] ?? '') . ($property['agency_state'] ? ' — ' . $property['agency_state'] : ''))) : ($property['advertiser_service_area'] ?? null);
 
-        $phone = $property['contact_phone'] ?: ($property['agent_phone'] ?: ($property['agency_phone'] ?: $property['advertiser_phone']));
-        $email = $property['contact_email'] ?: ($property['agent_email'] ?: ($property['agency_email'] ?: $property['advertiser_email']));
-        $whatsappRaw = $property['contact_whatsapp'] ?: ($property['agent_whatsapp'] ?: ($property['agency_whatsapp'] ?: ($property['advertiser_whatsapp'] ?: $phone)));
-        $whatsapp = $whatsappRaw ? preg_replace('/\D/', '', $whatsappRaw) : null;
+        ['phone' => $phone, 'email' => $email, 'whatsapp' => $whatsapp] = property_contact_info($property);
         $bio = $isAgent ? ($property['agent_bio'] ?? null) : ($isAgency ? ($property['agency_bio'] ?? null) : ($property['advertiser_bio'] ?? null));
         $memberSince = $isAgent ? ($property['agent_created_at'] ?? null) : ($isAgency ? ($property['agency_created_at'] ?? null) : ($property['advertiser_created_at'] ?? null));
         ?>
@@ -189,7 +194,20 @@ if ($price) {
           <?php if ($email): ?>
             <a href="mailto:<?= e($email) ?>" class="rounded-full border border-brand-border px-4 py-2.5 text-center text-sm font-semibold hover:border-brand-primary">Enviar e-mail</a>
           <?php endif; ?>
-          <a href="<?= base_url('fale-conosco.php?imovel=' . urlencode($property['code'])) ?>" class="rounded-full border border-brand-border px-4 py-2.5 text-center text-sm font-semibold hover:border-brand-primary">Enviar mensagem</a>
+          <?php if ($email): ?>
+            <button type="button" id="js-msg-toggle" class="rounded-full border border-brand-border px-4 py-2.5 text-center text-sm font-semibold hover:border-brand-primary">Enviar mensagem</button>
+            <div id="js-msg-form" class="hidden rounded-xl border border-brand-border p-3">
+              <form id="property-contact-form">
+                <?= csrf_field() ?>
+                <input type="hidden" name="slug" value="<?= e($property['slug']) ?>">
+                <div class="mb-2"><input name="name" required placeholder="Seu nome" value="<?= e($user ? trim($user['first_name'] . ' ' . $user['last_name']) : '') ?>" class="w-full rounded-lg border border-brand-border px-3 py-2 text-sm"></div>
+                <div class="mb-2"><input name="phone" required placeholder="Seu telefone" value="<?= e($user['phone'] ?? '') ?>" class="w-full rounded-lg border border-brand-border px-3 py-2 text-sm"></div>
+                <div class="mb-2"><input type="email" name="email" required placeholder="Seu e-mail" value="<?= e($user['email'] ?? '') ?>" class="w-full rounded-lg border border-brand-border px-3 py-2 text-sm"></div>
+                <button type="submit" class="w-full rounded-full bg-brand-primary px-4 py-2.5 text-sm font-semibold text-white hover:bg-brand-primary-hover">Enviar</button>
+                <p id="property-contact-status" class="mt-2 text-xs"></p>
+              </form>
+            </div>
+          <?php endif; ?>
         </div>
         <p class="mt-4 text-xs text-brand-text-secondary">Código do imóvel: <?= e($property['code']) ?></p>
       </div>
@@ -227,6 +245,45 @@ if ($price) {
   toggle.addEventListener('click', function () {
     var isClamped = text.classList.toggle('line-clamp-6');
     toggle.textContent = isClamped ? 'Mostrar mais' : 'Mostrar menos';
+  });
+})();
+
+(function () {
+  var msgToggle = document.getElementById('js-msg-toggle');
+  var msgForm = document.getElementById('js-msg-form');
+  var form = document.getElementById('property-contact-form');
+  if (!msgToggle || !msgForm || !form) return;
+
+  msgToggle.addEventListener('click', function () {
+    msgForm.classList.toggle('hidden');
+  });
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var status = document.getElementById('property-contact-status');
+    var submitBtn = form.querySelector('button[type="submit"]');
+    status.textContent = '';
+    status.className = 'mt-2 text-xs';
+    submitBtn.disabled = true;
+
+    fetch(APP_BASE + 'actions/property_contact.php', { method: 'POST', body: new FormData(form) })
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        submitBtn.disabled = false;
+        if (data.error) {
+          status.textContent = data.error;
+          status.className = 'mt-2 text-xs text-red-600';
+          return;
+        }
+        status.textContent = 'Mensagem enviada! O anunciante vai entrar em contato em breve.';
+        status.className = 'mt-2 text-xs text-brand-green-hover';
+        form.reset();
+      })
+      .catch(function () {
+        submitBtn.disabled = false;
+        status.textContent = 'Não foi possível enviar agora. Tente novamente.';
+        status.className = 'mt-2 text-xs text-red-600';
+      });
   });
 })();
 </script>

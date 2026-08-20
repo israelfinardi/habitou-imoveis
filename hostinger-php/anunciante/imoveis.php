@@ -73,6 +73,9 @@ require __DIR__ . '/../includes/header.php';
 
                 <div class="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1.5 border-t border-brand-border pt-3 text-xs">
                   <a href="<?= base_url('anunciante/editar.php?id=' . $p['id']) ?>" class="font-semibold text-brand-primary hover:underline">Editar</a>
+                  <?php if ($p['status'] === 'PUBLISHED'): ?>
+                    <a href="<?= e(property_href($p)) ?>" target="_blank" rel="noopener noreferrer" class="text-brand-text-secondary hover:underline">Ver anúncio</a>
+                  <?php endif; ?>
                   <?php if ($p['status'] === 'EXPIRED'): ?>
                     <form method="post" action="<?= base_url('actions/property_action.php') ?>" class="inline">
                       <?= csrf_field() ?><input type="hidden" name="id" value="<?= $p['id'] ?>"><input type="hidden" name="do" value="renew">

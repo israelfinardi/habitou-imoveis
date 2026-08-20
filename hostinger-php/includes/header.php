@@ -61,6 +61,11 @@ body{font-family:'Plus Jakarta Sans',Arial,sans-serif}
   cursor:pointer;
 }
 .price-pin-label.active,.price-pin-label:hover{background:#C1502E;color:#fff;border-color:#C1502E;z-index:1000!important}
+/* Isola o Leaflet num novo stacking context — os z-index internos dele (até
+   1000, nos controles de zoom) senão competem direto no stacking context
+   raiz contra os dropdowns do header (.cidade-dropdown z-index:220,
+   .nav-user-menu z-index:200) e vencem, cobrindo-os quando abertos. */
+#home-minimap{position:relative;z-index:0;isolation:isolate}
 .map-pin-popup .leaflet-popup-content-wrapper{padding:0;border-radius:12px;overflow:hidden}
 .map-pin-popup .leaflet-popup-content{margin:0;width:100%!important}
 .map-pin-popup .leaflet-popup-close-button{

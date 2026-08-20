@@ -14,7 +14,7 @@
   var DEFAULT_ZOOM = 4;
 
   var map = L.map('home-minimap', {
-    scrollWheelZoom: false,
+    scrollWheelZoom: true,
     zoomControl: false,
     attributionControl: false,
   });

@@ -54,10 +54,11 @@ require __DIR__ . '/../includes/header.php';
         <h1 class="text-2xl font-bold">Editar imóvel</h1>
         <div class="flex items-center gap-2">
           <span class="rounded-full bg-brand-bg-subtle px-3 py-1 text-xs font-semibold"><?= e(PROPERTY_STATUS_LABEL[$property['status']]) ?></span>
+          <button type="submit" form="property-form" class="rounded-full bg-brand-primary px-4 py-2 text-sm font-semibold text-white hover:bg-brand-primary-hover">Salvar alterações</button>
           <?php if ($property['status'] !== 'PUBLISHED'): ?>
             <form method="post" action="<?= base_url('actions/property_action.php') ?>">
               <?= csrf_field() ?><input type="hidden" name="id" value="<?= $id ?>"><input type="hidden" name="do" value="publish">
-              <button class="rounded-full bg-brand-primary px-4 py-2 text-sm font-semibold text-white hover:bg-brand-primary-hover">Publicar agora</button>
+              <button class="rounded-full border border-brand-primary px-4 py-2 text-sm font-semibold text-brand-primary hover:bg-brand-primary/5">Publicar agora</button>
             </form>
           <?php else: ?>
             <form method="post" action="<?= base_url('actions/property_action.php') ?>">
@@ -94,7 +95,7 @@ require __DIR__ . '/../includes/header.php';
         <p class="mt-1 text-xs text-brand-text-secondary">JPG, PNG ou WEBP, até 8MB por foto.</p>
       </section>
 
-      <form method="post">
+      <form method="post" id="property-form">
         <?= csrf_field() ?>
         <?php render_property_form($property); ?>
         <button type="submit" class="rounded-full bg-brand-primary px-6 py-3 text-sm font-semibold text-white hover:bg-brand-primary-hover">Salvar alterações</button>
