@@ -53,6 +53,23 @@ function run_pending_migrations(PDO $pdo): void
     if (!in_array('expires_at', $columns('properties'), true)) {
         $pdo->exec('ALTER TABLE properties ADD COLUMN expires_at DATETIME NULL');
     }
+    // Perfil completo (cadastro coleta o máximo de dados possível, editável
+    // na guia Perfil): redes sociais, endereço e CNPJ em users; redes
+    // sociais em agencies (endereço/CNPJ elas já tinham).
+    foreach (['cnpj VARCHAR(32) NULL', 'instagram VARCHAR(120) NULL', 'facebook VARCHAR(120) NULL',
+              'address VARCHAR(255) NULL', 'zip_code VARCHAR(16) NULL', 'city VARCHAR(120) NULL', 'state VARCHAR(60) NULL'] as $def) {
+        $col = strtok($def, ' ');
+        if (!in_array($col, $columns('users'), true)) {
+            $pdo->exec("ALTER TABLE users ADD COLUMN $def");
+        }
+    }
+    $agencyColumns = $columns('agencies');
+    if (!in_array('instagram', $agencyColumns, true)) {
+        $pdo->exec('ALTER TABLE agencies ADD COLUMN instagram VARCHAR(120) NULL');
+    }
+    if (!in_array('facebook', $agencyColumns, true)) {
+        $pdo->exec('ALTER TABLE agencies ADD COLUMN facebook VARCHAR(120) NULL');
+    }
     // Tabelas novas (não coluna em tabela existente) usam CREATE TABLE IF NOT
     // EXISTS direto — já é idempotente por natureza, sem precisar de checagem.
     $pdo->exec('CREATE TABLE IF NOT EXISTS login_attempts (

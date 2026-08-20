@@ -162,7 +162,13 @@ body{font-family:'Plus Jakarta Sans',Arial,sans-serif}
       <?php if ($__user): ?>
         <div class="relative">
           <button type="button" class="nav-user-btn" id="nav-user-btn">
-            <span class="flex h-7 w-7 items-center justify-center rounded-full bg-brand-primary text-xs font-semibold text-white"><?= e(mb_strtoupper(mb_substr($__user['first_name'], 0, 1))) ?></span>
+            <span class="flex h-7 w-7 shrink-0 items-center justify-center overflow-hidden rounded-full bg-brand-primary text-xs font-semibold text-white">
+              <?php if (!empty($__user['avatar_url'])): ?>
+                <img src="<?= e($__user['avatar_url']) ?>" class="h-full w-full object-cover" alt="">
+              <?php else: ?>
+                <?= e(mb_strtoupper(mb_substr($__user['first_name'], 0, 1))) ?>
+              <?php endif; ?>
+            </span>
             <span class="pr-2 text-sm font-medium"><?= e($__user['first_name']) ?></span>
           </button>
           <?php

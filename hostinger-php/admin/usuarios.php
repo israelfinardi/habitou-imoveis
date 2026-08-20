@@ -44,7 +44,13 @@ require __DIR__ . '/../includes/header.php';
           <?php foreach ($users as $u): ?>
             <div class="rounded-2xl border border-brand-border bg-white p-4">
               <div class="mb-3 flex items-center gap-2.5">
-                <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-primary text-sm font-semibold text-white"><?= e(mb_strtoupper(mb_substr($u['first_name'], 0, 1))) ?></span>
+                <span class="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-brand-primary text-sm font-semibold text-white">
+                  <?php if (!empty($u['avatar_url'])): ?>
+                    <img src="<?= e($u['avatar_url']) ?>" class="h-full w-full object-cover" alt="">
+                  <?php else: ?>
+                    <?= e(mb_strtoupper(mb_substr($u['first_name'], 0, 1))) ?>
+                  <?php endif; ?>
+                </span>
                 <div class="min-w-0">
                   <p class="truncate text-sm font-semibold text-brand-text"><?= e($u['first_name'] . ' ' . $u['last_name']) ?></p>
                   <p class="truncate text-xs text-brand-text-secondary"><?= e($u['email']) ?></p>

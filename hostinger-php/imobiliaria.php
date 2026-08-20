@@ -20,7 +20,7 @@ $params = $_GET;
 unset($params['slug']);
 $result = list_properties($params, ['p.agency_id = ?' => $agency['id']]);
 
-$agentsStmt = db()->prepare("SELECT id, first_name, last_name, creci FROM users WHERE agency_id = ? AND role IN ('AGENT','AGENCY_ADMIN') AND status = 'ACTIVE' ORDER BY first_name");
+$agentsStmt = db()->prepare("SELECT id, first_name, last_name, creci, avatar_url FROM users WHERE agency_id = ? AND role IN ('AGENT','AGENCY_ADMIN') AND status = 'ACTIVE' ORDER BY first_name");
 $agentsStmt->execute([$agency['id']]);
 $agents = $agentsStmt->fetchAll();
 
@@ -55,7 +55,13 @@ require __DIR__ . '/includes/header.php';
       <div class="flex flex-wrap gap-3">
         <?php foreach ($agents as $agent): ?>
           <a href="<?= base_url('corretor.php?id=' . $agent['id']) ?>" class="flex items-center gap-2 rounded-full border border-brand-border px-3 py-2 text-sm hover:border-brand-primary">
-            <span class="flex h-7 w-7 items-center justify-center rounded-full bg-brand-primary text-xs font-semibold text-white"><?= e(mb_strtoupper(mb_substr($agent['first_name'], 0, 1))) ?></span>
+            <span class="flex h-7 w-7 shrink-0 items-center justify-center overflow-hidden rounded-full bg-brand-primary text-xs font-semibold text-white">
+              <?php if (!empty($agent['avatar_url'])): ?>
+                <img src="<?= e($agent['avatar_url']) ?>" class="h-full w-full object-cover" alt="">
+              <?php else: ?>
+                <?= e(mb_strtoupper(mb_substr($agent['first_name'], 0, 1))) ?>
+              <?php endif; ?>
+            </span>
             <?= e($agent['first_name'] . ' ' . $agent['last_name']) ?>
           </a>
         <?php endforeach; ?>

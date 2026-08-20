@@ -26,7 +26,7 @@ db()->prepare('INSERT INTO contact_messages (name, email, phone, subject, messag
     ->execute([$name, $email, $phone ?: null, $subject, $message, $user['id'] ?? null]);
 
 // Mensagens do "Fale conosco" avisam quem administra o site — usa o
-// notify_email configurado em Meus dados (minha-conta-dados.php) do
+// notify_email configurado em Perfil (minha-conta-dados.php) do
 // primeiro ADMIN; sem isso, cai no e-mail padrão do site.
 $adminNotify = db()->query('SELECT COALESCE(notify_email, email) FROM users WHERE role = "ADMIN" AND status = "ACTIVE" ORDER BY id LIMIT 1')->fetchColumn();
 $notifyTo = $adminNotify ?: (defined('SMTP_FROM') ? SMTP_FROM : 'contato@habitou.com.br');

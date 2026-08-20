@@ -17,6 +17,23 @@ function e(?string $value): string
     return htmlspecialchars($value ?? '', ENT_QUOTES, 'UTF-8');
 }
 
+/**
+ * Extrai cidade/estado (nome por extenso) do valor do .js-city-picker
+ * (formato "Cidade (UF)" produzido pelo autocomplete de
+ * assets/js/location-picker.js) — usado para preencher users.city/state e
+ * agencies.city/state. Não confundir com property_mutations.php's
+ * parse_city_label(), que resolve slug de cidade pra busca de imóveis e tem
+ * assinatura/retorno diferentes.
+ * @return array{city: ?string, state: ?string}
+ */
+function parse_city_state_label(string $cityLabel): array
+{
+    if (!preg_match('/^(.+?)\s*\(([A-Za-z]{2})\)\s*$/u', trim($cityLabel), $m)) {
+        return ['city' => null, 'state' => null];
+    }
+    return ['city' => trim($m[1]), 'state' => BRAZIL_STATES[mb_strtoupper($m[2])] ?? null];
+}
+
 function format_currency_brl($value): string
 {
     if ($value === null || $value === '') {

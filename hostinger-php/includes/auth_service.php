@@ -5,8 +5,12 @@ require_once __DIR__ . '/password.php';
 class AuthServiceError extends \RuntimeException {}
 
 /**
- * @param array{type?: string, creci?: string, agencyName?: string, cnpj?: string, agencyPhone?: string, agencyCity?: string} $professional
+ * @param array{type?: string, creci?: string, agencyName?: string, cnpj?: string, agencyPhone?: string, agencyCity?: string,
+ *   instagram?: string, facebook?: string, zipCode?: string, address?: string, city?: string, state?: string} $professional
  *   type: '' (padrão, comprador/anunciante particular) | 'corretor' (AGENT autônomo) | 'imobiliaria' (AGENCY_ADMIN + nova agência)
+ *   Coleta o máximo de dados já no cadastro (endereço, redes sociais, CNPJ
+ *   do corretor autônomo) — tudo fica editável depois na guia Perfil
+ *   (minha-conta-dados.php), sem precisar preencher tudo de novo.
  */
 function register_user(string $firstName, string $lastName, string $email, string $phone, string $password, array $professional = []): int
 {
@@ -20,6 +24,7 @@ function register_user(string $firstName, string $lastName, string $email, strin
     $type = $professional['type'] ?? '';
     $role = 'USER';
     $creci = null;
+    $cnpj = trim((string) ($professional['cnpj'] ?? '')) ?: null;
     $agencyId = null;
 
     if ($type === 'corretor') {
@@ -33,13 +38,25 @@ function register_user(string $firstName, string $lastName, string $email, strin
         if (mb_strlen($agencyName) < 3) {
             throw new AuthServiceError('Informe o nome da imobiliária.');
         }
-        $agencyId = create_pending_agency($agencyName, $professional['cnpj'] ?? '', $professional['agencyPhone'] ?? '', $email, $professional['agencyCity'] ?? '');
+        $agencyId = create_pending_agency($agencyName, $cnpj ?? '', $professional['agencyPhone'] ?? '', $email, $professional['agencyCity'] ?? '');
         $role = 'AGENCY_ADMIN';
+        $cnpj = null; // CNPJ da imobiliária fica em agencies, não duplicado em users.
     }
 
     $hash = hash_password($password);
-    $stmt = $pdo->prepare('INSERT INTO users (first_name, last_name, email, phone, password_hash, role, status, creci, agency_id) VALUES (?,?,?,?,?,?,"ACTIVE",?,?)');
-    $stmt->execute([$firstName, $lastName, $email, $phone ?: null, $hash, $role, $creci, $agencyId]);
+    $stmt = $pdo->prepare('INSERT INTO users
+        (first_name, last_name, email, phone, password_hash, role, status, creci, cnpj, instagram, facebook, address, zip_code, city, state, agency_id)
+        VALUES (?,?,?,?,?,?,"ACTIVE",?,?,?,?,?,?,?,?,?)');
+    $stmt->execute([
+        $firstName, $lastName, $email, $phone ?: null, $hash, $role, $creci, $cnpj,
+        trim((string) ($professional['instagram'] ?? '')) ?: null,
+        trim((string) ($professional['facebook'] ?? '')) ?: null,
+        trim((string) ($professional['address'] ?? '')) ?: null,
+        trim((string) ($professional['zipCode'] ?? '')) ?: null,
+        trim((string) ($professional['city'] ?? '')) ?: null,
+        trim((string) ($professional['state'] ?? '')) ?: null,
+        $agencyId,
+    ]);
     return (int) $pdo->lastInsertId();
 }
 
@@ -59,13 +76,7 @@ function create_pending_agency(string $name, string $cnpj, string $phone, string
         $slug = $base . '-' . $i++;
     }
 
-    $city = null;
-    $state = null;
-    if (preg_match('/^(.+?)\s*\(([A-Za-z]{2})\)\s*$/u', trim($cityLabel), $m)) {
-        $city = trim($m[1]);
-        $uf = mb_strtoupper($m[2]);
-        $state = BRAZIL_STATES[$uf] ?? null;
-    }
+    ['city' => $city, 'state' => $state] = parse_city_state_label($cityLabel);
 
     $stmt = $pdo->prepare('INSERT INTO agencies (name, slug, cnpj, email, phone, city, state, status) VALUES (?,?,?,?,?,?,?,"PENDING")');
     $stmt->execute([$name, $slug, $cnpj ?: null, $email, $phone ?: null, $city, $state]);

@@ -25,7 +25,7 @@ Login de administrador criado automaticamente:
 - **E-mail:** admin@habitou.com.br
 - **Senha:** Admin@12345
 
-**Troque essa senha assim que entrar** (Minha conta → Meus dados).
+**Troque essa senha assim que entrar** (Minha conta → Alterar senha).
 
 ## O que você precisa no seu plano
 

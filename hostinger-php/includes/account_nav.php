@@ -25,7 +25,7 @@ function account_nav_items(): array
         'contratos' => ['contratos.php', 'Contratos', 'document'],
     ];
     $items['planos'] = ['planos.php', 'Planos', 'tag'];
-    $items['dados'] = ['minha-conta-dados.php', 'Meus dados', 'user'];
+    $items['dados'] = ['minha-conta-dados.php', 'Perfil', 'user'];
     $items['senha'] = ['minha-conta-senha.php', 'Alterar senha', 'lock'];
     if ($user['role'] === 'AGENCY_ADMIN' && $user['agency_id']) {
         $items['imobiliaria'] = ['imobiliaria/perfil.php', 'Perfil da imobiliária', 'building'];

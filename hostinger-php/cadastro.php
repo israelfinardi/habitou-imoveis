@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/includes/bootstrap.php';
 require_once __DIR__ . '/includes/auth_service.php';
+require_once __DIR__ . '/includes/avatar.php';
 
 $error = null;
 $fieldErrors = [];
@@ -18,9 +19,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $accountType = in_array($_POST['accountType'] ?? '', ['corretor', 'imobiliaria'], true) ? $_POST['accountType'] : '';
     $creci = trim($_POST['creci'] ?? '');
     $agencyName = trim($_POST['agencyName'] ?? '');
-    $cnpj = trim($_POST['cnpj'] ?? '');
+    $agencyCnpj = trim($_POST['cnpj'] ?? '');
     $agencyPhone = trim($_POST['agencyPhone'] ?? '');
     $agencyCity = trim($_POST['agencyCity'] ?? '');
+    $personalCnpj = trim($_POST['personalCnpj'] ?? '');
+    $instagram = trim($_POST['instagram'] ?? '');
+    $facebook = trim($_POST['facebook'] ?? '');
+    $address = trim($_POST['address'] ?? '');
+    $zipCode = trim($_POST['zipCode'] ?? '');
+    $cityLabel = trim($_POST['cityLabel'] ?? '');
+    $cnpj = $accountType === 'imobiliaria' ? $agencyCnpj : $personalCnpj;
 
     if (mb_strlen($firstName) < 2) $fieldErrors['firstName'] = 'Informe seu nome.';
     if (mb_strlen($lastName) < 2) $fieldErrors['lastName'] = 'Informe seu sobrenome.';
@@ -34,6 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($fieldErrors)) {
         rate_limit_hit('cadastro_ip', client_ip());
         try {
+            ['city' => $city, 'state' => $state] = parse_city_state_label($cityLabel);
             $userId = register_user($firstName, $lastName, $email, $phone, $password, [
                 'type' => $accountType,
                 'creci' => $creci,
@@ -41,8 +50,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'cnpj' => $cnpj,
                 'agencyPhone' => $agencyPhone,
                 'agencyCity' => $agencyCity,
+                'instagram' => $instagram,
+                'facebook' => $facebook,
+                'address' => $address,
+                'zipCode' => $zipCode,
+                'city' => $city,
+                'state' => $state,
             ]);
             login_user($userId);
+            if (!empty($_FILES['avatar']['name'])) {
+                try {
+                    handle_avatar_upload($userId, $_FILES['avatar']);
+                } catch (AvatarUploadError $e) {
+                    // Não bloqueia o cadastro — a foto pode ser enviada depois na guia Perfil.
+                }
+            }
             redirect(base_url($accountType === 'imobiliaria' ? 'imobiliaria/perfil.php' : 'minha-conta.php'));
         } catch (AuthServiceError $e) {
             $error = $e->getMessage();
@@ -60,8 +82,22 @@ require __DIR__ . '/includes/header.php';
 
     <?php if ($error): ?><p class="mb-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700"><?= e($error) ?></p><?php endif; ?>
 
-    <form method="post" id="cadastro-form">
+    <form method="post" id="cadastro-form" enctype="multipart/form-data">
       <?= csrf_field() ?>
+
+      <div class="mb-5 flex items-center gap-4">
+        <div class="relative h-16 w-16 shrink-0 overflow-hidden rounded-full bg-brand-bg-subtle">
+          <span id="avatar-preview-fallback" class="flex h-full w-full items-center justify-center text-xl font-semibold text-brand-primary">?</span>
+          <img id="avatar-preview" src="" class="hidden h-full w-full object-cover" alt="">
+        </div>
+        <div>
+          <label class="inline-flex cursor-pointer items-center gap-2 rounded-full border border-brand-border px-4 py-2 text-sm font-medium hover:border-brand-primary">
+            <span>Adicionar foto de perfil</span>
+            <input type="file" name="avatar" id="avatar-input" accept="image/jpeg,image/png,image/webp" class="hidden">
+          </label>
+          <p class="mt-1 text-xs text-brand-text-secondary">Opcional — JPG, PNG ou WEBP, até 8MB.</p>
+        </div>
+      </div>
 
       <div class="mb-5 grid grid-cols-3 gap-2 text-center text-xs font-semibold">
         <label class="js-account-type-label cursor-pointer rounded-lg border-2 px-2 py-2.5 <?= $accountType === '' ? 'border-brand-primary bg-brand-primary/5 text-brand-primary' : 'border-brand-border text-brand-text-secondary' ?>">
@@ -97,10 +133,43 @@ require __DIR__ . '/includes/header.php';
         <input type="tel" name="phone" placeholder="(47) 99999-9999" value="<?= e($_POST['phone'] ?? '') ?>" class="w-full rounded-lg border border-brand-border px-3 py-2 text-sm">
       </div>
 
+      <div class="mb-4 grid grid-cols-2 gap-3">
+        <div>
+          <label class="mb-1 block text-sm font-medium">CEP</label>
+          <input name="zipCode" value="<?= e($_POST['zipCode'] ?? '') ?>" placeholder="00000-000" class="w-full rounded-lg border border-brand-border px-3 py-2 text-sm">
+        </div>
+        <div>
+          <label class="mb-1 block text-sm font-medium">Cidade</label>
+          <input type="text" name="cityLabel" class="js-city-picker w-full rounded-lg border border-brand-border px-3 py-2 text-sm"
+                 list="cidades-datalist-pessoal" autocomplete="off"
+                 placeholder="Digite o nome da cidade..." value="<?= e($_POST['cityLabel'] ?? '') ?>">
+          <datalist id="cidades-datalist-pessoal"></datalist>
+        </div>
+      </div>
+      <div class="mb-4">
+        <label class="mb-1 block text-sm font-medium">Endereço</label>
+        <input name="address" value="<?= e($_POST['address'] ?? '') ?>" placeholder="Rua, número, bairro" class="w-full rounded-lg border border-brand-border px-3 py-2 text-sm">
+      </div>
+      <div class="mb-4 grid grid-cols-2 gap-3">
+        <div>
+          <label class="mb-1 block text-sm font-medium">Instagram</label>
+          <input name="instagram" value="<?= e($_POST['instagram'] ?? '') ?>" placeholder="@usuario" class="w-full rounded-lg border border-brand-border px-3 py-2 text-sm">
+        </div>
+        <div>
+          <label class="mb-1 block text-sm font-medium">Facebook</label>
+          <input name="facebook" value="<?= e($_POST['facebook'] ?? '') ?>" placeholder="facebook.com/usuario" class="w-full rounded-lg border border-brand-border px-3 py-2 text-sm">
+        </div>
+      </div>
+
       <div class="js-fields-corretor mb-4 <?= $accountType === 'corretor' ? '' : 'hidden' ?>">
         <label class="mb-1 block text-sm font-medium">CRECI</label>
         <input name="creci" value="<?= e($_POST['creci'] ?? '') ?>" placeholder="Ex.: 12345-F" class="w-full rounded-lg border border-brand-border px-3 py-2 text-sm">
         <?php if (!empty($fieldErrors['creci'])): ?><p class="mt-1 text-xs text-red-600"><?= e($fieldErrors['creci']) ?></p><?php endif; ?>
+      </div>
+
+      <div class="js-fields-personal-cnpj mb-4 <?= $accountType === 'imobiliaria' ? 'hidden' : '' ?>">
+        <label class="mb-1 block text-sm font-medium">CNPJ (opcional)</label>
+        <input name="personalCnpj" value="<?= e($_POST['personalCnpj'] ?? '') ?>" placeholder="Se você anuncia como pessoa jurídica" class="w-full rounded-lg border border-brand-border px-3 py-2 text-sm">
       </div>
 
       <div class="js-fields-imobiliaria <?= $accountType === 'imobiliaria' ? '' : 'hidden' ?>">
@@ -151,6 +220,7 @@ require __DIR__ . '/includes/header.php';
   var radios = document.querySelectorAll('.js-account-type');
   var fieldsCorretor = document.querySelector('.js-fields-corretor');
   var fieldsImobiliaria = document.querySelector('.js-fields-imobiliaria');
+  var fieldsPersonalCnpj = document.querySelector('.js-fields-personal-cnpj');
   function apply() {
     var value = document.querySelector('.js-account-type:checked').value;
     document.querySelectorAll('.js-account-type-label').forEach(function (label) {
@@ -163,9 +233,21 @@ require __DIR__ . '/includes/header.php';
     });
     fieldsCorretor.classList.toggle('hidden', value !== 'corretor');
     fieldsImobiliaria.classList.toggle('hidden', value !== 'imobiliaria');
+    fieldsPersonalCnpj.classList.toggle('hidden', value === 'imobiliaria');
   }
   radios.forEach(function (r) { r.addEventListener('change', apply); });
   apply();
+
+  var avatarInput = document.getElementById('avatar-input');
+  avatarInput.addEventListener('change', function (e) {
+    var file = e.target.files[0];
+    if (!file) return;
+    var img = document.getElementById('avatar-preview');
+    var fallback = document.getElementById('avatar-preview-fallback');
+    img.src = URL.createObjectURL(file);
+    img.classList.remove('hidden');
+    if (fallback) fallback.classList.add('hidden');
+  });
 })();
 </script>
 <?php require __DIR__ . '/includes/footer.php'; ?>
