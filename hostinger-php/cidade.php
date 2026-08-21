@@ -48,7 +48,7 @@ if ($hasFilters) {
     $params['cidade'] = $city['slug'];
     $result = list_properties($params);
     ?>
-    <div class="w-full px-4 py-6 sm:px-6 lg:px-8">
+    <div class="mx-auto max-w-[1800px] px-4 py-6 sm:px-6 lg:px-8">
       <nav class="mb-4 text-sm text-brand-text-secondary">
         <a href="<?= base_url('/') ?>" class="hover:text-brand-primary">Início</a> /
         <a href="<?= base_url('cidade.php?slug=' . $city['slug']) ?>" class="hover:text-brand-primary"><?= e($city['name']) ?></a>

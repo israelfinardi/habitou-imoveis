@@ -18,7 +18,7 @@ $pageTitle = 'Busca de imóveis';
 $pageDescription = 'Busque apartamentos, casas e terrenos para comprar ou alugar em todo o Brasil.';
 require __DIR__ . '/includes/header.php';
 ?>
-<div class="w-full px-4 py-6 sm:px-6 lg:px-8">
+<div class="mx-auto max-w-[1800px] px-4 py-6 sm:px-6 lg:px-8">
   <h1 class="sr-only">Busca de imóveis</h1>
 
   <div id="results-layout" class="lg:grid lg:grid-cols-2 lg:items-start lg:gap-6">
