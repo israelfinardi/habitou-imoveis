@@ -66,11 +66,11 @@ if ($price) {
     <span><?= e($property['title']) ?></span>
   </nav>
 
-  <div class="grid grid-cols-1 gap-8 lg:grid-cols-4">
-    <div class="lg:col-span-3">
-      <?php $images = $property['images']; render_property_gallery($images, $property['title']); ?>
+  <?php $images = $property['images']; render_property_gallery($images, $property['title']); ?>
 
-      <div class="mt-6 flex items-start justify-between gap-4">
+  <div class="mt-6 grid grid-cols-1 gap-8 lg:grid-cols-4">
+    <div class="lg:col-span-3">
+      <div class="flex items-start justify-between gap-4">
         <div>
           <h1 class="text-2xl font-bold"><?= e($property['title']) ?></h1>
           <p class="mt-1 text-sm text-brand-text-secondary">
