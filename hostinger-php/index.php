@@ -224,7 +224,7 @@ document.getElementById('buscar-codigo-link')?.addEventListener('click', functio
   <div class="mx-auto max-w-[1800px] px-4 sm:px-6 lg:px-8">
     <p class="text-sm font-medium text-brand-text-secondary">O que você procura</p>
     <h2 class="mt-1 text-2xl font-bold text-brand-text">Buscar por tipo</h2>
-    <div class="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+    <div class="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-9">
       <?php foreach ($typeCounts as $type => $count): ?>
         <a href="<?= base_url('imoveis.php?tipo=' . PROPERTY_TYPE_SLUG[$type]) ?>" class="flex flex-col items-center gap-2 rounded-2xl border border-brand-border bg-white p-4 text-center transition hover:border-brand-primary">
           <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" class="text-brand-text"><?= CATEGORY_ICONS[$type] ?></svg>
