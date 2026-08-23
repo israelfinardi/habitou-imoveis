@@ -33,6 +33,84 @@ function get_xml_import(int $id, array $actor): ?array
     return $authorized ? $import : null;
 }
 
+/**
+ * Quem pode EXCLUIR uma importação (mais restrito que a visualização acima,
+ * que qualquer um da mesma imobiliária tem): admin, quem fez o upload, ou
+ * alguém da mesma imobiliária com papel de gestão — mesma regra de
+ * can_manage_property().
+ */
+function can_manage_xml_import(array $actor, array $import): bool
+{
+    if ($actor['role'] === 'ADMIN') {
+        return true;
+    }
+    if ((int) $import['user_id'] === (int) $actor['id']) {
+        return true;
+    }
+    return !empty($import['agency_id']) && (int) ($actor['agency_id'] ?? 0) === (int) $import['agency_id'] && in_array($actor['role'], AGENCY_ROLES, true);
+}
+
+function count_properties_for_xml_import(int $importId): int
+{
+    $stmt = db()->prepare('SELECT COUNT(*) FROM properties WHERE import_id = ?');
+    $stmt->execute([$importId]);
+    return (int) $stmt->fetchColumn();
+}
+
+function xml_import_rrmdir(string $dir): void
+{
+    $items = @scandir($dir);
+    if ($items === false) {
+        return;
+    }
+    foreach ($items as $item) {
+        if ($item === '.' || $item === '..') {
+            continue;
+        }
+        $path = $dir . '/' . $item;
+        is_dir($path) ? xml_import_rrmdir($path) : @unlink($path);
+    }
+    @rmdir($dir);
+}
+
+/**
+ * Exclui a importação (linha + arquivo XML original) e TODOS os imóveis
+ * que vieram dela (import_id) — fotos/favoritos saem junto via ON DELETE
+ * CASCADE, mas os arquivos de foto em uploads/properties/ não são
+ * apagados pelo banco, então limpamos manualmente antes de excluir as
+ * linhas, pra não deixar lixo acumulando em disco num apagão em massa.
+ */
+function delete_xml_import(int $importId, array $actor): void
+{
+    $stmt = db()->prepare('SELECT * FROM xml_imports WHERE id = ?');
+    $stmt->execute([$importId]);
+    $import = $stmt->fetch();
+    if (!$import) {
+        throw new \RuntimeException('Importação não encontrada.');
+    }
+    if (!can_manage_xml_import($actor, $import)) {
+        throw new \RuntimeException('Você não pode excluir esta importação.');
+    }
+
+    $pdo = db();
+    $propStmt = $pdo->prepare('SELECT id FROM properties WHERE import_id = ?');
+    $propStmt->execute([$importId]);
+    $propertyIds = $propStmt->fetchAll(PDO::FETCH_COLUMN);
+
+    foreach ($propertyIds as $propertyId) {
+        xml_import_rrmdir(__DIR__ . '/../uploads/properties/' . $propertyId);
+    }
+    if ($propertyIds) {
+        $placeholders = implode(',', array_fill(0, count($propertyIds), '?'));
+        $pdo->prepare("DELETE FROM properties WHERE id IN ($placeholders)")->execute($propertyIds);
+    }
+
+    if (is_file($import['stored_path'])) {
+        @unlink($import['stored_path']);
+    }
+    $pdo->prepare('DELETE FROM xml_imports WHERE id = ?')->execute([$importId]);
+}
+
 /** "Santa Catarina" ou "SC" -> "SC" — alguns feeds mandam o nome do estado por extenso em vez da UF. */
 function xml_import_resolve_state_code(string $raw): ?string
 {

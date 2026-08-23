@@ -6,6 +6,10 @@ require_once __DIR__ . '/../includes/xml_import_service.php';
 $user = require_role(['ADMIN']);
 $imports = list_xml_imports_for_user($user);
 
+$flashError = $_SESSION['xml_import_error'] ?? null;
+$flashSuccess = $_SESSION['xml_import_success'] ?? null;
+unset($_SESSION['xml_import_error'], $_SESSION['xml_import_success']);
+
 if (($_GET['export'] ?? '') === 'csv') {
     export_csv('importacoes-xml.csv', [
         'file' => 'Arquivo', 'user' => 'Usuário', 'status' => 'Status', 'found' => 'Encontrados',
@@ -27,6 +31,8 @@ require __DIR__ . '/../includes/header.php';
         <h1 class="text-2xl font-bold">Importações de XML (<?= count($imports) ?>)</h1>
         <?php render_csv_export_button(); ?>
       </div>
+      <?php if ($flashSuccess): ?><p class="mb-4 rounded-lg bg-brand-green/10 px-3 py-2 text-sm text-brand-green-hover"><?= e($flashSuccess) ?></p><?php endif; ?>
+      <?php if ($flashError): ?><p class="mb-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700"><?= e($flashError) ?></p><?php endif; ?>
       <?php if (empty($imports)): ?>
         <div class="rounded-xl border border-dashed border-brand-border p-12 text-center text-brand-text-secondary">Nenhuma importação realizada ainda.</div>
       <?php else: ?>
@@ -65,8 +71,12 @@ require __DIR__ . '/../includes/header.php';
                   <td class="px-4 py-3 text-xs"><?= (int) $imp['total_updated'] ?></td>
                   <td class="px-4 py-3 text-xs"><?= (int) $imp['total_deactivated'] ?></td>
                   <td class="px-4 py-3 text-xs"><?= (int) $imp['total_errors'] ?></td>
-                  <td class="px-4 py-3 text-right">
+                  <td class="px-4 py-3 text-right whitespace-nowrap">
                     <a href="<?= base_url('actions/download_xml_import.php?id=' . $imp['id']) ?>" class="text-xs font-semibold text-brand-primary hover:underline">Baixar XML</a>
+                    <form method="post" action="<?= base_url('actions/delete_xml_import.php') ?>" class="inline" onsubmit="return confirm('Excluir esta importação e os <?= count_properties_for_xml_import((int) $imp['id']) ?> imóvel(is) criados por ela? Isso não pode ser desfeito.');">
+                      <?= csrf_field() ?><input type="hidden" name="id" value="<?= (int) $imp['id'] ?>"><input type="hidden" name="from_admin" value="1">
+                      <button type="submit" class="ml-3 text-xs font-semibold text-red-600 hover:underline">Excluir</button>
+                    </form>
                   </td>
                 </tr>
               <?php endforeach; ?>

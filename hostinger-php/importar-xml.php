@@ -70,8 +70,12 @@ require __DIR__ . '/includes/header.php';
                   <td class="px-4 py-3 text-xs"><?= (int) $imp['total_updated'] ?></td>
                   <td class="px-4 py-3 text-xs"><?= (int) $imp['total_deactivated'] ?></td>
                   <td class="px-4 py-3 text-xs"><?= (int) $imp['total_errors'] ?></td>
-                  <td class="px-4 py-3 text-right">
+                  <td class="px-4 py-3 text-right whitespace-nowrap">
                     <a href="<?= base_url('actions/download_xml_import.php?id=' . $imp['id']) ?>" class="text-xs font-semibold text-brand-primary hover:underline">Baixar XML</a>
+                    <form method="post" action="<?= base_url('actions/delete_xml_import.php') ?>" class="inline" onsubmit="return confirm('Excluir esta importação e os <?= count_properties_for_xml_import((int) $imp['id']) ?> imóvel(is) criados por ela? Isso não pode ser desfeito.');">
+                      <?= csrf_field() ?><input type="hidden" name="id" value="<?= (int) $imp['id'] ?>">
+                      <button type="submit" class="ml-3 text-xs font-semibold text-red-600 hover:underline">Excluir</button>
+                    </form>
                   </td>
                 </tr>
               <?php endforeach; ?>
