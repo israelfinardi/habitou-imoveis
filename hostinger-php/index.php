@@ -180,9 +180,9 @@ require __DIR__ . '/includes/header.php';
     <?php if ($featured): ?>
       <div class="mt-10">
         <h2 class="mb-4 text-lg font-bold text-brand-text">✨ Destaques da semana</h2>
-        <div class="flex flex-wrap justify-center gap-5 lg:justify-start">
+        <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
           <?php foreach ($featured as $item): ?>
-            <div class="w-[350px] max-w-full shrink-0">
+            <div>
               <?php render_property_card($item, in_array($item['id'], $favoriteIds, true)); ?>
             </div>
           <?php endforeach; ?>
