@@ -77,8 +77,8 @@ require __DIR__ . '/includes/header.php';
       <div class="absolute right-24 bottom-6 h-24 w-24 rounded-[1.5rem] bg-brand-primary/10"></div>
     </div>
 
-    <div class="relative flex flex-col gap-8 xl:flex-row xl:items-start xl:gap-16">
-    <div class="max-w-2xl">
+    <div class="relative flex flex-col gap-8 xl:flex-row xl:items-start xl:gap-10">
+    <div class="max-w-2xl xl:w-1/2 xl:max-w-none">
       <span class="inline-flex items-center gap-2 rounded-full border border-brand-border bg-white px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-brand-text-secondary">
         <span class="h-1.5 w-1.5 rounded-full bg-brand-green"></span> O portal de imóveis do Brasil
       </span>
@@ -172,7 +172,7 @@ require __DIR__ . '/includes/header.php';
       </div>
     </div>
 
-    <div class="hidden shrink-0 xl:ml-auto xl:block xl:h-[620px] xl:w-[620px]">
+    <div class="hidden xl:block xl:h-[620px] xl:w-1/2">
       <div id="home-minimap" class="h-full w-full overflow-hidden rounded-3xl border border-brand-border shadow-lg"></div>
     </div>
     </div>
