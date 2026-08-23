@@ -23,6 +23,7 @@ function account_nav_items(): array
         'anuncios' => ['anunciante/imoveis.php', 'Meus anúncios', 'house'],
         'favoritos' => ['minha-conta-favoritos.php', 'Favoritos', 'heart'],
         'contratos' => ['contratos.php', 'Contratos', 'document'],
+        'contratos_modelos' => ['contratos-modelos.php', 'Modelos de contrato', 'pencil'],
     ];
     $items['planos'] = ['planos.php', 'Planos', 'tag'];
     $items['dados'] = ['minha-conta-dados.php', 'Perfil', 'user'];

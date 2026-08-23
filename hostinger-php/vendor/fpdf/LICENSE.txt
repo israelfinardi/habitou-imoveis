@@ -1,0 +1,5 @@
+FPDF is released under a permissive license (free for any use, personal or
+commercial, with or without modification — see http://www.fpdf.org/en/script/script37.php).
+This copy is vendored directly as a single file (no Composer/dependency
+manager) so the site stays a plain drop-in-a-zip PHP deployment on shared
+hosting. Original author: Olivier Plathey (http://www.fpdf.org).

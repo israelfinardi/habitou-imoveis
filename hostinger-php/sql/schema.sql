@@ -331,6 +331,29 @@ CREATE INDEX IF NOT EXISTS idx_location_signals_user ON user_location_signals (u
 -- Contratos
 -- ---------------------------------------------------------------------
 
+-- Modelos de contrato (redigidos por corretor/imobiliária/admin, com
+-- placeholders tipo {{cliente_nome}} preenchidos automaticamente a partir
+-- do imóvel/contrato na hora de gerar um contrato a partir do modelo — ver
+-- includes/contract_service.php::contract_placeholder_map()). Visibilidade:
+-- is_global (só admin) aparece pra todo mundo; agency_id aparece só pra
+-- quem é da mesma imobiliária; sem os dois, é pessoal (só o criador vê).
+CREATE TABLE IF NOT EXISTS contract_templates (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name VARCHAR(160) NOT NULL,
+  transaction_type TEXT NOT NULL,
+  body TEXT NOT NULL,
+  is_global INTEGER NOT NULL DEFAULT 0,
+  agency_id INTEGER NULL,
+  created_by INTEGER NOT NULL,
+  is_active INTEGER NOT NULL DEFAULT 1,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_template_agency FOREIGN KEY (agency_id) REFERENCES agencies(id) ON DELETE CASCADE,
+  CONSTRAINT fk_template_creator FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE CASCADE
+);
+CREATE INDEX IF NOT EXISTS idx_template_agency ON contract_templates (agency_id);
+CREATE INDEX IF NOT EXISTS idx_template_type ON contract_templates (transaction_type);
+
 CREATE TABLE IF NOT EXISTS contracts (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   property_id INTEGER NOT NULL,
@@ -346,6 +369,12 @@ CREATE TABLE IF NOT EXISTS contracts (
   start_date DATE NULL,
   end_date DATE NULL,
   documents TEXT NULL,
+  template_id INTEGER NULL,
+  body TEXT NULL,
+  client_document VARCHAR(32) NULL,
+  signed_document_url VARCHAR(500) NULL,
+  signed_document_uploaded_at DATETIME NULL,
+  signed_document_uploaded_by INTEGER NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT fk_contract_property FOREIGN KEY (property_id) REFERENCES properties(id),
@@ -354,7 +383,9 @@ CREATE TABLE IF NOT EXISTS contracts (
   CONSTRAINT fk_contract_buyer FOREIGN KEY (buyer_id) REFERENCES users(id) ON DELETE SET NULL,
   CONSTRAINT fk_contract_tenant FOREIGN KEY (tenant_id) REFERENCES users(id) ON DELETE SET NULL,
   CONSTRAINT fk_contract_agent FOREIGN KEY (agent_id) REFERENCES users(id) ON DELETE SET NULL,
-  CONSTRAINT fk_contract_agency FOREIGN KEY (agency_id) REFERENCES agencies(id) ON DELETE SET NULL
+  CONSTRAINT fk_contract_agency FOREIGN KEY (agency_id) REFERENCES agencies(id) ON DELETE SET NULL,
+  CONSTRAINT fk_contract_template FOREIGN KEY (template_id) REFERENCES contract_templates(id) ON DELETE SET NULL,
+  CONSTRAINT fk_contract_signer FOREIGN KEY (signed_document_uploaded_by) REFERENCES users(id) ON DELETE SET NULL
 );
 CREATE INDEX IF NOT EXISTS idx_contract_property ON contracts (property_id);
 CREATE INDEX IF NOT EXISTS idx_contract_status ON contracts (status);

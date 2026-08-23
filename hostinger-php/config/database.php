@@ -148,6 +148,37 @@ function run_pending_migrations(PDO $pdo): void
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
     )');
     $pdo->exec('CREATE INDEX IF NOT EXISTS idx_poi_city ON points_of_interest (city_id)');
+
+    // Modelos de contrato + geração de PDF/assinatura (ver
+    // includes/contract_service.php e includes/contract_pdf.php). Colunas
+    // novas em `contracts` sem FK aqui (ALTER TABLE do SQLite não permite
+    // adicionar constraint) — quem quiser a FK, começa do sql/schema.sql.
+    $pdo->exec('CREATE TABLE IF NOT EXISTS contract_templates (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name VARCHAR(160) NOT NULL,
+        transaction_type TEXT NOT NULL,
+        body TEXT NOT NULL,
+        is_global INTEGER NOT NULL DEFAULT 0,
+        agency_id INTEGER NULL,
+        created_by INTEGER NOT NULL,
+        is_active INTEGER NOT NULL DEFAULT 1,
+        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+    )');
+    $pdo->exec('CREATE INDEX IF NOT EXISTS idx_template_agency ON contract_templates (agency_id)');
+    $pdo->exec('CREATE INDEX IF NOT EXISTS idx_template_type ON contract_templates (transaction_type)');
+
+    $contractColumns = $columns('contracts');
+    foreach ([
+        'template_id INTEGER NULL', 'body TEXT NULL', 'client_document VARCHAR(32) NULL',
+        'signed_document_url VARCHAR(500) NULL', 'signed_document_uploaded_at DATETIME NULL',
+        'signed_document_uploaded_by INTEGER NULL',
+    ] as $def) {
+        $col = strtok($def, ' ');
+        if (!in_array($col, $contractColumns, true)) {
+            $pdo->exec("ALTER TABLE contracts ADD COLUMN $def");
+        }
+    }
 }
 
 /**

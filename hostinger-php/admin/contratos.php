@@ -5,13 +5,13 @@ require_once __DIR__ . '/../includes/contract_service.php';
 
 $user = require_role(['ADMIN']);
 $contracts = list_contracts_for_user($user);
-$statusLabel = ['DRAFT' => 'Rascunho', 'ACTIVE' => 'Ativo', 'FINISHED' => 'Concluído', 'CANCELED' => 'Cancelado'];
+$statusLabel = CONTRACT_STATUS_LABEL;
 
 if (($_GET['export'] ?? '') === 'csv') {
     export_csv('contratos.csv', [
         'property_title' => 'Imóvel', 'type' => 'Tipo', 'value' => 'Valor', 'status' => 'Status',
     ], array_map(fn($c) => [
-        'property_title' => $c['property_title'], 'type' => $c['type'] === 'SALE' ? 'Venda' : 'Aluguel',
+        'property_title' => $c['property_title'], 'type' => CONTRACT_TYPE_LABEL[$c['type']] ?? $c['type'],
         'value' => $c['value'], 'status' => $statusLabel[$c['status']] ?? $c['status'],
     ], $contracts));
 }
@@ -33,9 +33,12 @@ require __DIR__ . '/../includes/header.php';
           <?php foreach ($contracts as $c): ?>
             <a href="<?= base_url('contrato.php?id=' . $c['id']) ?>" class="block rounded-2xl border border-brand-border bg-white p-4 hover:border-brand-primary">
               <p class="mb-2 truncate text-sm font-semibold text-brand-text"><?= e($c['property_title']) ?></p>
-              <p class="mb-1 text-xs text-brand-text-secondary"><?= $c['type'] === 'SALE' ? 'Venda' : 'Aluguel' ?></p>
+              <p class="mb-1 text-xs text-brand-text-secondary"><?= e(CONTRACT_TYPE_LABEL[$c['type']] ?? $c['type']) ?></p>
               <p class="mb-3 text-sm font-semibold text-brand-text"><?= $c['value'] ? format_currency_brl($c['value']) : '—' ?></p>
-              <span class="rounded-full bg-brand-bg-subtle px-2 py-1 text-xs font-medium"><?= e($statusLabel[$c['status']]) ?></span>
+              <div class="flex items-center gap-2">
+                <span class="rounded-full bg-brand-bg-subtle px-2 py-1 text-xs font-medium"><?= e($statusLabel[$c['status']]) ?></span>
+                <?php if (!empty($c['signed_document_url'])): ?><span class="text-xs font-medium text-brand-green">Assinado</span><?php endif; ?>
+              </div>
             </a>
           <?php endforeach; ?>
         </div>
