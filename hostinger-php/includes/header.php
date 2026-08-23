@@ -211,7 +211,17 @@ body{font-family:'Plus Jakarta Sans',Arial,sans-serif}
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
       <span>Filtros</span>
     </a>
-    <button id="mobile-menu-btn" class="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-brand-border lg:hidden" aria-label="Abrir menu">
+    <a href="<?= base_url('anunciante/novo.php') ?>" class="shrink-0 whitespace-nowrap text-sm font-semibold text-brand-text lg:hidden">Quero anunciar</a>
+    <?php if ($__user): ?>
+      <span class="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-brand-primary text-sm font-semibold text-white lg:hidden">
+        <?php if (!empty($__user['avatar_url'])): ?>
+          <img src="<?= e($__user['avatar_url']) ?>" class="h-full w-full object-cover" alt="">
+        <?php else: ?>
+          <?= e(mb_strtoupper(mb_substr($__user['first_name'], 0, 1))) ?>
+        <?php endif; ?>
+      </span>
+    <?php endif; ?>
+    <button id="mobile-menu-btn" class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-bg-subtle lg:hidden" aria-label="Abrir menu">
       <svg width="18" height="14" viewBox="0 0 18 14" fill="none"><path d="M0 1h18M0 7h18M0 13h18" stroke="currentColor" stroke-width="1.5"/></svg>
     </button>
   </div>
