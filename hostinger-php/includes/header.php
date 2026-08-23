@@ -61,6 +61,7 @@ body{font-family:'Plus Jakarta Sans',Arial,sans-serif}
   cursor:pointer;
 }
 .price-pin-label.active,.price-pin-label:hover{background:#C1502E;color:#fff;border-color:#C1502E;z-index:1000!important}
+.js-home-carousel-track::-webkit-scrollbar{display:none}
 /* Isola o Leaflet num novo stacking context — os z-index internos dele (até
    1000, nos controles de zoom) senão competem direto no stacking context
    raiz contra os dropdowns do header (.cidade-dropdown z-index:220,

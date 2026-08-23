@@ -144,6 +144,46 @@ function render_property_grid(array $items, array $favoriteIds = [], string $emp
 }
 
 /**
+ * Bloco de carrossel horizontal estilo Airbnb ("Vistos recentemente",
+ * "Perto de você" etc. na home): título + link "Ver mais" à direita,
+ * cartões de largura fixa rolando na horizontal com scroll-snap (sem grid
+ * que quebra linha) e setas de navegação prev/next em telas grandes.
+ * Não renderiza nada se a lista vier vazia — como no Airbnb, um bloco sem
+ * resultado simplesmente não aparece, sem mensagem de "nada encontrado".
+ */
+function render_home_carousel(string $id, string $heading, array $items, array $favoriteIds = [], ?string $href = null, ?string $subtitle = null, ?Closure $cardRenderer = null, int $cardWidth = 240): void
+{
+    if (empty($items)) {
+        return;
+    }
+    $cardRenderer ??= fn ($p) => render_property_card($p, in_array((int) $p['id'], $favoriteIds, true));
+    ?>
+    <section id="<?= e($id) ?>" class="js-home-carousel-section mx-auto max-w-[1800px] px-4 py-8 sm:px-6 lg:px-8">
+      <div class="mb-4 flex items-end justify-between gap-3">
+        <div>
+          <h2 class="text-lg font-bold text-brand-text"><?= e($heading) ?></h2>
+          <?php if ($subtitle): ?><p class="mt-0.5 text-xs text-brand-text-secondary"><?= e($subtitle) ?></p><?php endif; ?>
+        </div>
+        <?php if ($href): ?><a href="<?= e($href) ?>" class="shrink-0 text-sm font-medium text-brand-primary hover:underline">Ver mais →</a><?php endif; ?>
+      </div>
+      <div class="relative">
+        <button type="button" class="js-home-carousel-prev absolute -left-3 top-[92px] z-10 hidden h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-brand-border bg-white shadow lg:flex" aria-label="Rolar para a esquerda">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>
+        </button>
+        <div class="js-home-carousel-track flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth pb-2" style="scrollbar-width:none">
+          <?php foreach ($items as $p): ?>
+            <div class="w-[<?= (int) $cardWidth ?>px] shrink-0 snap-start"><?php $cardRenderer($p); ?></div>
+          <?php endforeach; ?>
+        </div>
+        <button type="button" class="js-home-carousel-next absolute -right-3 top-[92px] z-10 hidden h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-brand-border bg-white shadow lg:flex" aria-label="Rolar para a direita">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+        </button>
+      </div>
+    </section>
+    <?php
+}
+
+/**
  * Coluna de listagem dos resultados (usada junto de render_results_map()
  * num layout de 3 colunas: filtros 15% / lista 40% / mapa 45%). O breakpoint
  * de 3 colunas é mais alto que o do grid de largura cheia (xl em vez de lg)

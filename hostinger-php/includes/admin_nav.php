@@ -16,6 +16,7 @@ function admin_nav_items(): array
         'admin_planos' => ['admin/planos.php', 'Planos', 'tag'],
         'admin_assinaturas' => ['admin/assinaturas.php', 'Assinaturas', 'card'],
         'admin_contratos' => ['admin/contratos.php', 'Contratos', 'document'],
+        'admin_pontos_interesse' => ['admin/pontos-de-interesse.php', 'Pontos de interesse', 'pin'],
     ];
 }
 

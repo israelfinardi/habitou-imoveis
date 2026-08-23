@@ -135,6 +135,19 @@ function run_pending_migrations(PDO $pdo): void
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
     )');
     $pdo->exec('CREATE INDEX IF NOT EXISTS idx_location_signals_user ON user_location_signals (user_id)');
+
+    // Blocos da home estilo Airbnb (ver includes/home_blocks_service.php) —
+    // pontos de interesse cadastrados pelo admin.
+    $pdo->exec('CREATE TABLE IF NOT EXISTS points_of_interest (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name VARCHAR(160) NOT NULL,
+        type TEXT NOT NULL DEFAULT "OUTRO",
+        city_id INTEGER NOT NULL,
+        latitude DECIMAL(10,6) NOT NULL,
+        longitude DECIMAL(10,6) NOT NULL,
+        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+    )');
+    $pdo->exec('CREATE INDEX IF NOT EXISTS idx_poi_city ON points_of_interest (city_id)');
 }
 
 /**

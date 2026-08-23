@@ -52,19 +52,6 @@ foreach ($typeCountsStmt->fetchAll() as $row) {
 }
 arsort($typeCounts);
 
-// Algoritmo de recomendação da home — ver includes/recommendation_service.php.
-// Fase 1 (cold start: anônimo ou <3 interações registradas): geolocalização
-// aproximada por IP (o GPS do navegador, se concedido, faz o upgrade via
-// assets/js/home-recommendations.js depois que a página já carregou). Fase 2
-// (histórico suficiente): personalização por conteúdo — bairros/cidades e
-// faixa de preço mais buscados, transação preferida.
-$recommendations = get_home_recommendations($user, session_id(), client_ip(), 'SALE');
-$recommendationLabel = match ($recommendations['mode']) {
-    'personalized' => 'Recomendado para você',
-    'geo' => 'Perto de você',
-    default => 'Imóveis em destaque',
-};
-
 $faqs = [
     ['Como funciona o aluguel sem fiador?', 'O aluguel sem fiador funciona através de seguros fiança ou caução. Ao alugar um imóvel pela Habitou Imóveis, você pode verificar com o anunciante quais modalidades ele aceita, dispensando a necessidade de um fiador tradicional.'],
     ['Quais documentos são necessários para alugar online?', 'Normalmente RG, CPF, comprovante de renda e comprovante de residência. Cada anunciante pode pedir documentos adicionais — confira as condições diretamente com ele pela página do imóvel.'],
@@ -80,17 +67,17 @@ require __DIR__ . '/includes/header.php';
 ?>
 
 <section class="relative border-b border-brand-border bg-gradient-to-b from-brand-bg-subtle to-white py-12 sm:py-16">
-  <div class="pointer-events-none absolute inset-0 hidden overflow-hidden lg:block" aria-hidden="true">
-    <div class="absolute -left-10 top-6 h-28 w-28 rounded-[2rem] border-2 border-brand-light/40"></div>
-    <div class="absolute left-24 top-0 h-20 w-20 rounded-[1.5rem] bg-brand-primary/10"></div>
-    <div class="absolute -left-4 bottom-10 h-24 w-24 rounded-[1.5rem] border-2 border-brand-primary/25"></div>
-    <div class="absolute left-28 bottom-0 h-16 w-16 rounded-2xl bg-brand-light/10"></div>
-    <div class="absolute right-4 top-8 h-20 w-20 rounded-2xl border-2 border-brand-light/30"></div>
-    <div class="absolute right-24 bottom-6 h-24 w-24 rounded-[1.5rem] bg-brand-primary/10"></div>
-  </div>
-
   <div class="relative mx-auto max-w-[1800px] px-4 sm:px-6 lg:px-8">
-    <div class="flex flex-col gap-8 xl:flex-row xl:items-start xl:gap-16">
+    <div class="pointer-events-none absolute inset-0 hidden overflow-hidden lg:block" aria-hidden="true">
+      <div class="absolute -left-10 top-6 h-28 w-28 rounded-[2rem] border-2 border-brand-light/40"></div>
+      <div class="absolute left-24 top-0 h-20 w-20 rounded-[1.5rem] bg-brand-primary/10"></div>
+      <div class="absolute -left-4 bottom-10 h-24 w-24 rounded-[1.5rem] border-2 border-brand-primary/25"></div>
+      <div class="absolute left-28 bottom-0 h-16 w-16 rounded-2xl bg-brand-light/10"></div>
+      <div class="absolute right-4 top-8 h-20 w-20 rounded-2xl border-2 border-brand-light/30"></div>
+      <div class="absolute right-24 bottom-6 h-24 w-24 rounded-[1.5rem] bg-brand-primary/10"></div>
+    </div>
+
+    <div class="relative flex flex-col gap-8 xl:flex-row xl:items-start xl:gap-16">
     <div class="max-w-2xl">
       <span class="inline-flex items-center gap-2 rounded-full border border-brand-border bg-white px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-brand-text-secondary">
         <span class="h-1.5 w-1.5 rounded-full bg-brand-green"></span> O portal de imóveis do Brasil
@@ -249,15 +236,32 @@ document.getElementById('buscar-codigo-link')?.addEventListener('click', functio
   </div>
 </section>
 
-<?php if ($recommendations['items']): ?>
-<section id="home-recommendations" class="mx-auto max-w-[1800px] px-4 py-12 sm:px-6 lg:px-8" data-transacao="">
-  <div class="mb-4 flex items-center justify-between">
-    <h2 id="home-recommendations-label" class="text-xl font-bold"><?= e($recommendationLabel) ?></h2>
-    <a href="<?= base_url('imoveis.php') ?>" class="text-sm font-medium text-brand-primary hover:underline">Ver mais</a>
+<?php
+/**
+ * Blocos de sugestão estilo Airbnb: cada um carrega de forma assíncrona
+ * (assets/js/home-blocks.js) depois que a página termina de renderizar, pra
+ * não travar o carregamento inicial com consultas geo/estatísticas mais
+ * pesadas. Aqui só ficam esqueletos leves; se o bloco não tiver dado
+ * suficiente pra aparecer, o próprio JS remove o esqueleto sem deixar buraco.
+ */
+$__homeBlockEndpoints = [
+    'actions/block_recently_viewed.php',
+    'actions/home_recommendations.php',
+    'actions/block_poi.php',
+    'actions/block_good_value.php',
+    'actions/block_nearby_cities.php',
+];
+foreach ($__homeBlockEndpoints as $__endpoint):
+?>
+<section class="js-home-block-skeleton mx-auto max-w-[1800px] animate-pulse px-4 py-12 sm:px-6 lg:px-8" data-block-endpoint="<?= e($__endpoint) ?>">
+  <div class="mb-4 h-6 w-56 rounded bg-brand-bg-subtle"></div>
+  <div class="flex gap-4 overflow-hidden">
+    <?php for ($__i = 0; $__i < 5; $__i++): ?>
+      <div class="h-64 w-64 shrink-0 rounded-2xl bg-brand-bg-subtle sm:w-72"></div>
+    <?php endfor; ?>
   </div>
-  <?php render_property_grid($recommendations['items'], $favoriteIds, 'Nenhum imóvel encontrado com esses filtros.', 'home-recommendations-grid'); ?>
 </section>
-<?php endif; ?>
+<?php endforeach; ?>
 
 <section class="relative overflow-hidden bg-brand-navy py-16">
   <div class="mx-auto max-w-[1800px] px-4 sm:px-6 lg:px-8">

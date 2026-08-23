@@ -130,6 +130,21 @@ CREATE TABLE IF NOT EXISTS neighborhoods (
   CONSTRAINT fk_neighborhood_city FOREIGN KEY (city_id) REFERENCES cities(id) ON DELETE CASCADE
 );
 
+-- Pontos de interesse (universidades, polos empresariais, hospitais, etc.),
+-- cadastrados manualmente pelo admin — alimenta o bloco "Perto de pontos de
+-- interesse" da home (includes/home_blocks_service.php).
+CREATE TABLE IF NOT EXISTS points_of_interest (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name VARCHAR(160) NOT NULL,
+  type TEXT NOT NULL DEFAULT 'OUTRO',
+  city_id INTEGER NOT NULL,
+  latitude DECIMAL(10,6) NOT NULL,
+  longitude DECIMAL(10,6) NOT NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_poi_city FOREIGN KEY (city_id) REFERENCES cities(id) ON DELETE CASCADE
+);
+CREATE INDEX IF NOT EXISTS idx_poi_city ON points_of_interest (city_id);
+
 -- ---------------------------------------------------------------------
 -- Planos e assinaturas
 -- ---------------------------------------------------------------------

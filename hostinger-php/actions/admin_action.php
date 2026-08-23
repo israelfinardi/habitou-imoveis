@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../includes/bootstrap.php';
+require_once __DIR__ . '/../includes/property_mutations.php';
 
 $user = require_role(['ADMIN']);
 verify_csrf();
@@ -125,6 +126,28 @@ switch ($action) {
             $pdo->prepare('UPDATE subscriptions SET status = ? WHERE id = ?')->execute([$status, $id]);
         }
         redirect(base_url('admin/assinaturas.php'));
+        break;
+
+    case 'create_poi':
+        $name = trim($_POST['name'] ?? '');
+        $type = array_key_exists($_POST['type'] ?? '', POI_TYPE_LABEL) ? $_POST['type'] : 'OUTRO';
+        $lat = filter_var($_POST['latitude'] ?? '', FILTER_VALIDATE_FLOAT);
+        $lng = filter_var($_POST['longitude'] ?? '', FILTER_VALIDATE_FLOAT);
+        $cityId = get_or_create_city(trim($_POST['cityLabel'] ?? ''));
+        if ($name === '' || $lat === false || $lng === false || !$cityId) {
+            $_SESSION['admin_error'] = 'Preencha nome, cidade e coordenadas válidas.';
+        } else {
+            $pdo->prepare('INSERT INTO points_of_interest (name, type, city_id, latitude, longitude) VALUES (?,?,?,?,?)')
+                ->execute([$name, $type, $cityId, $lat, $lng]);
+            $_SESSION['admin_success'] = 'Ponto de interesse adicionado.';
+        }
+        redirect(base_url('admin/pontos-de-interesse.php'));
+        break;
+
+    case 'delete_poi':
+        $id = (int) $_POST['id'];
+        $pdo->prepare('DELETE FROM points_of_interest WHERE id = ?')->execute([$id]);
+        redirect(base_url('admin/pontos-de-interesse.php'));
         break;
 
     default:
