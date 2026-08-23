@@ -281,6 +281,37 @@ CREATE TABLE IF NOT EXISTS recommendation_email_log (
   CONSTRAINT fk_rec_email_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
+-- Cliques em anúncios (sinal de interesse mais forte que busca, mais fraco
+-- que favoritar) — alimenta o algoritmo de recomendação da home
+-- (includes/recommendation_service.php::get_home_recommendations). session_id
+-- cobre visitante anônimo; user_id fica NULL até ele logar.
+CREATE TABLE IF NOT EXISTS property_views (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id INTEGER NULL,
+  session_id VARCHAR(64) NULL,
+  property_id INTEGER NOT NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_view_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  CONSTRAINT fk_view_property FOREIGN KEY (property_id) REFERENCES properties(id) ON DELETE CASCADE
+);
+CREATE INDEX IF NOT EXISTS idx_property_views_user ON property_views (user_id, created_at);
+CREATE INDEX IF NOT EXISTS idx_property_views_session ON property_views (session_id, created_at);
+CREATE INDEX IF NOT EXISTS idx_property_views_property ON property_views (property_id);
+
+-- Última localização aproximada conhecida do visitante (GPS do navegador ou
+-- geolocalização por IP) — uma linha por sessão, sempre sobrescrita (upsert),
+-- não um histórico. Alimenta a Fase 1 (cold start) do algoritmo de
+-- recomendação enquanto ele não tem 3+ interações registradas.
+CREATE TABLE IF NOT EXISTS user_location_signals (
+  session_id VARCHAR(64) PRIMARY KEY,
+  user_id INTEGER NULL,
+  latitude DECIMAL(10,6) NOT NULL,
+  longitude DECIMAL(10,6) NOT NULL,
+  source TEXT NOT NULL,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_location_signals_user ON user_location_signals (user_id);
+
 -- ---------------------------------------------------------------------
 -- Contratos
 -- ---------------------------------------------------------------------

@@ -22,6 +22,10 @@ if ($user) {
 $favoriteIds = $user ? get_favorite_ids($user['id']) : [];
 $similar = get_similar_properties($property);
 
+// Sinal de interesse pro algoritmo de recomendação da home — ver
+// includes/recommendation_service.php::get_home_recommendations().
+log_property_view($user ? (int) $user['id'] : null, (int) $property['id']);
+
 $price = $property['listing_type'] === 'RENT' ? $property['price_rent'] : $property['price_sale'];
 $lat = $property['latitude'] ?: $property['city_lat'];
 $lng = $property['longitude'] ?: $property['city_lng'];

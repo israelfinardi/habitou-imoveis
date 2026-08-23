@@ -95,5 +95,6 @@ window.__CURRENT_FILTERS = {
 <script src="<?= asset_url('assets/js/cidades.js') ?>"></script>
 <script src="<?= asset_url('assets/js/location-picker.js') ?>"></script>
 <script src="<?= asset_url('assets/js/topbar.js') ?>"></script>
+<script src="<?= asset_url('assets/js/home-recommendations.js') ?>"></script>
 </body>
 </html>

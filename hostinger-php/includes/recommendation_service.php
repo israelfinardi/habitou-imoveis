@@ -337,6 +337,287 @@ function render_recommendation_email_html(array $user, array $properties): strin
 HTML;
 }
 
+// ---------------------------------------------------------------------
+// Algoritmo de recomendação da home (index.php): Fase 1 (cold start, por
+// geolocalização) e Fase 2 (personalização por conteúdo, reaproveitando o
+// perfil de interesse já usado no e-mail de recomendação acima). Tudo em
+// PHP/SQLite puro — sem serviço externo, sem fila, sem dependência que não
+// suba junto no zip da Hostinger.
+// ---------------------------------------------------------------------
+
+const COLD_START_INTERACTION_THRESHOLD = 3;
+const RECOMMENDATION_SIGNAL_WINDOW_DAYS = 90;
+const HOME_RECOMMENDATION_RADIUS_KM = 15.0;
+const HOME_RECOMMENDATION_RADIUS_FALLBACK_KM = 60.0;
+const HOME_RECOMMENDATIONS_LIMIT = 8;
+
+/**
+ * Registra um clique/visualização de anúncio — sinal de interesse mais forte
+ * que busca (log_search_history), mais fraco que favoritar. Chamado uma vez
+ * por carregamento de imovel.php. session_id() já é iniciado globalmente em
+ * includes/auth.php, então cobre visitante anônimo e logado com a mesma
+ * chamada, sem precisar de cookie próprio.
+ */
+function log_property_view(?int $userId, int $propertyId): void
+{
+    db()->prepare('INSERT INTO property_views (user_id, session_id, property_id) VALUES (?,?,?)')
+        ->execute([$userId, session_id(), $propertyId]);
+
+    // Limpeza oportunista (1 em ~50), mesmo padrão do resto do app.
+    if (random_int(1, 50) === 1) {
+        db()->exec("DELETE FROM property_views WHERE created_at < datetime('now', '-" . RECOMMENDATION_SIGNAL_WINDOW_DAYS . " day')");
+    }
+}
+
+/**
+ * Quantos sinais de interesse o usuário logado tem nos últimos 90 dias:
+ * buscas com filtro + cliques em anúncios + favoritos (esses não expiram).
+ * < COLD_START_INTERACTION_THRESHOLD → ainda está em cold start (Fase 1).
+ */
+function count_user_interactions(int $userId): int
+{
+    $pdo = db();
+    $since = "datetime('now', '-" . RECOMMENDATION_SIGNAL_WINDOW_DAYS . " day')";
+
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM search_history WHERE user_id = ? AND created_at >= $since");
+    $stmt->execute([$userId]);
+    $searches = (int) $stmt->fetchColumn();
+
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM property_views WHERE user_id = ? AND created_at >= $since");
+    $stmt->execute([$userId]);
+    $views = (int) $stmt->fetchColumn();
+
+    $stmt = $pdo->prepare('SELECT COUNT(*) FROM favorites WHERE user_id = ?');
+    $stmt->execute([$userId]);
+    $favorites = (int) $stmt->fetchColumn();
+
+    return $searches + $views + $favorites;
+}
+
+/**
+ * Geolocalização aproximada por IP, via API pública gratuita (sem chave,
+ * ~45 req/min — suficiente aqui porque o resultado fica em cache por sessão
+ * em user_location_signals, então cada IP só é resolvido uma vez por
+ * sessão). Timeout curto e nunca lança: se falhar ou o IP for local/privado
+ * (ambiente de dev), a Fase 1 cai no fallback de "mais recentes do site"
+ * mais adiante em get_home_recommendations().
+ */
+function resolve_ip_geolocation(string $ip): ?array
+{
+    if ($ip === '' || $ip === '0.0.0.0' || filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) === false) {
+        return null;
+    }
+    try {
+        $ch = curl_init('http://ip-api.com/json/' . rawurlencode($ip) . '?fields=status,lat,lon');
+        curl_setopt_array($ch, [CURLOPT_RETURNTRANSFER => true, CURLOPT_TIMEOUT => 2, CURLOPT_CONNECTTIMEOUT => 1]);
+        $raw = curl_exec($ch);
+        curl_close($ch);
+        $data = $raw ? json_decode($raw, true) : null;
+        if (!$data || ($data['status'] ?? '') !== 'success' || !isset($data['lat'], $data['lon'])) {
+            return null;
+        }
+        return ['lat' => (float) $data['lat'], 'lng' => (float) $data['lon']];
+    } catch (\Throwable $e) {
+        error_log('[recommendation] Falha na geolocalização por IP: ' . $e->getMessage());
+        return null;
+    }
+}
+
+/** Grava/atualiza a última localização conhecida da sessão (GPS ou IP). */
+function upsert_location_signal(string $sessionId, ?int $userId, float $lat, float $lng, string $source): void
+{
+    db()->prepare('
+        INSERT INTO user_location_signals (session_id, user_id, latitude, longitude, source, updated_at)
+        VALUES (?,?,?,?,?, CURRENT_TIMESTAMP)
+        ON CONFLICT(session_id) DO UPDATE SET
+            user_id = excluded.user_id, latitude = excluded.latitude, longitude = excluded.longitude,
+            source = excluded.source, updated_at = CURRENT_TIMESTAMP
+    ')->execute([$sessionId, $userId, $lat, $lng, $source]);
+}
+
+/**
+ * Localização aproximada da sessão atual: usa o que já está salvo (GPS tem
+ * prioridade e não expira dentro da sessão — o navegador só pede de novo se
+ * quiser; IP expira em 24h pra acompanhar quem viaja) e só chama a API
+ * externa de geolocalização por IP quando não há nada aproveitável ainda.
+ */
+function get_session_location(string $sessionId, ?int $userId, string $ip): ?array
+{
+    $stmt = db()->prepare('SELECT latitude, longitude, source, updated_at FROM user_location_signals WHERE session_id = ?');
+    $stmt->execute([$sessionId]);
+    $row = $stmt->fetch();
+
+    if ($row) {
+        $isFreshEnough = $row['source'] === 'gps' || strtotime($row['updated_at'] . ' UTC') > time() - 86400;
+        if ($isFreshEnough) {
+            return ['lat' => (float) $row['latitude'], 'lng' => (float) $row['longitude'], 'source' => $row['source']];
+        }
+    }
+
+    $geo = resolve_ip_geolocation($ip);
+    if (!$geo) {
+        return null;
+    }
+    upsert_location_signal($sessionId, $userId, $geo['lat'], $geo['lng'], 'ip');
+    return ['lat' => $geo['lat'], 'lng' => $geo['lng'], 'source' => 'ip'];
+}
+
+/**
+ * Imóveis publicados num raio de $radiusKm ao redor de (lat,lng), mais
+ * próximos primeiro. SQLite (sem a extensão de funções matemáticas, que não
+ * é garantida na Hostinger) não tem seno/cosseno nativo pra Haversine em
+ * SQL, então o filtro aqui é em duas etapas: 1) uma caixa delimitadora
+ * (bounding box) barata em SQL, só com +/-, que já elimina a maior parte do
+ * banco usando os índices de latitude/longitude; 2) distância exata
+ * (Haversine) e ordenação final em PHP, só sobre os poucos candidatos que
+ * sobraram da caixa — rápido mesmo sem índice geoespacial de verdade.
+ */
+function query_properties_near(PDO $pdo, float $lat, float $lng, float $radiusKm, ?string $listingType, array $excludeIds, int $limit): array
+{
+    // 1 grau de latitude ≈ 111km sempre; 1 grau de longitude encolhe perto
+    // dos polos (~111km * cos(latitude)) — relevante mesmo num país só
+    // continental como o Brasil, que vai de ~5°N a ~34°S.
+    $latDelta = $radiusKm / 111.0;
+    $lngDelta = $radiusKm / (111.0 * max(cos(deg2rad($lat)), 0.1));
+
+    $where = [
+        'p.status = "PUBLISHED"',
+        'p.latitude IS NOT NULL', 'p.longitude IS NOT NULL',
+        'p.latitude BETWEEN ? AND ?',
+        'p.longitude BETWEEN ? AND ?',
+    ];
+    $args = [$lat - $latDelta, $lat + $latDelta, $lng - $lngDelta, $lng + $lngDelta];
+
+    if ($listingType) {
+        $where[] = 'p.listing_type = ?';
+        $args[] = $listingType;
+    }
+    if ($excludeIds) {
+        $placeholders = implode(',', array_fill(0, count($excludeIds), '?'));
+        $where[] = "p.id NOT IN ($placeholders)";
+        $args = array_merge($args, $excludeIds);
+    }
+
+    // Limite generoso na caixa (até 300 candidatos) — o corte final por
+    // distância + $limit acontece em PHP logo abaixo.
+    $sql = 'SELECT ' . PROPERTY_LIST_SELECT . PROPERTY_LIST_JOIN . ' WHERE ' . implode(' AND ', $where)
+        . ' ORDER BY p.published_at DESC LIMIT 300';
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute($args);
+    $candidates = $stmt->fetchAll();
+
+    foreach ($candidates as &$row) {
+        $row['_distance_km'] = haversine_distance_km($lat, $lng, (float) $row['latitude'], (float) $row['longitude']);
+    }
+    unset($row);
+
+    $candidates = array_values(array_filter($candidates, fn ($row) => $row['_distance_km'] <= $radiusKm));
+    usort($candidates, fn ($a, $b) => $a['_distance_km'] <=> $b['_distance_km']);
+    $candidates = array_slice($candidates, 0, $limit);
+
+    return attach_primary_images($pdo, $candidates, 1);
+}
+
+/** Distância em linha reta entre duas coordenadas, em km (fórmula de Haversine, raio médio da Terra = 6371km). */
+function haversine_distance_km(float $lat1, float $lng1, float $lat2, float $lng2): float
+{
+    $earthRadiusKm = 6371.0;
+    $dLat = deg2rad($lat2 - $lat1);
+    $dLng = deg2rad($lng2 - $lng1);
+    $a = sin($dLat / 2) ** 2 + cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * sin($dLng / 2) ** 2;
+    return $earthRadiusKm * 2 * atan2(sqrt($a), sqrt(1 - $a));
+}
+
+/**
+ * Fallback final quando nem geolocalização nem perfil de conteúdo dão
+ * resultado (banco muito pequeno, ou imóvel sem lat/lng cadastrado): os
+ * publicados mais recentes, respeitando a transação padrão quando possível
+ * — nunca deixa a seção da home vazia enquanto existir QUALQUER imóvel.
+ */
+function query_most_recent_properties(PDO $pdo, ?string $listingType, array $excludeIds, int $limit): array
+{
+    $where = ['p.status = "PUBLISHED"'];
+    $args = [];
+    if ($listingType) {
+        $where[] = 'p.listing_type = ?';
+        $args[] = $listingType;
+    }
+    if ($excludeIds) {
+        $placeholders = implode(',', array_fill(0, count($excludeIds), '?'));
+        $where[] = "p.id NOT IN ($placeholders)";
+        $args = array_merge($args, $excludeIds);
+    }
+    $sql = 'SELECT ' . PROPERTY_LIST_SELECT . PROPERTY_LIST_JOIN . ' WHERE ' . implode(' AND ', $where)
+        . " ORDER BY p.published_at DESC LIMIT $limit";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute($args);
+    $items = $stmt->fetchAll();
+
+    if (count($items) < $limit && $listingType) {
+        // Solta a transação também — melhor mostrar algo do que nada.
+        $more = query_most_recent_properties($pdo, null, array_merge($excludeIds, array_column($items, 'id')), $limit - count($items));
+        $items = array_merge($items, $more);
+    }
+
+    return attach_primary_images($pdo, $items, 1);
+}
+
+/**
+ * Ponto de entrada único do algoritmo de recomendação da home — chamado de
+ * index.php (render inicial, com IP) e de actions/home_recommendations.php
+ * (refresh via AJAX, depois que o navegador cede o GPS).
+ *
+ * Fase 1 (cold start): usuário anônimo OU logado com poucas interações
+ * registradas (< COLD_START_INTERACTION_THRESHOLD) → geolocalização
+ * aproximada, raio de HOME_RECOMMENDATION_RADIUS_KM (com um raio maior de
+ * fallback se não achar nada perto).
+ *
+ * Fase 2 (personalização): logado com histórico suficiente → filtragem
+ * baseada em conteúdo (bairros/cidades e faixa de preço mais buscados,
+ * tipo de transação preferido), reaproveitando build_user_interest_profile()
+ * e find_recommendations_for_user() já usados no e-mail de recomendação.
+ *
+ * @return array{items: array, mode: string, radius_km: ?float}
+ *   mode: 'personalized' (Fase 2) | 'geo' (Fase 1 com localização) | 'fallback' (sem geo/sem perfil)
+ */
+function get_home_recommendations(?array $user, string $sessionId, string $ip, string $defaultListingType, int $limit = HOME_RECOMMENDATIONS_LIMIT): array
+{
+    $pdo = db();
+    $interactionCount = $user ? count_user_interactions((int) $user['id']) : 0;
+    $isColdStart = !$user || $interactionCount < COLD_START_INTERACTION_THRESHOLD;
+
+    // --- Fase 2: personalização por conteúdo ---------------------------
+    if (!$isColdStart) {
+        $profile = build_user_interest_profile((int) $user['id']);
+        if ($profile) {
+            $items = find_recommendations_for_user((int) $user['id'], $profile, [], $limit);
+            if (count($items) >= 3) {
+                return ['items' => $items, 'mode' => 'personalized', 'radius_km' => null];
+            }
+        }
+        // Perfil vazio ou resultado curto demais: continua pro fallback
+        // geo/recente abaixo em vez de devolver poucos itens.
+    }
+
+    // --- Fase 1: geolocalização aproximada ------------------------------
+    $excludeIds = $user ? get_favorite_ids((int) $user['id']) : [];
+    $location = get_session_location($sessionId, $user ? (int) $user['id'] : null, $ip);
+    if ($location) {
+        $items = query_properties_near($pdo, $location['lat'], $location['lng'], HOME_RECOMMENDATION_RADIUS_KM, $defaultListingType, $excludeIds, $limit);
+        if (count($items) < 3) {
+            // Raio curto não achou o suficiente — tenta um raio bem maior
+            // antes de desistir da geolocalização de vez.
+            $items = query_properties_near($pdo, $location['lat'], $location['lng'], HOME_RECOMMENDATION_RADIUS_FALLBACK_KM, $defaultListingType, $excludeIds, $limit);
+        }
+        if (count($items) >= 3) {
+            return ['items' => $items, 'mode' => 'geo', 'radius_km' => HOME_RECOMMENDATION_RADIUS_FALLBACK_KM];
+        }
+    }
+
+    // --- Fallback final: sem GPS, sem IP resolvido, ou raio sem imóveis --
+    return ['items' => query_most_recent_properties($pdo, $defaultListingType, $excludeIds, $limit), 'mode' => 'fallback', 'radius_km' => null];
+}
+
 function render_recommendation_email_card(array $p): string
 {
     $isRent = $p['listing_type'] === 'RENT';

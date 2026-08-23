@@ -52,11 +52,18 @@ foreach ($typeCountsStmt->fetchAll() as $row) {
 }
 arsort($typeCounts);
 
-// Imóveis da cidade mais ativa do momento (heroCity, já usada como padrão do
-// formulário de busca) — alimenta a seção "Imóveis em {cidade}" mais abaixo.
-// Nacional: mostra sempre a cidade mais movimentada, seja qual for, em vez
-// de cidades fixas.
-$heroCityProperties = $heroCity ? get_properties_by_city($heroCity['slug'], 3) : [];
+// Algoritmo de recomendação da home — ver includes/recommendation_service.php.
+// Fase 1 (cold start: anônimo ou <3 interações registradas): geolocalização
+// aproximada por IP (o GPS do navegador, se concedido, faz o upgrade via
+// assets/js/home-recommendations.js depois que a página já carregou). Fase 2
+// (histórico suficiente): personalização por conteúdo — bairros/cidades e
+// faixa de preço mais buscados, transação preferida.
+$recommendations = get_home_recommendations($user, session_id(), client_ip(), 'SALE');
+$recommendationLabel = match ($recommendations['mode']) {
+    'personalized' => 'Recomendado para você',
+    'geo' => 'Perto de você',
+    default => 'Imóveis em destaque',
+};
 
 $faqs = [
     ['Como funciona o aluguel sem fiador?', 'O aluguel sem fiador funciona através de seguros fiança ou caução. Ao alugar um imóvel pela Habitou Imóveis, você pode verificar com o anunciante quais modalidades ele aceita, dispensando a necessidade de um fiador tradicional.'],
@@ -242,13 +249,13 @@ document.getElementById('buscar-codigo-link')?.addEventListener('click', functio
   </div>
 </section>
 
-<?php if ($heroCity && $heroCityProperties): ?>
-<section class="mx-auto max-w-[1800px] px-4 py-12 sm:px-6 lg:px-8">
+<?php if ($recommendations['items']): ?>
+<section id="home-recommendations" class="mx-auto max-w-[1800px] px-4 py-12 sm:px-6 lg:px-8" data-transacao="">
   <div class="mb-4 flex items-center justify-between">
-    <h2 class="text-xl font-bold">Imóveis em <?= e($heroCity['name']) ?></h2>
-    <a href="<?= base_url('cidade.php?slug=' . $heroCity['slug']) ?>" class="text-sm font-medium text-brand-primary hover:underline">Ver mais</a>
+    <h2 id="home-recommendations-label" class="text-xl font-bold"><?= e($recommendationLabel) ?></h2>
+    <a href="<?= base_url('imoveis.php') ?>" class="text-sm font-medium text-brand-primary hover:underline">Ver mais</a>
   </div>
-  <?php render_property_grid($heroCityProperties, $favoriteIds); ?>
+  <?php render_property_grid($recommendations['items'], $favoriteIds, 'Nenhum imóvel encontrado com esses filtros.', 'home-recommendations-grid'); ?>
 </section>
 <?php endif; ?>
 

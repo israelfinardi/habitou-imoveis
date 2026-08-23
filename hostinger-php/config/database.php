@@ -113,6 +113,28 @@ function run_pending_migrations(PDO $pdo): void
     // texto antigo não existir mais.
     $pdo->prepare("UPDATE plans SET description = 'Para imobiliárias com grande carteira de imóveis.',
         features = '[\"Até 100 anúncios ativos\"]' WHERE slug = 'plano-100' AND description LIKE '%VRSync%'")->execute();
+
+    // Algoritmo de recomendação da home (Fase 1 geo / Fase 2 conteúdo) —
+    // ver includes/recommendation_service.php::get_home_recommendations().
+    $pdo->exec('CREATE TABLE IF NOT EXISTS property_views (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NULL,
+        session_id VARCHAR(64) NULL,
+        property_id INTEGER NOT NULL,
+        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+    )');
+    $pdo->exec('CREATE INDEX IF NOT EXISTS idx_property_views_user ON property_views (user_id, created_at)');
+    $pdo->exec('CREATE INDEX IF NOT EXISTS idx_property_views_session ON property_views (session_id, created_at)');
+    $pdo->exec('CREATE INDEX IF NOT EXISTS idx_property_views_property ON property_views (property_id)');
+    $pdo->exec('CREATE TABLE IF NOT EXISTS user_location_signals (
+        session_id VARCHAR(64) PRIMARY KEY,
+        user_id INTEGER NULL,
+        latitude DECIMAL(10,6) NOT NULL,
+        longitude DECIMAL(10,6) NOT NULL,
+        source TEXT NOT NULL,
+        updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+    )');
+    $pdo->exec('CREATE INDEX IF NOT EXISTS idx_location_signals_user ON user_location_signals (user_id)');
 }
 
 /**
