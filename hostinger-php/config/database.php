@@ -149,34 +149,37 @@ function run_pending_migrations(PDO $pdo): void
     )');
     $pdo->exec('CREATE INDEX IF NOT EXISTS idx_poi_city ON points_of_interest (city_id)');
 
-    // Modelos de contrato + geração de PDF/assinatura (ver
-    // includes/contract_service.php e includes/contract_pdf.php). Colunas
-    // novas em `contracts` sem FK aqui (ALTER TABLE do SQLite não permite
-    // adicionar constraint) — quem quiser a FK, começa do sql/schema.sql.
-    $pdo->exec('CREATE TABLE IF NOT EXISTS contract_templates (
+    // Importação de XML de imóveis (padrão VRSync, compatível com a maioria
+    // dos CRMs imobiliários do mercado brasileiro) — ver
+    // includes/xml_import_parser.php e includes/xml_import_service.php.
+    // Colunas novas em `properties` sem FK aqui (ALTER TABLE do SQLite não
+    // permite adicionar constraint) — quem quiser a FK, começa do sql/schema.sql.
+    $pdo->exec('CREATE TABLE IF NOT EXISTS xml_imports (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name VARCHAR(160) NOT NULL,
-        transaction_type TEXT NOT NULL,
-        body TEXT NOT NULL,
-        is_global INTEGER NOT NULL DEFAULT 0,
+        user_id INTEGER NOT NULL,
         agency_id INTEGER NULL,
-        created_by INTEGER NOT NULL,
-        is_active INTEGER NOT NULL DEFAULT 1,
+        original_filename VARCHAR(255) NOT NULL,
+        stored_path VARCHAR(500) NOT NULL,
+        status TEXT NOT NULL DEFAULT "PROCESSING",
+        total_found INTEGER NOT NULL DEFAULT 0,
+        total_created INTEGER NOT NULL DEFAULT 0,
+        total_updated INTEGER NOT NULL DEFAULT 0,
+        total_deactivated INTEGER NOT NULL DEFAULT 0,
+        total_errors INTEGER NOT NULL DEFAULT 0,
+        error_summary TEXT NULL,
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+        finished_at DATETIME NULL
     )');
-    $pdo->exec('CREATE INDEX IF NOT EXISTS idx_template_agency ON contract_templates (agency_id)');
-    $pdo->exec('CREATE INDEX IF NOT EXISTS idx_template_type ON contract_templates (transaction_type)');
+    $pdo->exec('CREATE INDEX IF NOT EXISTS idx_xml_imports_user ON xml_imports (user_id)');
+    $pdo->exec('CREATE INDEX IF NOT EXISTS idx_xml_imports_agency ON xml_imports (agency_id)');
 
-    $contractColumns = $columns('contracts');
+    $propertyColumns = $columns('properties');
     foreach ([
-        'template_id INTEGER NULL', 'body TEXT NULL', 'client_document VARCHAR(32) NULL',
-        'signed_document_url VARCHAR(500) NULL', 'signed_document_uploaded_at DATETIME NULL',
-        'signed_document_uploaded_by INTEGER NULL',
+        'origin TEXT NOT NULL DEFAULT "MANUAL"', 'external_code VARCHAR(64) NULL', 'import_id INTEGER NULL',
     ] as $def) {
         $col = strtok($def, ' ');
-        if (!in_array($col, $contractColumns, true)) {
-            $pdo->exec("ALTER TABLE contracts ADD COLUMN $def");
+        if (!in_array($col, $propertyColumns, true)) {
+            $pdo->exec("ALTER TABLE properties ADD COLUMN $def");
         }
     }
 }

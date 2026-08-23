@@ -55,7 +55,13 @@ require __DIR__ . '/../includes/header.php';
           <tbody class="divide-y divide-brand-border">
             <?php foreach ($properties as $p): ?>
               <tr>
-                <td class="px-4 py-3"><p class="font-medium"><?= e($p['title']) ?></p><p class="text-xs text-brand-text-secondary"><?= e($p['code']) ?> · <?= e($p['city_name']) ?></p></td>
+                <td class="px-4 py-3">
+                  <p class="font-medium"><?= e($p['title']) ?></p>
+                  <p class="text-xs text-brand-text-secondary">
+                    <?= e($p['code']) ?> · <?= e($p['city_name']) ?>
+                    <?php if (($p['origin'] ?? 'MANUAL') === 'XML_IMPORT'): ?><span class="ml-1 rounded-full bg-brand-primary/10 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-brand-primary">XML</span><?php endif; ?>
+                  </p>
+                </td>
                 <td class="px-4 py-3 text-xs text-brand-text-secondary"><?= e($p['agency_name'] ?? ($p['first_name'] . ' ' . $p['last_name'])) ?></td>
                 <td class="px-4 py-3 text-xs"><?= format_currency_brl($p['price_sale'] ?? $p['price_rent']) ?></td>
                 <td class="px-4 py-3">

@@ -3,13 +3,10 @@ require_once __DIR__ . '/admin_nav.php';
 
 /**
  * Fonte única do leque de links da área logada — usada tanto pela sidebar
- * (render_account_nav, minha-conta.php/anunciante/imobiliaria/contratos)
- * quanto pelo dropdown "Minha conta" do header (includes/header.php). Antes
- * cada página montava sua própria lista à mão e elas divergiam entre si
- * (ex.: contratos.php/imobiliaria/*.php tinham uma sidebar totalmente
- * separada sem Favoritos/Planos/Meus dados, e o dropdown do header não
- * tinha Contratos nem Planos). Calculando os itens uma vez aqui, a partir
- * do usuário logado, os dois lugares ficam sempre iguais.
+ * (render_account_nav, minha-conta.php/anunciante/imobiliaria) quanto pelo
+ * dropdown "Minha conta" do header (includes/header.php). Calculando os
+ * itens uma vez aqui, a partir do usuário logado, os dois lugares ficam
+ * sempre iguais.
  */
 function account_nav_items(): array
 {
@@ -22,8 +19,7 @@ function account_nav_items(): array
         'overview' => ['minha-conta.php', 'Visão geral', 'grid'],
         'anuncios' => ['anunciante/imoveis.php', 'Meus anúncios', 'house'],
         'favoritos' => ['minha-conta-favoritos.php', 'Favoritos', 'heart'],
-        'contratos' => ['contratos.php', 'Contratos', 'document'],
-        'contratos_modelos' => ['contratos-modelos.php', 'Modelos de contrato', 'pencil'],
+        'importar_xml' => ['importar-xml.php', 'Importar XML', 'sync'],
     ];
     $items['planos'] = ['planos.php', 'Planos', 'tag'];
     $items['dados'] = ['minha-conta-dados.php', 'Perfil', 'user'];

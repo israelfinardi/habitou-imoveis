@@ -15,7 +15,7 @@ function admin_nav_items(): array
         'admin_imobiliarias' => ['admin/imobiliarias.php', 'Imobiliárias', 'building'],
         'admin_planos' => ['admin/planos.php', 'Planos', 'tag'],
         'admin_assinaturas' => ['admin/assinaturas.php', 'Assinaturas', 'card'],
-        'admin_contratos' => ['admin/contratos.php', 'Contratos', 'document'],
+        'admin_importacoes_xml' => ['admin/importacoes-xml.php', 'Importações XML', 'sync'],
         'admin_pontos_interesse' => ['admin/pontos-de-interesse.php', 'Pontos de interesse', 'pin'],
     ];
 }

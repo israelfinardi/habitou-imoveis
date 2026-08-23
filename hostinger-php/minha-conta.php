@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/includes/bootstrap.php';
 require_once __DIR__ . '/includes/account_nav.php';
-require_once __DIR__ . '/includes/contract_service.php';
+require_once __DIR__ . '/includes/xml_import_service.php';
 
 $user = require_login();
 $pdo = db();
@@ -14,7 +14,7 @@ $stmtFav = $pdo->prepare('SELECT COUNT(*) FROM favorites WHERE user_id = ?');
 $stmtFav->execute([$user['id']]);
 $favCount = (int) $stmtFav->fetchColumn();
 
-$contractCount = count(list_contracts_for_user($user));
+$xmlImportCount = count(list_xml_imports_for_user($user));
 
 // Aspas simples no literal: plans tem uma coluna `active`, e o SQLite
 // resolveria "ACTIVE" (aspas duplas) como referência a essa coluna em vez
@@ -39,7 +39,7 @@ if ($user['role'] === 'AGENCY_ADMIN' && $user['agency_id']) {
 $summaryCards = [
     'anuncios' => ['value' => (string) $propertyCount, 'label' => 'Meus anúncios'],
     'favoritos' => ['value' => (string) $favCount, 'label' => 'Imóveis favoritos'],
-    'contratos' => ['value' => (string) $contractCount, 'label' => 'Contratos'],
+    'importar_xml' => ['value' => (string) $xmlImportCount, 'label' => 'Importações de XML'],
     'planos' => ['value' => e($subscription['plan_name'] ?? 'Nenhum'), 'label' => 'Plano atual'],
     'dados' => ['value' => $profileFilled . '/' . count($profileFields), 'label' => 'Perfil preenchido'],
 ];

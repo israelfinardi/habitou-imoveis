@@ -62,7 +62,10 @@ require __DIR__ . '/../includes/header.php';
               </a>
               <div class="p-3.5">
                 <a href="<?= base_url('anunciante/editar.php?id=' . $p['id']) ?>" class="block truncate text-[15px] font-semibold text-brand-text hover:text-brand-primary"><?= e($p['title']) ?></a>
-                <p class="mt-0.5 truncate text-xs text-brand-text-secondary"><?= e($p['code']) ?> · <?= e($p['city_name']) ?></p>
+                <p class="mt-0.5 truncate text-xs text-brand-text-secondary">
+                  <?= e($p['code']) ?> · <?= e($p['city_name']) ?>
+                  <?php if (($p['origin'] ?? 'MANUAL') === 'XML_IMPORT'): ?><span class="ml-1 rounded-full bg-brand-primary/10 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-brand-primary">XML</span><?php endif; ?>
+                </p>
                 <p class="mt-1 text-sm text-brand-text-secondary"><?= e(PROPERTY_TYPE_LABEL[$p['property_type']]) ?></p>
                 <p class="mt-1 text-[15px] font-semibold text-brand-text"><?= format_currency_brl($p['price_sale'] ?? $p['price_rent']) ?></p>
                 <?php if ($p['status'] === 'PUBLISHED' && !empty($p['expires_at'])): ?>
@@ -98,7 +101,6 @@ require __DIR__ . '/../includes/header.php';
                       <button class="text-brand-text-secondary hover:underline">Duplicar</button>
                     </form>
                   <?php endif; ?>
-                  <a href="<?= base_url('contrato-novo.php?imovel_id=' . $p['id']) ?>" class="text-brand-text-secondary hover:underline">Contrato</a>
                   <form method="post" action="<?= base_url('actions/property_action.php') ?>" class="inline" onsubmit="return confirm('Excluir este imóvel permanentemente?');">
                     <?= csrf_field() ?><input type="hidden" name="id" value="<?= $p['id'] ?>"><input type="hidden" name="do" value="delete">
                     <button class="text-red-600 hover:underline">Excluir</button>

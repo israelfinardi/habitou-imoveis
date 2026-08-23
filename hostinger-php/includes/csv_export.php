@@ -1,8 +1,8 @@
 <?php
 /**
  * Exportação de listagens em CSV — usado por toda página que lista algo
- * (meus anúncios, favoritos, contratos, planos, usuários, imóveis,
- * imobiliárias, assinaturas...). Cada página monta suas próprias colunas e
+ * (meus anúncios, favoritos, planos, usuários, imóveis, imobiliárias,
+ * assinaturas...). Cada página monta suas próprias colunas e
  * linhas a partir dos dados que já carregou pra exibir na tela, então o CSV
  * sempre bate com o que está sendo mostrado (incluindo filtros ativos).
  *

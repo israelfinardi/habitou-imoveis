@@ -8,7 +8,7 @@ $stats = [
     'Usuários' => $pdo->query('SELECT COUNT(*) FROM users')->fetchColumn(),
     'Imóveis' => $pdo->query('SELECT COUNT(*) FROM properties')->fetchColumn(),
     'Imobiliárias' => $pdo->query('SELECT COUNT(*) FROM agencies')->fetchColumn(),
-    'Contratos' => $pdo->query('SELECT COUNT(*) FROM contracts')->fetchColumn(),
+    'Importações de XML' => $pdo->query('SELECT COUNT(*) FROM xml_imports')->fetchColumn(),
     'Assinaturas ativas' => $pdo->query('SELECT COUNT(*) FROM subscriptions WHERE status = "ACTIVE"')->fetchColumn(),
 ];
 

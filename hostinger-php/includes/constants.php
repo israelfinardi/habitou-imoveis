@@ -109,7 +109,7 @@ const PAGE_SIZE = 12;
 
 // Grid padrão de cards (mínimo 250px cada, preenchendo as colunas
 // disponíveis) reaproveitado em toda página que lista alguma coisa —
-// usuários, imobiliárias, planos, assinaturas, contratos, feeds no admin,
+// usuários, imobiliárias, planos, assinaturas, importações de XML no admin,
 // e nas páginas de conta que já usam grid de imóvel — pra manter o mesmo
 // alinhamento visual em qualquer lugar do site.
 const CARD_GRID_CLASS = 'grid grid-cols-1 gap-4 sm:grid-cols-[repeat(auto-fill,minmax(250px,1fr))]';

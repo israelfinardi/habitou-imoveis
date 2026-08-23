@@ -179,7 +179,7 @@ body{font-family:'Plus Jakarta Sans',Arial,sans-serif}
           </button>
           <?php
           $__navItems = account_nav_items();
-          $__navPrimary = array_intersect_key($__navItems, array_flip(['overview', 'anuncios', 'favoritos', 'contratos']));
+          $__navPrimary = array_intersect_key($__navItems, array_flip(['overview', 'anuncios', 'favoritos']));
           $__navSecondary = array_diff_key($__navItems, $__navPrimary);
           ?>
           <div class="nav-user-menu" id="nav-user-menu">

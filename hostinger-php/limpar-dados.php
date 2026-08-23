@@ -1,6 +1,6 @@
 <?php
 /**
- * Apaga TODOS os dados de demonstração: imóveis, fotos, favoritos, contratos,
+ * Apaga TODOS os dados de demonstração: imóveis, fotos, favoritos,
  * imobiliárias, bairros e cidades — além das contas de usuário criadas pelo
  * seed (imobiliárias parceiras de exemplo e o anunciante demo). A conta
  * admin@habitou.com.br e qualquer conta real que você já tenha criado NÃO
@@ -25,7 +25,7 @@ if (!hash_equals(AUTH_SECRET, $token)) {
     exit;
 }
 if (($_GET['confirmar'] ?? '') !== 'sim') {
-    echo "Isso vai apagar TODOS os imóveis, imobiliárias, cidades, bairros e contratos do banco.\n";
+    echo "Isso vai apagar TODOS os imóveis, imobiliárias, cidades e bairros do banco.\n";
     echo "Não pode ser desfeito. Para confirmar, adicione &confirmar=sim na mesma URL:\n\n";
     echo $_SERVER['REQUEST_URI'] . "&confirmar=sim\n";
     exit;
@@ -44,13 +44,17 @@ $antes = [
     'agencies' => contar($pdo, 'agencies'),
     'cities' => contar($pdo, 'cities'),
     'neighborhoods' => contar($pdo, 'neighborhoods'),
-    'contracts' => contar($pdo, 'contracts'),
 ];
+// Contratos foram removidos do site — a tabela só existe em instalações
+// antigas que já tinham sido provisionadas antes da remoção; se ainda
+// existir, some junto (referenciava imóveis sem CASCADE).
+$hasLegacyContracts = (bool) $pdo->query("SELECT name FROM sqlite_master WHERE type='table' AND name='contracts'")->fetchColumn();
 
 $pdo->beginTransaction();
 try {
-    // Contratos referenciam imóveis sem CASCADE — precisam sair primeiro.
-    $pdo->exec('DELETE FROM contracts');
+    if ($hasLegacyContracts) {
+        $pdo->exec('DELETE FROM contracts');
+    }
     // Apaga os imóveis: fotos e favoritos saem junto (ON DELETE CASCADE).
     $pdo->exec('DELETE FROM properties');
     // Bairros e cidades só podem sair depois que nenhum imóvel os referencia.
@@ -64,7 +68,7 @@ try {
 
     // Reinicia a contagem de id (equivalente ao AUTO_INCREMENT do MySQL).
     $resetSeq = $pdo->prepare('DELETE FROM sqlite_sequence WHERE name = ?');
-    foreach (['properties', 'agencies', 'cities', 'neighborhoods', 'contracts'] as $tabela) {
+    foreach (['properties', 'agencies', 'cities', 'neighborhoods'] as $tabela) {
         $resetSeq->execute([$tabela]);
     }
 
@@ -79,7 +83,6 @@ printf("Imóveis removidos: %d\n", $antes['properties']);
 printf("Imobiliárias removidas: %d\n", $antes['agencies']);
 printf("Cidades removidas: %d\n", $antes['cities']);
 printf("Bairros removidos: %d\n", $antes['neighborhoods']);
-printf("Contratos removidos: %d\n", $antes['contracts']);
 printf("Contas de demonstração removidas: %d\n", $usersRemovidos);
 
 echo "\n== Limpeza concluída. ==\n";

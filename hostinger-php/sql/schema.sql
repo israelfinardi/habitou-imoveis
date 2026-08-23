@@ -184,12 +184,44 @@ CREATE INDEX IF NOT EXISTS idx_sub_user ON subscriptions (user_id);
 CREATE INDEX IF NOT EXISTS idx_sub_agency ON subscriptions (agency_id);
 
 -- ---------------------------------------------------------------------
+-- Importação de XML — precisa existir antes de properties por causa da FK.
+-- Histórico de cada arquivo XML enviado (padrão VRSync, compatível com a
+-- maioria dos CRMs imobiliários do mercado brasileiro): quem enviou,
+-- quando, quantos imóveis foram criados/atualizados, e o arquivo original
+-- guardado pra poder baixar de novo — ver includes/xml_import_service.php.
+-- ---------------------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS xml_imports (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id INTEGER NOT NULL,
+  agency_id INTEGER NULL,
+  original_filename VARCHAR(255) NOT NULL,
+  stored_path VARCHAR(500) NOT NULL,
+  status TEXT NOT NULL DEFAULT 'PROCESSING',
+  total_found INTEGER NOT NULL DEFAULT 0,
+  total_created INTEGER NOT NULL DEFAULT 0,
+  total_updated INTEGER NOT NULL DEFAULT 0,
+  total_deactivated INTEGER NOT NULL DEFAULT 0,
+  total_errors INTEGER NOT NULL DEFAULT 0,
+  error_summary TEXT NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  finished_at DATETIME NULL,
+  CONSTRAINT fk_import_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  CONSTRAINT fk_import_agency FOREIGN KEY (agency_id) REFERENCES agencies(id) ON DELETE SET NULL
+);
+CREATE INDEX IF NOT EXISTS idx_xml_imports_user ON xml_imports (user_id);
+CREATE INDEX IF NOT EXISTS idx_xml_imports_agency ON xml_imports (agency_id);
+
+-- ---------------------------------------------------------------------
 -- Imóveis
 -- ---------------------------------------------------------------------
 
 CREATE TABLE IF NOT EXISTS properties (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   code VARCHAR(32) NOT NULL UNIQUE,
+  external_code VARCHAR(64) NULL,
+  origin TEXT NOT NULL DEFAULT 'MANUAL',
+  import_id INTEGER NULL,
   title VARCHAR(255) NOT NULL,
   slug VARCHAR(255) NOT NULL UNIQUE,
   description TEXT NULL,
@@ -233,9 +265,11 @@ CREATE TABLE IF NOT EXISTS properties (
   CONSTRAINT fk_prop_advertiser FOREIGN KEY (advertiser_id) REFERENCES users(id),
   CONSTRAINT fk_prop_owner FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE SET NULL,
   CONSTRAINT fk_prop_agent FOREIGN KEY (agent_id) REFERENCES users(id) ON DELETE SET NULL,
-  CONSTRAINT fk_prop_agency FOREIGN KEY (agency_id) REFERENCES agencies(id) ON DELETE SET NULL
+  CONSTRAINT fk_prop_agency FOREIGN KEY (agency_id) REFERENCES agencies(id) ON DELETE SET NULL,
+  CONSTRAINT fk_prop_import FOREIGN KEY (import_id) REFERENCES xml_imports(id) ON DELETE SET NULL
 );
 CREATE INDEX IF NOT EXISTS idx_listing ON properties (city_id, listing_type, property_type, status);
+CREATE INDEX IF NOT EXISTS idx_prop_import ON properties (import_id);
 CREATE INDEX IF NOT EXISTS idx_prop_neighborhood ON properties (neighborhood_id);
 CREATE INDEX IF NOT EXISTS idx_prop_price_sale ON properties (price_sale);
 CREATE INDEX IF NOT EXISTS idx_prop_price_rent ON properties (price_rent);
@@ -326,79 +360,6 @@ CREATE TABLE IF NOT EXISTS user_location_signals (
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 CREATE INDEX IF NOT EXISTS idx_location_signals_user ON user_location_signals (user_id);
-
--- ---------------------------------------------------------------------
--- Contratos
--- ---------------------------------------------------------------------
-
--- Modelos de contrato (redigidos por corretor/imobiliária/admin, com
--- placeholders tipo {{cliente_nome}} preenchidos automaticamente a partir
--- do imóvel/contrato na hora de gerar um contrato a partir do modelo — ver
--- includes/contract_service.php::contract_placeholder_map()). Visibilidade:
--- is_global (só admin) aparece pra todo mundo; agency_id aparece só pra
--- quem é da mesma imobiliária; sem os dois, é pessoal (só o criador vê).
-CREATE TABLE IF NOT EXISTS contract_templates (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  name VARCHAR(160) NOT NULL,
-  transaction_type TEXT NOT NULL,
-  body TEXT NOT NULL,
-  is_global INTEGER NOT NULL DEFAULT 0,
-  agency_id INTEGER NULL,
-  created_by INTEGER NOT NULL,
-  is_active INTEGER NOT NULL DEFAULT 1,
-  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  CONSTRAINT fk_template_agency FOREIGN KEY (agency_id) REFERENCES agencies(id) ON DELETE CASCADE,
-  CONSTRAINT fk_template_creator FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE CASCADE
-);
-CREATE INDEX IF NOT EXISTS idx_template_agency ON contract_templates (agency_id);
-CREATE INDEX IF NOT EXISTS idx_template_type ON contract_templates (transaction_type);
-
-CREATE TABLE IF NOT EXISTS contracts (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  property_id INTEGER NOT NULL,
-  type TEXT NOT NULL,
-  status TEXT NOT NULL DEFAULT 'DRAFT',
-  owner_id INTEGER NULL,
-  advertiser_id INTEGER NULL,
-  buyer_id INTEGER NULL,
-  tenant_id INTEGER NULL,
-  agent_id INTEGER NULL,
-  agency_id INTEGER NULL,
-  value DECIMAL(14,2) NULL,
-  start_date DATE NULL,
-  end_date DATE NULL,
-  documents TEXT NULL,
-  template_id INTEGER NULL,
-  body TEXT NULL,
-  client_document VARCHAR(32) NULL,
-  signed_document_url VARCHAR(500) NULL,
-  signed_document_uploaded_at DATETIME NULL,
-  signed_document_uploaded_by INTEGER NULL,
-  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  CONSTRAINT fk_contract_property FOREIGN KEY (property_id) REFERENCES properties(id),
-  CONSTRAINT fk_contract_owner FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE SET NULL,
-  CONSTRAINT fk_contract_advertiser FOREIGN KEY (advertiser_id) REFERENCES users(id) ON DELETE SET NULL,
-  CONSTRAINT fk_contract_buyer FOREIGN KEY (buyer_id) REFERENCES users(id) ON DELETE SET NULL,
-  CONSTRAINT fk_contract_tenant FOREIGN KEY (tenant_id) REFERENCES users(id) ON DELETE SET NULL,
-  CONSTRAINT fk_contract_agent FOREIGN KEY (agent_id) REFERENCES users(id) ON DELETE SET NULL,
-  CONSTRAINT fk_contract_agency FOREIGN KEY (agency_id) REFERENCES agencies(id) ON DELETE SET NULL,
-  CONSTRAINT fk_contract_template FOREIGN KEY (template_id) REFERENCES contract_templates(id) ON DELETE SET NULL,
-  CONSTRAINT fk_contract_signer FOREIGN KEY (signed_document_uploaded_by) REFERENCES users(id) ON DELETE SET NULL
-);
-CREATE INDEX IF NOT EXISTS idx_contract_property ON contracts (property_id);
-CREATE INDEX IF NOT EXISTS idx_contract_status ON contracts (status);
-
-CREATE TABLE IF NOT EXISTS contract_history (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  contract_id INTEGER NOT NULL,
-  status TEXT NOT NULL,
-  note TEXT NULL,
-  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  CONSTRAINT fk_history_contract FOREIGN KEY (contract_id) REFERENCES contracts(id) ON DELETE CASCADE
-);
-CREATE INDEX IF NOT EXISTS idx_history_contract ON contract_history (contract_id);
 
 -- ---------------------------------------------------------------------
 -- Conteúdo (blog / central de ajuda) e contato
