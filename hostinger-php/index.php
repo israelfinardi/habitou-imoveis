@@ -172,7 +172,7 @@ require __DIR__ . '/includes/header.php';
       </div>
     </div>
 
-    <div class="hidden shrink-0 xl:block xl:h-[550px] xl:w-[550px]">
+    <div class="hidden shrink-0 xl:ml-auto xl:block xl:h-[620px] xl:w-[620px]">
       <div id="home-minimap" class="h-full w-full overflow-hidden rounded-3xl border border-brand-border shadow-lg"></div>
     </div>
     </div>
