@@ -97,5 +97,6 @@ window.__CURRENT_FILTERS = {
 <script src="<?= asset_url('assets/js/topbar.js') ?>"></script>
 <script src="<?= asset_url('assets/js/home-blocks.js') ?>"></script>
 <script src="<?= asset_url('assets/js/property-view-tracker.js') ?>"></script>
+<script src="<?= asset_url('assets/js/auth-modal.js') ?>"></script>
 </body>
 </html>

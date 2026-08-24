@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/auth.php';
 require_once __DIR__ . '/constants.php';
+require_once __DIR__ . '/auth_modal.php';
 $__user = current_user();
 $__pageTitle = $pageTitle ?? APP_NAME;
 $__pageDescription = $pageDescription ?? 'Encontre apartamentos, casas e terrenos para comprar ou alugar em todo o Brasil.';
@@ -223,8 +224,7 @@ body{font-family:'Plus Jakarta Sans',Arial,sans-serif}
           </div>
         </div>
       <?php else: ?>
-        <a href="<?= base_url('login.php') ?>" class="rounded-full border border-brand-border px-4 py-2 text-sm font-medium hover:border-brand-primary hover:text-brand-primary">Entrar</a>
-        <a href="<?= base_url('cadastro.php') ?>" class="text-sm font-medium hover:text-brand-primary">Cadastre-se</a>
+        <button type="button" data-open-auth class="rounded-full border border-brand-border px-4 py-2 text-sm font-medium hover:border-brand-primary hover:text-brand-primary">Entrar ou cadastrar-se</button>
       <?php endif; ?>
     </div>
 
@@ -265,9 +265,8 @@ body{font-family:'Plus Jakarta Sans',Arial,sans-serif}
         <?php endif; ?>
       </div>
     <?php else: ?>
-      <div class="mb-3 flex gap-2">
-        <a href="<?= base_url('login.php') ?>" class="flex-1 rounded-full border border-brand-border py-2 text-center text-sm font-medium">Entrar</a>
-        <a href="<?= base_url('cadastro.php') ?>" class="flex-1 rounded-full bg-brand-primary py-2 text-center text-sm font-medium text-white">Cadastre-se</a>
+      <div class="mb-3">
+        <button type="button" data-open-auth class="w-full rounded-full bg-brand-primary py-2 text-center text-sm font-medium text-white">Entrar ou cadastrar-se</button>
       </div>
     <?php endif; ?>
     <div class="flex flex-col gap-1">
@@ -279,4 +278,5 @@ body{font-family:'Plus Jakarta Sans',Arial,sans-serif}
     </div>
   </div>
 </header>
+<?php if (!$__user) { render_auth_modal(); } ?>
 <main class="flex-1">
