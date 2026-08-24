@@ -17,6 +17,38 @@ switch ($action) {
         redirect(base_url('admin/usuarios.php'));
         break;
 
+    case 'set_user_plan':
+        $userId = (int) ($_POST['id'] ?? 0);
+        $planId = ($_POST['planId'] ?? '') !== '' ? (int) $_POST['planId'] : null;
+
+        $activeStmt = $pdo->prepare("SELECT * FROM subscriptions WHERE user_id = ? AND status = 'ACTIVE' ORDER BY created_at DESC LIMIT 1");
+        $activeStmt->execute([$userId]);
+        $activeSub = $activeStmt->fetch();
+
+        if ($activeSub) {
+            try {
+                cancel_subscription($activeSub);
+            } catch (\Throwable $e) {
+                $_SESSION['admin_error'] = 'Falha ao desativar a assinatura atual: ' . $e->getMessage();
+                redirect(base_url('admin/usuarios.php'));
+            }
+        }
+
+        if ($planId) {
+            $planStmt = $pdo->prepare('SELECT name FROM plans WHERE id = ?');
+            $planStmt->execute([$planId]);
+            $planName = $planStmt->fetchColumn();
+            if ($planName) {
+                $pdo->prepare('INSERT INTO subscriptions (user_id, plan_id, status, started_at) VALUES (?,?,"ACTIVE",CURRENT_TIMESTAMP)')
+                    ->execute([$userId, $planId]);
+                $_SESSION['admin_success'] = 'Plano "' . $planName . '" ativado para o usuário.';
+            }
+        } else {
+            $_SESSION['admin_success'] = 'Plano desativado — usuário voltou ao plano grátis.';
+        }
+        redirect(base_url('admin/usuarios.php'));
+        break;
+
     case 'update_property_status':
         $id = (int) $_POST['id'];
         $status = $_POST['status'];
