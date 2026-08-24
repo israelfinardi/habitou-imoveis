@@ -22,6 +22,7 @@ $agentName = trim($agent['first_name'] . ' ' . $agent['last_name']);
 $memberSince = $agent['created_at'] ? date('Y', strtotime($agent['created_at'])) : null;
 
 $pageTitle = $agentName . ' — Corretor';
+$ogImage = $agent['avatar_url'] ?? null;
 require __DIR__ . '/includes/header.php';
 ?>
 <div class="mx-auto max-w-[1800px] px-4 py-10 sm:px-6 lg:px-8">

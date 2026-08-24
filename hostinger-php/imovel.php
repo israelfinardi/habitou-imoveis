@@ -34,6 +34,7 @@ $approximateLocation = !$property['latitude'] || !$property['longitude'];
 $canonical = base_url('imovel.php?slug=' . $property['slug']);
 $pageTitle = $property['title'];
 $pageDescription = $property['description'] ? mb_substr(strip_tags($property['description']), 0, 155) : $property['title'];
+$ogImage = $property['images'][0]['url'] ?? null;
 require __DIR__ . '/includes/header.php';
 
 $jsonLd = [

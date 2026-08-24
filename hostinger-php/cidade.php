@@ -41,6 +41,7 @@ $neighborhoods = $stmtN->fetchAll();
 
 $pageTitle = 'Imóveis em ' . $city['name'];
 $pageDescription = $city['description'] ?: "Encontre apartamentos, casas e terrenos para comprar ou alugar em {$city['name']} - {$city['state_code']}.";
+$ogImage = $city['hero_image_url'] ?? null;
 require __DIR__ . '/includes/header.php';
 
 if ($hasFilters) {

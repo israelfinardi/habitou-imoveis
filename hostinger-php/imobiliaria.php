@@ -26,6 +26,7 @@ $agents = $agentsStmt->fetchAll();
 
 $pageTitle = $agency['name'];
 $pageDescription = $agency['description'] ?: "Imóveis anunciados por {$agency['name']} no Habitou Imóveis.";
+$ogImage = $agency['logo_url'] ?? null;
 require __DIR__ . '/includes/header.php';
 ?>
 <div class="border-b border-brand-border bg-brand-bg-subtle">

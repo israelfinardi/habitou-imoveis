@@ -4,6 +4,15 @@ require_once __DIR__ . '/constants.php';
 $__user = current_user();
 $__pageTitle = $pageTitle ?? APP_NAME;
 $__pageDescription = $pageDescription ?? 'Encontre apartamentos, casas e terrenos para comprar ou alugar em todo o Brasil.';
+$__fullTitle = $__pageTitle . (!str_starts_with($__pageTitle, APP_NAME) ? ' | ' . APP_NAME : '');
+
+// Open Graph / Twitter Card — imagem de capa quando o link é compartilhado
+// (WhatsApp, Facebook, Instagram, Slack etc.). Cada página pode definir
+// $ogImage (URL absoluta) antes de dar require neste arquivo — ex.: a foto
+// principal do imóvel, o logo da imobiliária, o avatar do corretor, a
+// hero_image_url da cidade. Sem isso, cai na capa padrão da marca.
+$__ogImage = !empty($ogImage) ? $ogImage : base_url('assets/img/og-default.png');
+$__ogUrl = $canonical ?? (base_url(ltrim($_SERVER['REQUEST_URI'] ?? '', '/')));
 
 // Estado atual dos filtros (transação/cidade), usado para manter a barra de
 // busca superior sincronizada com o que já está aplicado na página.
@@ -18,10 +27,21 @@ if (!empty($city['name']) && !empty($city['state_code'])) {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title><?= e($__pageTitle) ?><?= $__pageTitle !== APP_NAME ? ' | ' . APP_NAME : '' ?></title>
+<title><?= e($__fullTitle) ?></title>
 <meta name="description" content="<?= e($__pageDescription) ?>">
 <?php if (!empty($canonical)): ?><link rel="canonical" href="<?= e($canonical) ?>"><?php endif; ?>
 <link rel="icon" href="<?= base_url('assets/img/favicon.ico') ?>">
+<meta property="og:site_name" content="<?= e(APP_NAME) ?>">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="pt_BR">
+<meta property="og:url" content="<?= e($__ogUrl) ?>">
+<meta property="og:title" content="<?= e($__fullTitle) ?>">
+<meta property="og:description" content="<?= e($__pageDescription) ?>">
+<meta property="og:image" content="<?= e($__ogImage) ?>">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="<?= e($__fullTitle) ?>">
+<meta name="twitter:description" content="<?= e($__pageDescription) ?>">
+<meta name="twitter:image" content="<?= e($__ogImage) ?>">
 <script src="https://cdn.tailwindcss.com"></script>
 <script>
   tailwind.config = {
