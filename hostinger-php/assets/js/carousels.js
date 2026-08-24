@@ -34,14 +34,20 @@
 
   function updateDots(track) {
     var root = track.closest('.js-carousel');
-    var dots = root ? root.querySelector('.js-carousel-dots') : null;
-    if (!dots) return;
+    if (!root) return;
     var w = slideWidth(track) || 1;
     var index = Math.round(track.scrollLeft / w);
-    Array.prototype.forEach.call(dots.children, function (dot, i) {
-      dot.classList.toggle('bg-white', i === index);
-      dot.classList.toggle('bg-white/50', i !== index);
-    });
+    var dots = root.querySelector('.js-carousel-dots');
+    if (dots) {
+      Array.prototype.forEach.call(dots.children, function (dot, i) {
+        dot.classList.toggle('bg-white', i === index);
+        dot.classList.toggle('bg-white/50', i !== index);
+      });
+    }
+    var counter = root.querySelector('.js-carousel-counter');
+    if (counter) {
+      counter.textContent = (index + 1) + '/' + track.children.length;
+    }
   }
 
   // 'scroll' não borbulha (bubble) — precisa de capture:true para delegar.

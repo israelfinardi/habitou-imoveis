@@ -41,7 +41,7 @@ require __DIR__ . '/includes/header.php';
       </div>
       <div class="mt-5 flex flex-col gap-2">
         <?php if (!empty($agent['whatsapp']) || !empty($agent['phone'])): ?>
-          <a href="https://wa.me/55<?= e(preg_replace('/\D/', '', $agent['whatsapp'] ?: $agent['phone'])) ?>" target="_blank" rel="noopener noreferrer" class="rounded-full bg-brand-green px-4 py-2.5 text-sm font-semibold text-white hover:bg-brand-green-hover">Conversar no WhatsApp</a>
+          <a href="https://wa.me/55<?= e(preg_replace('/\D/', '', $agent['whatsapp'] ?: $agent['phone'])) ?>" target="_blank" rel="noopener noreferrer" class="rounded-full bg-brand-primary px-4 py-2.5 text-sm font-semibold text-white hover:bg-brand-primary-hover">Conversar no WhatsApp</a>
         <?php endif; ?>
         <?php if (!empty($agent['email'])): ?><a href="mailto:<?= e($agent['email']) ?>" class="rounded-full border border-brand-border px-4 py-2.5 text-sm font-semibold hover:border-brand-primary">E-mail</a><?php endif; ?>
       </div>

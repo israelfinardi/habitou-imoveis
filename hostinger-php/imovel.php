@@ -58,7 +58,7 @@ if ($price) {
 ?>
 <script type="application/ld+json"><?= json_encode($jsonLd, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?></script>
 
-<div class="mx-auto max-w-[1800px] px-4 py-8 pb-24 sm:px-6 lg:px-8 lg:pb-8">
+<div class="mx-auto max-w-[1200px] px-4 py-8 pb-24 sm:px-6 lg:px-8 lg:pb-8">
   <nav class="mb-4 text-sm text-brand-text-secondary">
     <a href="<?= base_url('/') ?>" class="hover:text-brand-primary">Início</a> /
     <a href="<?= base_url('cidade.php?slug=' . $property['city_slug']) ?>" class="hover:text-brand-primary"><?= e($property['city_name']) ?></a> /
@@ -68,8 +68,9 @@ if ($price) {
 
   <?php $images = $property['images']; render_property_gallery($images, $property['title']); ?>
 
-  <div class="mt-6 grid grid-cols-1 gap-8 lg:grid-cols-4">
-    <div class="lg:col-span-3">
+  <div class="relative z-10 -mx-4 -mt-6 rounded-t-3xl bg-white px-4 pt-6 sm:-mx-6 sm:px-6 lg:static lg:z-auto lg:mx-0 lg:mt-6 lg:rounded-none lg:bg-transparent lg:px-0 lg:pt-0">
+  <div class="grid grid-cols-1 gap-8 lg:grid-cols-3">
+    <div class="lg:col-span-2">
       <div class="flex items-start justify-between gap-4">
         <div>
           <h1 class="text-2xl font-bold"><?= e($property['title']) ?></h1>
@@ -190,7 +191,7 @@ if ($price) {
         <?php endif; ?>
         <div class="mt-4 flex flex-col gap-2">
           <?php if ($whatsapp): ?>
-            <a href="https://wa.me/55<?= e($whatsapp) ?>?text=<?= urlencode('Olá! Tenho interesse no imóvel "' . $property['title'] . '" (código ' . $property['code'] . ').') ?>" target="_blank" rel="noopener noreferrer" class="rounded-full bg-brand-green px-4 py-2.5 text-center text-sm font-semibold text-white hover:bg-brand-green-hover">Conversar no WhatsApp</a>
+            <a href="https://wa.me/55<?= e($whatsapp) ?>?text=<?= urlencode('Olá! Tenho interesse no imóvel "' . $property['title'] . '" (código ' . $property['code'] . ').') ?>" target="_blank" rel="noopener noreferrer" class="rounded-full bg-brand-primary px-4 py-2.5 text-center text-sm font-semibold text-white hover:bg-brand-primary-hover">Conversar no WhatsApp</a>
           <?php endif; ?>
           <?php if ($phone): ?>
             <a href="tel:<?= e(preg_replace('/\D/', '', $phone)) ?>" class="rounded-full border border-brand-border px-4 py-2.5 text-center text-sm font-semibold hover:border-brand-primary"><?= e($phone) ?></a>
@@ -217,6 +218,7 @@ if ($price) {
       </div>
     </div>
   </div>
+  </div>
 
   <div class="fixed inset-x-0 bottom-0 z-40 flex items-center justify-between gap-3 border-t border-brand-border bg-white px-4 py-3 shadow-[0_-4px_16px_rgba(0,0,0,0.08)] lg:hidden">
     <div>
@@ -224,7 +226,7 @@ if ($price) {
       <a href="#anunciante" class="text-xs text-brand-text-secondary underline">Ver contato</a>
     </div>
     <?php if ($whatsapp): ?>
-      <a href="https://wa.me/55<?= e($whatsapp) ?>?text=<?= urlencode('Olá! Tenho interesse no imóvel "' . $property['title'] . '" (código ' . $property['code'] . ').') ?>" target="_blank" rel="noopener noreferrer" class="shrink-0 rounded-full bg-brand-green px-6 py-3 text-sm font-semibold text-white hover:bg-brand-green-hover">Conversar no WhatsApp</a>
+      <a href="https://wa.me/55<?= e($whatsapp) ?>?text=<?= urlencode('Olá! Tenho interesse no imóvel "' . $property['title'] . '" (código ' . $property['code'] . ').') ?>" target="_blank" rel="noopener noreferrer" class="shrink-0 rounded-full bg-brand-primary px-6 py-3 text-sm font-semibold text-white hover:bg-brand-primary-hover">Conversar no WhatsApp</a>
     <?php else: ?>
       <a href="#anunciante" class="shrink-0 rounded-full bg-brand-primary px-6 py-3 text-sm font-semibold text-white hover:bg-brand-primary-hover">Entrar em contato</a>
     <?php endif; ?>

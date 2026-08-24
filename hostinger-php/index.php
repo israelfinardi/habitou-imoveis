@@ -274,7 +274,7 @@ foreach ($__homeBlockEndpoints as $__endpoint):
       <li class="flex items-center gap-2"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#25D366" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>Perfil de imobiliária com todos os seus imóveis</li>
     </ul>
     <div class="mt-7 flex flex-wrap items-center gap-5">
-      <a href="<?= base_url('anunciante/novo.php') ?>" class="rounded-full bg-brand-green px-6 py-3 text-sm font-semibold text-white hover:bg-brand-green-hover">Anunciar na Habitou Imóveis</a>
+      <a href="<?= base_url('anunciante/novo.php') ?>" class="rounded-full bg-brand-primary px-6 py-3 text-sm font-semibold text-white hover:bg-brand-primary-hover">Anunciar na Habitou Imóveis</a>
       <a href="<?= base_url('planos.php') ?>" class="text-sm font-semibold text-white hover:underline">Ver planos →</a>
     </div>
   </div>

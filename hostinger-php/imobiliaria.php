@@ -43,7 +43,7 @@ require __DIR__ . '/includes/header.php';
       <?php if ($agency['website']): ?><a href="<?= e($agency['website']) ?>" target="_blank" rel="noopener noreferrer" class="text-brand-primary hover:underline"><?= e($agency['website']) ?></a><?php endif; ?>
     </div>
     <?php if (!empty($agency['whatsapp'])): ?>
-      <a href="https://wa.me/55<?= e(preg_replace('/\D/', '', $agency['whatsapp'])) ?>" target="_blank" rel="noopener noreferrer" class="rounded-full bg-brand-green px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-green-hover">Conversar no WhatsApp</a>
+      <a href="https://wa.me/55<?= e(preg_replace('/\D/', '', $agency['whatsapp'])) ?>" target="_blank" rel="noopener noreferrer" class="rounded-full bg-brand-primary px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-primary-hover">Conversar no WhatsApp</a>
     <?php endif; ?>
   </div>
 </div>

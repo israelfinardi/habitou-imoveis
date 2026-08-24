@@ -74,7 +74,7 @@ function render_property_gallery(array $images, string $title): void
       <?php if ($count === 0): ?>
         <div class="flex aspect-[16/9] w-full items-center justify-center rounded-xl bg-brand-bg-subtle text-brand-text-secondary lg:aspect-[21/9]">Sem fotos</div>
       <?php else: ?>
-        <div class="js-carousel group relative block aspect-square w-full overflow-hidden rounded-xl bg-brand-bg-subtle sm:aspect-[4/3] lg:hidden">
+        <div class="js-carousel group relative -mx-4 block aspect-[4/5] w-[calc(100%+2rem)] overflow-hidden bg-brand-bg-subtle sm:-mx-6 sm:aspect-[4/3] sm:w-[calc(100%+3rem)] lg:hidden">
           <div class="js-carousel-track scrollbar-none flex h-full w-full snap-x snap-mandatory overflow-x-auto scroll-smooth">
             <?php foreach ($images as $i => $img): ?>
               <img src="<?= e($img['url']) ?>" data-index="<?= $i ?>" alt="<?= e($title) ?>" loading="<?= $i === 0 ? 'eager' : 'lazy' ?>" class="js-lightbox-trigger h-full w-full shrink-0 cursor-pointer snap-center object-cover">
@@ -83,9 +83,7 @@ function render_property_gallery(array $images, string $title): void
           <?php if ($count > 1): ?>
             <button type="button" class="js-carousel-prev absolute left-2 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-brand-text opacity-0 shadow transition group-hover:opacity-100" aria-label="Foto anterior"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
             <button type="button" class="js-carousel-next absolute right-2 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-brand-text opacity-0 shadow transition group-hover:opacity-100" aria-label="Próxima foto"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
-            <div class="js-carousel-dots pointer-events-none absolute bottom-2 left-1/2 flex -translate-x-1/2 gap-1">
-              <?php foreach ($images as $i => $_): ?><span class="h-1.5 w-1.5 rounded-full <?= $i === 0 ? 'bg-white' : 'bg-white/50' ?>"></span><?php endforeach; ?>
-            </div>
+            <div class="js-carousel-counter pointer-events-none absolute bottom-3 right-3 rounded-md bg-black/70 px-2 py-1 text-xs font-semibold text-white">1/<?= $count ?></div>
           <?php endif; ?>
         </div>
 
@@ -93,7 +91,7 @@ function render_property_gallery(array $images, string $title): void
         $mainImages = array_slice($images, 0, 5);
         $gridCols = $count === 1 ? 'lg:grid-cols-1' : ($count === 2 ? 'lg:grid-cols-2' : ($count === 3 ? 'lg:grid-cols-2 lg:grid-rows-2' : 'lg:grid-cols-4 lg:grid-rows-2'));
         ?>
-        <div class="relative hidden overflow-hidden rounded-xl bg-brand-bg-subtle lg:grid lg:gap-1.5 <?= $gridCols ?>" style="aspect-ratio:<?= $count === 1 ? '16/8' : '16/7' ?>">
+        <div class="relative hidden overflow-hidden rounded-xl bg-brand-bg-subtle lg:grid lg:gap-1.5 <?= $gridCols ?>" style="aspect-ratio:16/8">
           <?php foreach ($mainImages as $i => $img):
               $span = ($count >= 4 && $i === 0) ? 'lg:col-span-2 lg:row-span-2' : (($count === 3 && $i === 0) ? 'lg:row-span-2' : '');
           ?>
