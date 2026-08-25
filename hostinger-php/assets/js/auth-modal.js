@@ -23,6 +23,7 @@
   var errorEl = document.getElementById('authm-error');
   var redirectInput = document.getElementById('authm-redirect');
   var passwordSync = document.getElementById('authm-password-sync');
+  var siteHeader = document.querySelector('header');
   var captchaWidget = document.getElementById('authm-captcha-widget');
 
   var emailInput = document.getElementById('authm-email');
@@ -263,19 +264,36 @@
     updateStepChrome();
   }
 
-  function openModal() {
+  // login.php e cadastro.php continuam existindo como página cheia (fallback
+  // sem JS) — mas se o JS carrega, essa página nunca deve aparecer ao lado
+  // do modal (ficava "duplicado": o mesmo login em dois lugares na tela).
+  // Em vez disso escondemos o bloco e abrimos o modal automaticamente, do
+  // jeito que a Airbnb faz: tudo passa pelo mesmo modal, nunca por uma
+  // página de login separada.
+  var fallbackPage = document.getElementById('auth-fallback-page');
+  var isFallbackFlow = !!fallbackPage;
+  if (fallbackPage) fallbackPage.classList.add('hidden');
+
+  function openModal(opts) {
+    opts = opts || {};
     resetModal();
-    redirectInput.value = window.location.pathname + window.location.search;
+    redirectInput.value = opts.noRedirect ? '' : (window.location.pathname + window.location.search);
     overlay.classList.remove('hidden');
     overlay.classList.add('flex');
     document.body.classList.add('authm-open');
+    if (siteHeader) siteHeader.classList.add('authm-header-flat');
     setTimeout(function () { emailInput.focus(); }, 50);
   }
 
   function closeModal() {
+    // Chegou aqui direto por /login.php ou /cadastro.php (sem outra página
+    // por trás pra voltar a mostrar) — fechar o modal sem sair da tela em
+    // branco: manda pra home, igual ao "Não é você?"/fechar da Airbnb.
+    if (isFallbackFlow) { window.location.href = APP_BASE; return; }
     overlay.classList.add('hidden');
     overlay.classList.remove('flex');
     document.body.classList.remove('authm-open');
+    if (siteHeader) siteHeader.classList.remove('authm-header-flat');
   }
 
   document.addEventListener('click', function (e) {
@@ -290,4 +308,5 @@
   panel.addEventListener('click', function (e) { e.stopPropagation(); });
 
   updateStepChrome();
+  if (isFallbackFlow) openModal({ noRedirect: true });
 })();

@@ -185,7 +185,7 @@ body{font-family:'Plus Jakarta Sans',Arial,sans-serif}
     </div>
 
     <div class="hidden items-center gap-3 lg:flex">
-      <a href="<?= base_url('anunciante/novo.php') ?>" class="rounded-full border border-brand-border px-4 py-2 text-sm font-semibold text-brand-text hover:border-brand-text">Anunciar imóvel</a>
+      <a href="<?= base_url('anunciante/novo.php') ?>" class="rounded-full border border-brand-text/30 px-4 py-2 text-sm font-semibold text-brand-text hover:border-brand-text">Anunciar imóvel</a>
       <?php if ($__user): ?>
         <div class="relative">
           <button type="button" class="nav-user-btn" id="nav-user-btn">

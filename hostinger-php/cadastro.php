@@ -75,7 +75,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $pageTitle = 'Criar conta';
 require __DIR__ . '/includes/header.php';
 ?>
-<div class="flex min-h-[60vh] items-center justify-center bg-brand-bg-subtle px-4 py-12">
+<!-- Se o JS carregar, assets/js/auth-modal.js esconde este bloco e abre o
+     modal global automaticamente — pra quem chegou direto em /cadastro.php
+     ver a mesma experiência do resto do site (um único fluxo, sem página
+     cheia duplicando o que o modal já mostra). Sem JS, isso aqui continua
+     funcionando normalmente como fallback. -->
+<div id="auth-fallback-page" class="flex min-h-[60vh] items-center justify-center bg-brand-bg-subtle px-4 py-12">
   <div class="w-full max-w-lg rounded-2xl border border-brand-border bg-white p-8 shadow-sm">
     <h1 class="mb-1 text-2xl font-bold">Criar conta</h1>
     <p class="mb-6 text-sm text-brand-text-secondary">Cadastre-se para favoritar imóveis, anunciar ou representar sua imobiliária.</p>

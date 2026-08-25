@@ -249,6 +249,19 @@ function render_auth_modal(): void
     .authm-choice:hover span{border-color:#222222}
     .authm-choice input:checked + span{border-color:#222222;border-width:2px;background:#F7F7F7}
     body.authm-open{overflow:hidden}
+    /* z-index via CSS puro (não a classe utilitária z-[300] do Tailwind):
+       o header é sticky com z-40 explícito — se a classe arbitrária do CDN
+       falhar em gerar a regra a tempo, o overlay cai pra z-index:auto e o
+       header (com z-index numérico de verdade) fica por cima dele, sem
+       escurecer/borrar. Isso aqui garante que o modal sempre cobre a
+       página inteira, header (e sua barra de busca) incluído. */
+    #authm-overlay{z-index:9999}
+    /* O header também usa backdrop-filter (blur) — dois backdrop-filter
+       empilhados (o do overlay por cima do header sticky) não compõem
+       direito (o de baixo "vaza" sem escurecer). Enquanto o modal está
+       aberto, o JS tira o blur do header (authm-header-flat) pra sobrar só
+       uma camada de blur, a do overlay, cobrindo a página inteira. */
+    header.authm-header-flat{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;background:#fff!important;position:static!important}
     </style>
     <?php
 }
