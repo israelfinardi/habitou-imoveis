@@ -18,8 +18,10 @@
     zoomControl: false,
     attributionControl: false,
   });
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 19,
+  // Base neutra (cinza claro), consistente com o mapa da página de busca.
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    subdomains: 'abcd',
+    maxZoom: 20,
   }).addTo(map);
   L.control.zoom({ position: 'bottomright' }).addTo(map);
 

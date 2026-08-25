@@ -28,8 +28,11 @@
   var initialLng = hasInitial ? parseFloat(lngInput.value) : -51.92528;
 
   var map = L.map('property-map').setView([initialLat, initialLng], hasInitial ? 16 : 4);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; OpenStreetMap contributors',
+  // Base neutra (cinza claro), consistente com os outros mapas do site.
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    subdomains: 'abcd',
+    maxZoom: 20,
+    attribution: '&copy; <a href="https://carto.com/attributions">CARTO</a> &copy; OpenStreetMap contributors',
   }).addTo(map);
   // Exposto pro wizard de anúncio (assets/js/property-wizard.js) chamar
   // invalidateSize() quando essa etapa, escondida com display:none até o

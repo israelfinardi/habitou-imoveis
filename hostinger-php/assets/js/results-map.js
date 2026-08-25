@@ -10,9 +10,12 @@
   var DEFAULT_ZOOM = 4;
 
   var map = L.map('results-map', { scrollWheelZoom: true, zoomControl: true });
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 19,
-    attribution: '&copy; OpenStreetMap',
+  // Base neutra (cinza claro, sem vegetação/rodovias coloridas) em vez do
+  // estilo padrão do OpenStreetMap, pra combinar com o visual clean do site.
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    subdomains: 'abcd',
+    maxZoom: 20,
+    attribution: '&copy; <a href="https://carto.com/attributions">CARTO</a> &copy; OpenStreetMap contributors',
   }).addTo(map);
 
   var markers = {};
