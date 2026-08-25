@@ -18,6 +18,11 @@ if ($action === 'subscribe') {
         redirect(base_url('planos.php'));
     }
 
+    if (!isset($_POST['acceptTerms'])) {
+        $_SESSION['plans_error'] = 'Você precisa aceitar os Termos do contrato de assinatura para assinar um plano.';
+        redirect(base_url('planos.php'));
+    }
+
     if (empty($plan['mp_plan_id'])) {
         // Plano ainda não sincronizado com o Mercado Pago — mantém o fluxo
         // manual antigo (fica PENDING até o admin confirmar em

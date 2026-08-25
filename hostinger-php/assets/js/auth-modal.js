@@ -35,6 +35,7 @@
   var lastNameInput = form.querySelector('[name="lastName"]');
   var creciInput = form.querySelector('[name="creci"]');
   var agencyNameInput = form.querySelector('[name="agencyName"]');
+  var acceptTermsInput = document.getElementById('authm-accept-terms');
   var accountTypeRadios = form.querySelectorAll('.authm-account-type');
   var hideIfImobiliariaEls = form.querySelectorAll('.authm-hide-if-imobiliaria');
 
@@ -95,6 +96,7 @@
       case 'signup-password': return signupPasswordInput.value.length >= 8 && signupPasswordInput.value === passwordConfirmationInput.value;
       case 'signup-creci': return creciInput.value.trim() !== '';
       case 'signup-agency': return agencyNameInput.value.trim().length >= 3;
+      case 'signup-review': return acceptTermsInput.checked;
       default: return true; // demais etapas são opcionais
     }
   }

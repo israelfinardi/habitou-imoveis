@@ -216,7 +216,10 @@ function render_auth_modal(): void
             <section class="authm-step" data-step="signup-review">
               <p class="authm-step-eyebrow">Criar conta</p>
               <h2 class="mb-5 text-2xl font-bold">Tudo pronto!</h2>
-              <p class="mb-5 text-sm text-brand-text-secondary">Ao criar sua conta, você concorda com os <a href="<?= base_url('termos-de-uso.php') ?>" target="_blank" class="font-medium text-brand-primary hover:underline">Termos de uso</a> e a <a href="<?= base_url('politica-de-privacidade.php') ?>" target="_blank" class="font-medium text-brand-primary hover:underline">Política de privacidade</a>.</p>
+              <label class="mb-5 flex items-start gap-2 text-sm text-brand-text-secondary">
+                <input type="checkbox" id="authm-accept-terms" name="acceptTerms" required class="mt-0.5 h-4 w-4 shrink-0 rounded border-brand-border text-brand-primary focus:ring-brand-primary">
+                <span>Li e aceito os <a href="<?= base_url('termos-de-uso.php') ?>" target="_blank" class="font-medium text-brand-primary hover:underline">Termos de uso</a> e a <a href="<?= base_url('politica-de-privacidade.php') ?>" target="_blank" class="font-medium text-brand-primary hover:underline">Política de privacidade</a> do Habitou Imóveis, incluindo a isenção de responsabilidade do portal pela negociação entre corretores, imobiliárias, proprietários e clientes.</span>
+              </label>
               <div class="authm-captcha-slot"></div>
             </section>
 

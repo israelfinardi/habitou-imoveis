@@ -209,6 +209,7 @@ if ($price) {
                 <div class="mb-2"><input name="name" required placeholder="Seu nome" value="<?= e($user ? trim($user['first_name'] . ' ' . $user['last_name']) : '') ?>" class="w-full rounded-lg border border-brand-border px-3 py-2 text-sm"></div>
                 <div class="mb-2"><input name="phone" required placeholder="Seu telefone" value="<?= e($user['phone'] ?? '') ?>" class="w-full rounded-lg border border-brand-border px-3 py-2 text-sm"></div>
                 <div class="mb-2"><input type="email" name="email" required placeholder="Seu e-mail" value="<?= e($user['email'] ?? '') ?>" class="w-full rounded-lg border border-brand-border px-3 py-2 text-sm"></div>
+                <p class="mb-2 text-xs text-brand-text-secondary">Ao enviar, concordo com os <a href="<?= base_url('termos-de-uso.php') ?>" target="_blank" class="text-brand-primary hover:underline">Termos de uso</a> e que meus dados sejam enviados ao anunciante deste imóvel, conforme a <a href="<?= base_url('politica-de-privacidade.php') ?>" target="_blank" class="text-brand-primary hover:underline">Política de privacidade</a>.</p>
                 <button type="submit" class="w-full rounded-full bg-brand-primary px-4 py-2.5 text-sm font-semibold text-white hover:bg-brand-primary-hover">Enviar</button>
                 <p id="property-contact-status" class="mt-2 text-xs"></p>
               </form>

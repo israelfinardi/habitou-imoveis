@@ -29,6 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $zipCode = trim($_POST['zipCode'] ?? '');
     $cityLabel = trim($_POST['cityLabel'] ?? '');
     $cnpj = $accountType === 'imobiliaria' ? $agencyCnpj : $personalCnpj;
+    $acceptTerms = isset($_POST['acceptTerms']);
 
     if (mb_strlen($firstName) < 2) $fieldErrors['firstName'] = 'Informe seu nome.';
     if (mb_strlen($lastName) < 2) $fieldErrors['lastName'] = 'Informe seu sobrenome.';
@@ -37,6 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($password !== $passwordConfirmation) $fieldErrors['passwordConfirmation'] = 'As senhas não coincidem.';
     if ($accountType === 'corretor' && $creci === '') $fieldErrors['creci'] = 'Informe seu número de CRECI.';
     if ($accountType === 'imobiliaria' && mb_strlen($agencyName) < 3) $fieldErrors['agencyName'] = 'Informe o nome da imobiliária.';
+    if (!$acceptTerms) $fieldErrors['acceptTerms'] = 'Você precisa ler e aceitar os Termos de uso e a Política de privacidade para criar sua conta.';
     if (!verify_captcha()) $fieldErrors['captcha'] = 'Não foi possível confirmar que você não é um robô. Tente novamente.';
 
     if (empty($fieldErrors)) {
@@ -212,6 +214,13 @@ require __DIR__ . '/includes/header.php';
         <label class="mb-1 block text-sm font-medium">Confirmar senha</label>
         <input type="password" name="passwordConfirmation" required class="w-full rounded-lg border border-brand-border px-3 py-2 text-sm">
         <?php if (!empty($fieldErrors['passwordConfirmation'])): ?><p class="mt-1 text-xs text-red-600"><?= e($fieldErrors['passwordConfirmation']) ?></p><?php endif; ?>
+      </div>
+      <div class="mb-4">
+        <label class="flex items-start gap-2 text-xs text-brand-text-secondary">
+          <input type="checkbox" name="acceptTerms" required class="mt-0.5 h-4 w-4 shrink-0 rounded border-brand-border text-brand-primary focus:ring-brand-primary">
+          <span>Li e aceito os <a href="<?= base_url('termos-de-uso.php') ?>" target="_blank" class="font-medium text-brand-primary hover:underline">Termos de uso</a> e a <a href="<?= base_url('politica-de-privacidade.php') ?>" target="_blank" class="font-medium text-brand-primary hover:underline">Política de privacidade</a> do Habitou Imóveis, incluindo a isenção de responsabilidade do portal pela negociação entre corretores, imobiliárias, proprietários e clientes.</span>
+        </label>
+        <?php if (!empty($fieldErrors['acceptTerms'])): ?><p class="mt-1 text-xs text-red-600"><?= e($fieldErrors['acceptTerms']) ?></p><?php endif; ?>
       </div>
       <?= render_captcha_widget() ?>
       <?php if (!empty($fieldErrors['captcha'])): ?><p class="mb-4 text-xs text-red-600"><?= e($fieldErrors['captcha']) ?></p><?php endif; ?>

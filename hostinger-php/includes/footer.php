@@ -55,6 +55,7 @@ unset($_SESSION['newsletter_success'], $_SESSION['newsletter_error']);
       <ul class="space-y-2.5 text-sm text-white/80">
         <li><a href="<?= base_url('termos-de-uso.php') ?>" class="hover:underline">Termos de uso</a></li>
         <li><a href="<?= base_url('politica-de-privacidade.php') ?>" class="hover:underline">Política de privacidade</a></li>
+        <li><a href="<?= base_url('termos-assinatura.php') ?>" class="hover:underline">Termos de assinatura</a></li>
       </ul>
     </div>
   </div>

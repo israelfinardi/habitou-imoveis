@@ -55,6 +55,10 @@ require __DIR__ . '/includes/header.php';
         <?php else: ?>
           <form method="post" action="<?= base_url('actions/subscribe_action.php') ?>">
             <?= csrf_field() ?><input type="hidden" name="do" value="subscribe"><input type="hidden" name="plan_id" value="<?= $plan['id'] ?>">
+            <label class="mb-3 flex items-start gap-2 text-left text-xs text-brand-text-secondary">
+              <input type="checkbox" name="acceptTerms" required class="mt-0.5 h-4 w-4 shrink-0 rounded border-brand-border text-brand-primary focus:ring-brand-primary">
+              <span>Li e aceito os <a href="<?= base_url('termos-assinatura.php') ?>" target="_blank" class="font-medium text-brand-primary hover:underline">Termos do contrato de assinatura</a>.</span>
+            </label>
             <button class="w-full rounded-full bg-brand-primary py-2.5 text-sm font-semibold text-white hover:bg-brand-primary-hover"><?= $currentSubscription ? 'Trocar para este plano' : 'Assinar plano' ?></button>
           </form>
           <?php if (!$plan['mp_plan_id']): ?>
