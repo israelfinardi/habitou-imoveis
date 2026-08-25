@@ -53,18 +53,22 @@
         '</div>'
       : '';
     return (
-      '<div class="w-80 overflow-hidden rounded-xl">' +
+      '<div class="w-80 overflow-hidden rounded-[20px]">' +
       '<div class="js-carousel group relative">' +
       media + arrows +
-      '<button type="button" class="js-favorite-btn js-favorite-overlay ' + (p.isFavorite ? 'is-favorite' : '') + ' absolute left-2 top-2 flex h-7 w-7 items-center justify-center" data-property-id="' + p.id + '" aria-label="Favoritar">' +
+      // Coração + fechar juntos no canto superior direito, com espaço entre
+      // os dois (o botão de fechar do Leaflet já fica em top:10/right:10 —
+      // o coração fica logo à esquerda dele) — mesmo agrupamento do popup
+      // de imóvel da Airbnb, em vez de cada ícone num canto diferente.
+      '<button type="button" class="js-favorite-btn js-favorite-overlay ' + (p.isFavorite ? 'is-favorite' : '') + ' absolute right-[46px] top-2.5 flex h-7 w-7 items-center justify-center" data-property-id="' + p.id + '" aria-label="Favoritar">' +
       '<svg width="20" height="20" viewBox="0 0 24 24" fill="' + (p.isFavorite ? '#C1502E' : 'rgba(0,0,0,.5)') + '" stroke="#fff" stroke-width="1.5" style="filter:drop-shadow(0 1px 2px rgba(0,0,0,.3))"><path d="M12 21s-7.5-4.6-10-9.3C.4 8.1 2 4.5 5.6 4c2-.3 3.8.6 6.4 3 2.6-2.4 4.4-3.3 6.4-3 3.6.5 5.2 4.1 3.6 7.7C19.5 16.4 12 21 12 21z"/></svg>' +
       '</button>' +
       '</div>' +
-      '<a href="' + esc(p.href) + '" class="block p-2.5">' +
-      '<p class="truncate text-sm font-semibold text-brand-text">' + esc(p.title) + '</p>' +
-      (p.neighborhood ? '<p class="truncate text-xs text-brand-text-secondary">' + esc(p.neighborhood) + '</p>' : '') +
-      (p.meta ? '<p class="truncate text-xs text-brand-text-secondary">' + esc(p.meta) + '</p>' : '') +
-      '<p class="mt-1 text-sm font-bold text-brand-text">' + esc(p.price) + '</p>' +
+      '<a href="' + esc(p.href) + '" class="block p-4">' +
+      '<p class="truncate text-[15px] font-semibold leading-snug text-brand-text">' + esc(p.title) + '</p>' +
+      (p.neighborhood ? '<p class="mt-0.5 truncate text-sm text-brand-text-secondary">' + esc(p.neighborhood) + '</p>' : '') +
+      (p.meta ? '<p class="mt-0.5 truncate text-sm text-brand-text-secondary">' + esc(p.meta) + '</p>' : '') +
+      '<p class="mt-2 text-base font-bold text-brand-text">' + esc(p.price) + '</p>' +
       '</a></div>'
     );
   }

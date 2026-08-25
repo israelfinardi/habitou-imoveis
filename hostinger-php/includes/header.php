@@ -88,12 +88,13 @@ body{font-family:'Plus Jakarta Sans',Arial,sans-serif}
    raiz contra os dropdowns do header (.cidade-dropdown z-index:220,
    .nav-user-menu z-index:200) e vencem, cobrindo-os quando abertos. */
 #home-minimap{position:relative;z-index:0;isolation:isolate}
-.map-pin-popup .leaflet-popup-content-wrapper{padding:0;border-radius:12px;overflow:hidden}
+.map-pin-popup .leaflet-popup-content-wrapper{padding:0;border-radius:20px;overflow:hidden;box-shadow:0 12px 28px rgba(0,0,0,.18),0 2px 6px rgba(0,0,0,.08)}
 .map-pin-popup .leaflet-popup-content{margin:0;width:100%!important}
+.map-pin-popup .leaflet-popup-tip{box-shadow:0 3px 6px rgba(0,0,0,.1)}
 .map-pin-popup .leaflet-popup-close-button{
-  top:8px!important;right:8px!important;width:26px!important;height:26px!important;
+  top:10px!important;right:10px!important;width:28px!important;height:28px!important;
   display:flex!important;align-items:center;justify-content:center;
-  background:rgba(255,255,255,.92)!important;border-radius:999px;
+  background:#fff!important;border-radius:999px;
   box-shadow:0 1px 4px rgba(0,0,0,.3);font-size:16px!important;
   color:#222!important;z-index:20;
 }
