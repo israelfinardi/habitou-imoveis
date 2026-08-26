@@ -2,10 +2,9 @@
 require_once __DIR__ . '/includes/bootstrap.php';
 
 $subjects = ['Anunciar no Habitou Imóveis', 'Suporte para minha conta', 'Dúvida sobre um imóvel', 'Parcerias e imprensa', 'Reportar um problema', 'Sugestão ou elogio', 'Outro'];
-$success = $_SESSION['contact_success'] ?? null;
 $error = $_SESSION['contact_error'] ?? null;
 $formData = $_SESSION['contact_form'] ?? [];
-unset($_SESSION['contact_success'], $_SESSION['contact_error'], $_SESSION['contact_form']);
+unset($_SESSION['contact_error'], $_SESSION['contact_form']);
 
 $imovel = $_GET['imovel'] ?? null;
 
@@ -17,14 +16,11 @@ require __DIR__ . '/includes/header.php';
   <div class="mb-10 text-center">
     <p class="text-sm font-semibold uppercase tracking-wide text-brand-primary">Atendimento · seg a sex, 8h–18h</p>
     <h1 class="mt-2 text-3xl font-bold">Fale com a gente</h1>
-    <p class="mx-auto mt-2 max-w-xl text-brand-text-secondary">Dúvida, sugestão, proposta de parceria ou quer anunciar? Preencha o formulário — normalmente respondemos em até 2 horas úteis.</p>
+    <p class="mx-auto mt-2 max-w-xl text-brand-text-secondary">Dúvida, sugestão, proposta de parceria ou quer anunciar? Preencha o formulário — você será redirecionado ao nosso WhatsApp com a mensagem já pronta.</p>
   </div>
 
   <div class="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_320px]">
     <div class="rounded-2xl border border-brand-border bg-white p-6">
-      <?php if ($success): ?>
-        <p class="rounded-lg bg-brand-green/10 px-4 py-3 text-sm text-brand-green-hover"><?= e($success) ?></p>
-      <?php else: ?>
         <?php if ($error): ?><p class="mb-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700"><?= e($error) ?></p><?php endif; ?>
         <form method="post" action="<?= base_url('actions/contact_action.php') ?>">
           <?= csrf_field() ?>
@@ -44,10 +40,9 @@ require __DIR__ . '/includes/header.php';
           <p class="mb-4 text-xs text-brand-text-secondary">Ao enviar, você concorda com a <a href="<?= base_url('politica-de-privacidade.php') ?>" class="text-brand-primary hover:underline">Política de Privacidade</a>.</p>
           <button type="submit" class="rounded-full bg-brand-primary px-6 py-2.5 text-sm font-semibold text-white hover:bg-brand-primary-hover">Enviar mensagem</button>
         </form>
-      <?php endif; ?>
     </div>
     <div class="space-y-4">
-      <div class="rounded-2xl border border-brand-border bg-white p-5"><p class="text-sm font-semibold">WhatsApp</p><a href="https://wa.me/5547964279000" class="text-sm text-brand-primary hover:underline">(47) 96427-9000</a><p class="text-xs text-brand-text-secondary">resposta rápida em horário comercial</p></div>
+      <div class="rounded-2xl border border-brand-border bg-white p-5"><p class="text-sm font-semibold">WhatsApp</p><a href="https://wa.me/5547991872805" class="text-sm text-brand-primary hover:underline">(47) 99187-2805</a><p class="text-xs text-brand-text-secondary">resposta rápida em horário comercial</p></div>
       <div class="rounded-2xl border border-brand-border bg-white p-5"><p class="text-sm font-semibold">E-mail</p><a href="mailto:contato@habitou.com.br" class="text-sm text-brand-primary hover:underline">contato@habitou.com.br</a><p class="text-xs text-brand-text-secondary">assuntos gerais e suporte</p></div>
       <div class="rounded-2xl border border-brand-border bg-white p-5"><p class="text-sm font-semibold">Horário de atendimento</p><p class="text-xs text-brand-text-secondary">Seg — Sex: 8h — 18h</p><p class="text-xs text-brand-text-secondary">Sáb, Dom e feriados: fechado</p></div>
     </div>

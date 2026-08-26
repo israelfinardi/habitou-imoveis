@@ -47,7 +47,6 @@ unset($_SESSION['newsletter_success'], $_SESSION['newsletter_error']);
         <li><a href="<?= base_url('anunciante/novo.php') ?>" class="hover:underline">Anunciar imóvel</a></li>
         <li><a href="<?= base_url('planos.php') ?>" class="hover:underline">Planos</a></li>
         <li><a href="<?= base_url('guias.php') ?>" class="hover:underline">Central de ajuda</a></li>
-        <li><a href="<?= base_url('blog.php') ?>" class="hover:underline">Blog</a></li>
       </ul>
     </div>
     <div>

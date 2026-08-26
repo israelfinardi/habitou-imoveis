@@ -283,9 +283,10 @@ if ($price) {
           status.className = 'mt-2 text-xs text-red-600';
           return;
         }
-        status.textContent = 'Mensagem enviada! O anunciante vai entrar em contato em breve.';
+        status.textContent = 'Abrindo o WhatsApp do anunciante...';
         status.className = 'mt-2 text-xs text-brand-green-hover';
         form.reset();
+        if (data.redirect) window.location.href = data.redirect;
       })
       .catch(function () {
         submitBtn.disabled = false;

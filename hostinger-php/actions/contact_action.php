@@ -25,12 +25,16 @@ $user = current_user();
 db()->prepare('INSERT INTO contact_messages (name, email, phone, subject, message, user_id) VALUES (?,?,?,?,?,?)')
     ->execute([$name, $email, $phone ?: null, $subject, $message, $user['id'] ?? null]);
 
-// Mensagens do "Fale conosco" avisam quem administra o site — usa o
-// notify_email configurado em Perfil (minha-conta-dados.php) do
-// primeiro ADMIN; sem isso, cai no e-mail padrão do site.
+// Mantém o e-mail interno como registro/backup — best-effort, não bloqueia
+// o fluxo principal, que agora é o WhatsApp da Habitou Imóveis.
 $adminNotify = db()->query('SELECT COALESCE(notify_email, email) FROM users WHERE role = "ADMIN" AND status = "ACTIVE" ORDER BY id LIMIT 1')->fetchColumn();
 $notifyTo = $adminNotify ?: (defined('SMTP_FROM') ? SMTP_FROM : 'contato@habitou.com.br');
 send_mail($notifyTo, "Novo contato: $subject", "<p><strong>" . e($name) . "</strong> (" . e($email) . ") enviou:</p><p>" . nl2br(e($message)) . '</p>');
 
-$_SESSION['contact_success'] = 'Mensagem enviada! Normalmente respondemos em até 2 horas úteis.';
-redirect(base_url('fale-conosco.php'));
+// Redireciona pro WhatsApp da Habitou Imóveis com os dados já digitados
+// pelo cliente preenchidos na mensagem, pra ele só confirmar o envio.
+$waText = "Olá! Enviei uma mensagem pelo site Habitou Imóveis:\n\n"
+    . "Assunto: {$subject}\nNome: {$name}\nE-mail: {$email}"
+    . ($phone ? "\nTelefone: {$phone}" : '')
+    . "\n\nMensagem: {$message}";
+redirect('https://wa.me/5547991872805?text=' . urlencode($waText));
