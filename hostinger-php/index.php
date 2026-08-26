@@ -66,17 +66,8 @@ $pageDescription = 'Encontre apartamentos, casas e terrenos para comprar ou alug
 require __DIR__ . '/includes/header.php';
 ?>
 
-<section class="relative border-b border-brand-border bg-gradient-to-b from-brand-bg-subtle to-white py-12 sm:py-16">
+<section class="relative border-b border-brand-border bg-brand-bg-subtle py-12 sm:py-16">
   <div class="relative mx-auto max-w-[1800px] px-4 sm:px-6 lg:px-8">
-    <div class="pointer-events-none absolute inset-0 hidden overflow-hidden lg:block" aria-hidden="true">
-      <div class="absolute -left-10 top-6 h-28 w-28 rounded-[2rem] border-2 border-brand-light/40"></div>
-      <div class="absolute left-24 top-0 h-20 w-20 rounded-[1.5rem] bg-brand-primary/10"></div>
-      <div class="absolute -left-4 bottom-10 h-24 w-24 rounded-[1.5rem] border-2 border-brand-primary/25"></div>
-      <div class="absolute left-28 bottom-0 h-16 w-16 rounded-2xl bg-brand-light/10"></div>
-      <div class="absolute right-4 top-8 h-20 w-20 rounded-2xl border-2 border-brand-light/30"></div>
-      <div class="absolute right-24 bottom-6 h-24 w-24 rounded-[1.5rem] bg-brand-primary/10"></div>
-    </div>
-
     <div class="relative flex flex-col gap-8 xl:flex-row xl:items-start xl:gap-10">
     <div class="max-w-2xl xl:w-1/2 xl:max-w-none">
       <span class="inline-flex items-center gap-2 rounded-full border border-brand-border bg-white px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-brand-text-secondary">
