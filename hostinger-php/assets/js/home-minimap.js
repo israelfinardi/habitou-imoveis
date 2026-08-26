@@ -13,15 +13,20 @@
   var DEFAULT_CENTER = [-14.235004, -51.92528];
   var DEFAULT_ZOOM = 4;
 
-  // Minimapa da home é só um elemento decorativo atrás do formulário de
-  // busca — sem tiles de mapa real (ruas/relevo), só a cor de fundo do site
-  // por trás dos pinos de preço, a pedido do usuário.
-  mapEl.style.background = '#FFFFFF';
   var map = L.map('home-minimap', {
     scrollWheelZoom: true,
     zoomControl: false,
     attributionControl: false,
   });
+  // Mesma base neutra (Esri Light Gray, gratuita e sem chave de API) do
+  // mapa da página de busca e do mapa de localização do imóvel.
+  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+    maxZoom: 19, maxNativeZoom: 16,
+    attribution: '&copy; Esri &mdash; Esri, DeLorme, NAVTEQ',
+  }).addTo(map);
+  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Reference/MapServer/tile/{z}/{y}/{x}', {
+    maxZoom: 19, maxNativeZoom: 16,
+  }).addTo(map);
   L.control.zoom({ position: 'bottomright' }).addTo(map);
 
   function esc(s) {
