@@ -16,7 +16,7 @@
   // Minimapa da home é só um elemento decorativo atrás do formulário de
   // busca — sem tiles de mapa real (ruas/relevo), só a cor de fundo do site
   // por trás dos pinos de preço, a pedido do usuário.
-  mapEl.style.background = '#F8F6F4';
+  mapEl.style.background = '#FFFFFF';
   var map = L.map('home-minimap', {
     scrollWheelZoom: true,
     zoomControl: false,
