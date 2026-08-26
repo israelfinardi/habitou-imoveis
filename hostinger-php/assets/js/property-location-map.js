@@ -28,11 +28,17 @@
   var initialLng = hasInitial ? parseFloat(lngInput.value) : -51.92528;
 
   var map = L.map('property-map').setView([initialLat, initialLng], hasInitial ? 16 : 4);
-  // Base neutra (cinza claro), consistente com os outros mapas do site.
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-    subdomains: 'abcd',
-    maxZoom: 20,
-    attribution: '&copy; <a href="https://carto.com/attributions">CARTO</a> &copy; OpenStreetMap contributors',
+  // Base neutra (cinza claro, sem vegetação/rodovias coloridas), via Esri —
+  // gratuita e sem chave de API (a CARTO passou a exigir chave, o que
+  // quebrava o mapa em produção com o aviso "API KEY REQUIRED"). maxZoom
+  // fica em 19 (maior que o maxNativeZoom de 16) pra permitir aproximar
+  // mais pra fixar o pino com precisão, mesmo com o tile ampliado.
+  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+    maxZoom: 19, maxNativeZoom: 16,
+    attribution: '&copy; Esri &mdash; Esri, DeLorme, NAVTEQ',
+  }).addTo(map);
+  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Reference/MapServer/tile/{z}/{y}/{x}', {
+    maxZoom: 19, maxNativeZoom: 16,
   }).addTo(map);
   // Exposto pro wizard de anúncio (assets/js/property-wizard.js) chamar
   // invalidateSize() quando essa etapa, escondida com display:none até o

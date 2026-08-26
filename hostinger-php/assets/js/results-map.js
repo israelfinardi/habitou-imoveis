@@ -10,12 +10,15 @@
   var DEFAULT_ZOOM = 4;
 
   var map = L.map('results-map', { scrollWheelZoom: true, zoomControl: true });
-  // Base neutra (cinza claro, sem vegetação/rodovias coloridas) em vez do
-  // estilo padrão do OpenStreetMap, pra combinar com o visual clean do site.
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-    subdomains: 'abcd',
-    maxZoom: 20,
-    attribution: '&copy; <a href="https://carto.com/attributions">CARTO</a> &copy; OpenStreetMap contributors',
+  // Base neutra (cinza claro, sem vegetação/rodovias coloridas), via Esri —
+  // gratuita e sem chave de API (a CARTO passou a exigir chave, o que
+  // quebrava o mapa em produção com o aviso "API KEY REQUIRED").
+  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+    maxZoom: 19, maxNativeZoom: 16,
+    attribution: '&copy; Esri &mdash; Esri, DeLorme, NAVTEQ',
+  }).addTo(map);
+  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Reference/MapServer/tile/{z}/{y}/{x}', {
+    maxZoom: 19, maxNativeZoom: 16,
   }).addTo(map);
 
   var markers = {};

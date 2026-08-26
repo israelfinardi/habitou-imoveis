@@ -13,16 +13,15 @@
   var DEFAULT_CENTER = [-14.235004, -51.92528];
   var DEFAULT_ZOOM = 4;
 
+  // Minimapa da home é só um elemento decorativo atrás do formulário de
+  // busca — sem tiles de mapa real (ruas/relevo), só a cor de fundo do site
+  // por trás dos pinos de preço, a pedido do usuário.
+  mapEl.style.background = '#F8F6F4';
   var map = L.map('home-minimap', {
     scrollWheelZoom: true,
     zoomControl: false,
     attributionControl: false,
   });
-  // Base neutra (cinza claro), consistente com o mapa da página de busca.
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-    subdomains: 'abcd',
-    maxZoom: 20,
-  }).addTo(map);
   L.control.zoom({ position: 'bottomright' }).addTo(map);
 
   function esc(s) {
