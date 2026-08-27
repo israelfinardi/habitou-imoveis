@@ -33,6 +33,10 @@ require __DIR__ . '/../includes/header.php';
         <h1 class="text-2xl font-bold">Meus imóveis</h1>
         <div class="flex items-center gap-2">
           <?php render_csv_export_button(); ?>
+          <a href="<?= base_url('actions/export_properties_xml.php') ?>" class="inline-flex items-center gap-1.5 rounded-full border border-brand-border px-4 py-2 text-sm font-semibold text-brand-text hover:border-brand-primary">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M4 21h16"/></svg>
+            Exportar XML
+          </a>
           <?php if ($atCap): ?>
             <a href="<?= base_url('planos.php') ?>" class="rounded-full border border-brand-primary px-4 py-2 text-sm font-semibold text-brand-primary hover:bg-brand-primary/5">Assinar plano</a>
           <?php else: ?>
