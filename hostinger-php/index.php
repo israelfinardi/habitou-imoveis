@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/includes/bootstrap.php';
+require_once __DIR__ . '/includes/filters_modal.php';
 
 $user = current_user();
 $featured = get_featured_properties(FEATURED_PROPERTIES_LIMIT);
@@ -19,6 +20,7 @@ foreach ($featured as $p) {
         'lng' => (float) $p['longitude'],
         'label' => format_price_short($mPrice, $p['listing_type'] === 'RENT'),
         'title' => (PROPERTY_TYPE_LABEL[$p['property_type']] ?? 'Imóvel') . ' · ' . $p['city_name'],
+        'neighborhood' => $p['neighborhood_name'] ?? null,
         'price' => format_currency_brl($mPrice) . ($p['listing_type'] === 'RENT' ? '/mês' : ''),
         'image' => $p['image_url'] ?? null,
         'href' => property_href($p),
@@ -293,4 +295,5 @@ foreach ($__homeBlockEndpoints as $__endpoint):
   </div>
 </section>
 
+<?php render_filters_modal(base_url('imoveis.php'), []); ?>
 <?php require __DIR__ . '/includes/footer.php'; ?>

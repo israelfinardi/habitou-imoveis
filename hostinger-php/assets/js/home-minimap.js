@@ -48,6 +48,7 @@
     var popupHtml = '<a href="' + esc(p.href) + '" class="block w-56 overflow-hidden rounded-xl">'
       + (p.image ? '<img src="' + esc(p.image) + '" alt="" class="h-32 w-full object-cover">' : '')
       + '<div class="p-2.5"><p class="truncate text-xs font-semibold text-brand-text">' + esc(p.title) + '</p>'
+      + (p.neighborhood ? '<p class="mt-0.5 truncate text-xs text-brand-text-secondary">' + esc(p.neighborhood) + '</p>' : '')
       + '<p class="mt-0.5 text-sm font-bold text-brand-text">' + esc(p.price) + '</p></div></a>';
     marker.bindPopup(popupHtml, { closeButton: true, className: 'map-pin-popup' });
     bounds.push([p.lat, p.lng]);
