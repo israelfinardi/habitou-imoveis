@@ -92,6 +92,13 @@ window.initCidadePicker = function (root, opts) {
   var heroPill = document.getElementById('hero-cidade-pill');
   if (heroPill) window.initCidadePicker(heroPill);
 
+  // Mesmo componente no menu mobile (hambúrguer) — cidade e transação
+  // ficavam disponíveis só na barra de busca desktop; no mobile essa barra
+  // é escondida (não cabe no cabeçalho compacto), então essa cópia dentro
+  // do menu garante a mesma capacidade de busca em qualquer tamanho de tela.
+  var mobileMenuPill = document.getElementById('mobile-menu-cidade-pill');
+  if (mobileMenuPill) window.initCidadePicker(mobileMenuPill);
+
   // --- Segmentado Todos / Comprar / Alugar + botão de busca -----------------
   var activeTransacao = current.transacao || '';
   var segs = document.querySelectorAll('.sp-seg');

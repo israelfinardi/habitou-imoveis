@@ -189,12 +189,6 @@ require __DIR__ . '/includes/header.php';
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="<?= asset_url('assets/js/home-minimap.js') ?>"></script>
 
-<style>
-.hero-transacao-tab{display:inline-flex;flex:1}
-.hero-transacao-tab input{position:absolute;opacity:0;width:0;height:0}
-.hero-transacao-tab span{display:block;width:100%;text-align:center;border-radius:10px;padding:8px 12px;font-size:13.5px;font-weight:600;color:#717171;cursor:pointer;transition:.15s}
-.hero-transacao-tab input:checked + span{background:#F7F7F7;color:#222222}
-</style>
 <script>
 document.getElementById('buscar-codigo-link')?.addEventListener('click', function (e) {
   e.preventDefault();
