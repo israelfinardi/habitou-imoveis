@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <title>Habitou FB Extractor</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <header>
+      <img src="icons/icon32.png" alt="" />
+      <h1>Extrator de dados do Facebook</h1>
+    </header>
+
+    <p class="hint">
+      Abra a página do Facebook (post, grupo ou Marketplace) que deseja
+      analisar e clique em <strong>Extrair desta página</strong>. Só é lida a
+      página que já está na sua tela.
+    </p>
+
+    <div id="not-facebook" class="warning" hidden>
+      Abra uma aba do facebook.com para usar a extensão.
+    </div>
+
+    <button id="extract-btn">Extrair desta página</button>
+
+    <div id="status" class="status"></div>
+
+    <div id="result-panel" hidden>
+      <div class="result-summary">
+        <span id="result-count"></span>
+        <span id="result-type"></span>
+      </div>
+      <div class="actions">
+        <button id="export-csv">Exportar CSV</button>
+        <button id="export-json">Exportar JSON</button>
+        <button id="copy-json" class="secondary">Copiar JSON</button>
+      </div>
+      <div id="preview"></div>
+    </div>
+
+    <footer>
+      Uso manual e pessoal. Extrai apenas o que está visível na tela — respeite
+      os Termos de Uso do Facebook e a privacidade de terceiros.
+    </footer>
+
+    <script src="popup.js"></script>
+  </body>
+</html>
