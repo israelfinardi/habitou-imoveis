@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Baixador de Legendas do Twitter/X</title>
+<meta name="description" content="Ferramenta gratuita para baixar as legendas (closed captions) de vídeos publicados no Twitter/X." />
+<meta name="robots" content="noindex" />
+<style>
+  :root {
+    --bg: #0f1419;
+    --card: #16202a;
+    --border: #273340;
+    --text: #e7e9ea;
+    --muted: #8b98a5;
+    --accent: #1d9bf0;
+    --accent-hover: #1a8cd8;
+    --danger: #f4212e;
+    --ok: #00ba7c;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 32px 16px 64px;
+  }
+  main { width: 100%; max-width: 640px; }
+  h1 {
+    font-size: 1.6rem;
+    margin: 0 0 4px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  h1 svg { flex: none; }
+  p.subtitle { color: var(--muted); margin: 0 0 28px; line-height: 1.5; }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+  label { display: block; font-size: 0.85rem; color: var(--muted); margin-bottom: 6px; }
+  input[type="text"], textarea {
+    width: 100%;
+    background: #0b1015;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    padding: 12px 14px;
+    font-size: 0.95rem;
+    font-family: inherit;
+    resize: vertical;
+  }
+  input[type="text"]:focus, textarea:focus { outline: 2px solid var(--accent); border-color: var(--accent); }
+  .row { display: flex; gap: 10px; margin-top: 12px; }
+  .row input { flex: 1; }
+  button {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 999px;
+    padding: 0 20px;
+    height: 42px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  button:hover { background: var(--accent-hover); }
+  button:disabled { background: #3a4650; cursor: not-allowed; }
+  button.secondary {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
+  }
+  button.secondary:hover { border-color: var(--accent); color: var(--accent); background: transparent; }
+  details { margin-top: 8px; }
+  summary { cursor: pointer; color: var(--accent); font-size: 0.9rem; margin-top: 4px; }
+  .hint { font-size: 0.8rem; color: var(--muted); margin-top: 8px; line-height: 1.5; }
+  .status { margin-top: 14px; font-size: 0.9rem; }
+  .status.error { color: var(--danger); }
+  .status.ok { color: var(--ok); }
+  ul.tracks { list-style: none; margin: 14px 0 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+  ul.tracks li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    background: #0b1015;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 14px;
+  }
+  ul.tracks .meta { font-size: 0.88rem; }
+  ul.tracks .meta .path { display: block; color: var(--muted); font-size: 0.75rem; word-break: break-all; margin-top: 2px; }
+  .btn-group { display: flex; gap: 8px; flex: none; }
+  .btn-group button { height: 34px; padding: 0 14px; font-size: 0.85rem; }
+  footer { color: var(--muted); font-size: 0.78rem; margin-top: 8px; text-align: center; line-height: 1.6; }
+  a { color: var(--accent); }
+</style>
+</head>
+<body>
+<main>
+  <h1>
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="var(--accent)" aria-hidden="true"><path d="M18.9 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.65h2.039L6.486 3.24H4.298Z"/></svg>
+    Baixador de Legendas do Twitter/X
+  </h1>
+  <p class="subtitle">
+    Cole o link de um post do Twitter/X que tenha vídeo com legendas (closed captions) e baixe o arquivo de legenda (.vtt) — com opção de converter para .srt.
+  </p>
+
+  <div class="card">
+    <label for="tweetUrl">Link do post (ou apenas o ID numérico)</label>
+    <div class="row">
+      <input type="text" id="tweetUrl" placeholder="https://x.com/usuario/status/1234567890123456789" autocomplete="off" />
+      <button id="searchBtn">Buscar legendas</button>
+    </div>
+    <p class="hint">
+      A busca automática usa a API pública de incorporação (embed) do Twitter/X. Ela só funciona para posts públicos que
+      realmente possuem uma faixa de legenda associada ao vídeo — a maioria dos vídeos no Twitter/X não tem legendas.
+    </p>
+    <div id="status" class="status" role="status" aria-live="polite"></div>
+    <ul id="tracks" class="tracks" hidden></ul>
+  </div>
+
+  <div class="card">
+    <details id="advanced">
+      <summary>Não funcionou? Cole manualmente os dados da requisição (avançado)</summary>
+      <div class="hint" style="margin-top:10px;">
+        Abra o post no navegador, pressione F12 → aba <strong>Rede/Network</strong>, recarregue a página, procure por uma
+        requisição chamada <code>TweetDetail</code> ou <code>tweet-result</code>, abra a aba "Resposta/Response" e cole o
+        JSON completo abaixo. A ferramenta procura automaticamente por qualquer link de legenda (.vtt/.srt) dentro do JSON.
+      </div>
+      <label for="rawJson" style="margin-top:12px;">JSON da resposta</label>
+      <textarea id="rawJson" rows="6" placeholder="Cole aqui o JSON copiado do Network do navegador..."></textarea>
+      <div class="row" style="margin-top:10px;">
+        <button id="parseJsonBtn">Analisar JSON</button>
+      </div>
+      <div id="jsonStatus" class="status" role="status" aria-live="polite"></div>
+      <ul id="jsonTracks" class="tracks" hidden></ul>
+    </details>
+  </div>
+
+  <div class="card">
+    <label for="directUrl">Ou baixe direto por uma URL de legenda (.vtt/.srt)</label>
+    <div class="row">
+      <input type="text" id="directUrl" placeholder="https://video.twimg.com/.../subtitles.vtt" autocomplete="off" />
+      <button id="directBtn" class="secondary">Baixar</button>
+    </div>
+    <div id="directStatus" class="status" role="status" aria-live="polite"></div>
+  </div>
+
+  <footer>
+    Esta ferramenta roda inteiramente no seu navegador (nenhum dado é enviado a servidores próprios) e só consegue
+    baixar legendas que já são públicas no Twitter/X. Ela não contorna restrições de privacidade nem baixa vídeos ou
+    conteúdo protegido por login.
+  </footer>
+</main>
+
+<script>
+(function () {
+  "use strict";
+
+  function $(id) { return document.getElementById(id); }
+
+  function setStatus(el, text, kind) {
+    el.textContent = text || "";
+    el.className = "status" + (kind ? " " + kind : "");
+  }
+
+  function extractTweetId(input) {
+    var trimmed = (input || "").trim();
+    if (/^\d+$/.test(trimmed)) return trimmed;
+    var match = trimmed.match(/status(?:es)?\/(\d+)/);
+    return match ? match[1] : null;
+  }
+
+  function randomToken() {
+    return Math.random().toString(36).slice(2, 10);
+  }
+
+  // Walks an arbitrary JSON structure looking for anything that looks like a subtitle/caption track.
+  function findSubtitleTracks(root) {
+    var found = [];
+    var seen = new Set();
+
+    function isSubtitleUrl(url) {
+      return typeof url === "string" && /\.(vtt|srt)(\?|#|$)/i.test(url);
+    }
+
+    function langFromContext(obj) {
+      return obj && (obj.language || obj.lang || obj.locale || obj.display_type) || null;
+    }
+
+    function walk(node, path) {
+      if (!node || typeof node !== "object") return;
+
+      if (Array.isArray(node)) {
+        node.forEach(function (item, i) { walk(item, path + "[" + i + "]"); });
+        return;
+      }
+
+      var url = node.url || node.subtitles_url || node.subtitle_url || node.src;
+      var contentType = node.content_type || node.contentType || node.type;
+      var looksLikeSubtitle =
+        (typeof url === "string" && (isSubtitleUrl(url) || contentType === "text/vtt" || contentType === "application/x-subrip"));
+
+      if (looksLikeSubtitle && !seen.has(url)) {
+        seen.add(url);
+        found.push({ url: url, lang: langFromContext(node), path: path });
+      }
+
+      Object.keys(node).forEach(function (key) {
+        walk(node[key], path ? path + "." + key : key);
+      });
+    }
+
+    walk(root, "");
+    return found;
+  }
+
+  function filenameFor(track, index, sourceId) {
+    var ext = /\.srt(\?|#|$)/i.test(track.url) ? "srt" : "vtt";
+    var lang = track.lang ? String(track.lang).replace(/[^a-z0-9-]/gi, "") : ("faixa" + (index + 1));
+    return "legenda-" + (sourceId || "twitter") + "-" + lang + "." + ext;
+  }
+
+  function vttToSrt(vtt) {
+    var lines = vtt.replace(/\r/g, "").split("\n");
+    var out = [];
+    var counter = 1;
+    var block = [];
+
+    function flush() {
+      if (!block.length) return;
+      // Skip cue identifier lines (block[0] without "-->" gets dropped, timing line kept).
+      var timing = block.find(function (l) { return l.indexOf("-->") !== -1; });
+      if (!timing) { block = []; return; }
+      var text = block.slice(block.indexOf(timing) + 1);
+      var srtTiming = timing
+        .replace(/\./g, ",")
+        .replace(/(\d{2}:\d{2}:\d{2}),(\d{3}).*-->.*?(\d{2}:\d{2}:\d{2}),(\d{3})/, "$1,$2 --> $3,$4");
+      out.push(String(counter++));
+      out.push(srtTiming);
+      out.push.apply(out, text);
+      out.push("");
+      block = [];
+    }
+
+    lines.forEach(function (line) {
+      if (line.trim() === "" ) { flush(); return; }
+      if (/^WEBVTT/i.test(line) || /^NOTE/i.test(line) || /^STYLE/i.test(line)) return;
+      block.push(line);
+    });
+    flush();
+    return out.join("\n");
+  }
+
+  function downloadBlob(content, filename, mime) {
+    var blob = new Blob([content], { type: mime || "text/plain" });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
+  }
+
+  function renderTracks(listEl, tracks, sourceId) {
+    listEl.innerHTML = "";
+    if (!tracks.length) {
+      listEl.hidden = true;
+      return;
+    }
+    listEl.hidden = false;
+
+    tracks.forEach(function (track, index) {
+      var li = document.createElement("li");
+
+      var meta = document.createElement("div");
+      meta.className = "meta";
+      meta.innerHTML =
+        "<strong>" + (track.lang ? "Idioma/faixa: " + escapeHtml(track.lang) : "Faixa de legenda " + (index + 1)) + "</strong>" +
+        "<span class=\"path\">" + escapeHtml(track.url) + "</span>";
+
+      var group = document.createElement("div");
+      group.className = "btn-group";
+
+      var vttBtn = document.createElement("button");
+      vttBtn.textContent = "Baixar .vtt";
+      vttBtn.className = "secondary";
+      vttBtn.onclick = function () { fetchAndSave(track, index, sourceId, "vtt"); };
+
+      var srtBtn = document.createElement("button");
+      srtBtn.textContent = "Baixar .srt";
+      srtBtn.onclick = function () { fetchAndSave(track, index, sourceId, "srt"); };
+
+      group.appendChild(vttBtn);
+      group.appendChild(srtBtn);
+      li.appendChild(meta);
+      li.appendChild(group);
+      listEl.appendChild(li);
+    });
+  }
+
+  function escapeHtml(str) {
+    return String(str).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+
+  function fetchAndSave(track, index, sourceId, format) {
+    fetch(track.url)
+      .then(function (res) {
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        return res.text();
+      })
+      .then(function (text) {
+        var isSourceSrt = /\.srt(\?|#|$)/i.test(track.url);
+        var finalText = text;
+        var mime = "text/vtt";
+        var ext = "vtt";
+
+        if (format === "srt") {
+          finalText = isSourceSrt ? text : vttToSrt(text);
+          mime = "application/x-subrip";
+          ext = "srt";
+        } else if (isSourceSrt) {
+          // Requested vtt but source is srt: just deliver as-is with the right extension.
+          ext = "srt";
+        }
+
+        var name = filenameFor(track, index, sourceId).replace(/\.(vtt|srt)$/i, "." + ext);
+        downloadBlob(finalText, name, mime);
+      })
+      .catch(function (err) {
+        window.alert(
+          "Não foi possível baixar automaticamente (provavelmente bloqueio de CORS do servidor de origem).\n" +
+          "Abrindo o link em uma nova aba — use \"Salvar como...\" para baixar manualmente.\n\nDetalhes: " + err.message
+        );
+        window.open(track.url, "_blank", "noopener");
+      });
+  }
+
+  function searchByUrl() {
+    var input = $("tweetUrl").value;
+    var status = $("status");
+    var listEl = $("tracks");
+    var id = extractTweetId(input);
+
+    listEl.hidden = true;
+    listEl.innerHTML = "";
+
+    if (!id) {
+      setStatus(status, "Não foi possível identificar o ID do post. Cole a URL completa (ex.: https://x.com/usuario/status/123...).", "error");
+      return;
+    }
+
+    setStatus(status, "Buscando dados do post...", "");
+    $("searchBtn").disabled = true;
+
+    var endpoint = "https://cdn.syndication.twimg.com/tweet-result?id=" + encodeURIComponent(id) + "&token=" + randomToken();
+
+    fetch(endpoint)
+      .then(function (res) {
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        return res.json();
+      })
+      .then(function (data) {
+        if (data && data.__typename === "TweetTombstone") {
+          throw new Error("Post indisponível ou privado.");
+        }
+        var tracks = findSubtitleTracks(data);
+        if (!tracks.length) {
+          setStatus(status, "Nenhuma legenda foi encontrada para este post. Tente o método avançado (colar JSON) caso saiba que o vídeo tem legendas.", "error");
+          return;
+        }
+        setStatus(status, "Encontrada" + (tracks.length > 1 ? "s " + tracks.length + " faixas" : " 1 faixa") + " de legenda:", "ok");
+        renderTracks(listEl, tracks, id);
+      })
+      .catch(function (err) {
+        setStatus(
+          status,
+          "Falha ao buscar automaticamente (" + err.message + "). Use o método avançado abaixo colando o JSON da requisição.",
+          "error"
+        );
+      })
+      .finally(function () {
+        $("searchBtn").disabled = false;
+      });
+  }
+
+  function parseJsonManually() {
+    var raw = $("rawJson").value;
+    var status = $("jsonStatus");
+    var listEl = $("jsonTracks");
+    listEl.hidden = true;
+    listEl.innerHTML = "";
+
+    var data;
+    try {
+      data = JSON.parse(raw);
+    } catch (e) {
+      setStatus(status, "JSON inválido: " + e.message, "error");
+      return;
+    }
+
+    var tracks = findSubtitleTracks(data);
+    if (!tracks.length) {
+      setStatus(status, "Nenhuma legenda foi encontrada nesse JSON.", "error");
+      return;
+    }
+    setStatus(status, "Encontrada" + (tracks.length > 1 ? "s " + tracks.length + " faixas" : " 1 faixa") + " de legenda:", "ok");
+    renderTracks(listEl, tracks, "manual");
+  }
+
+  function downloadDirect() {
+    var url = $("directUrl").value.trim();
+    var status = $("directStatus");
+
+    if (!url || !/^https?:\/\//i.test(url)) {
+      setStatus(status, "Informe uma URL válida.", "error");
+      return;
+    }
+
+    setStatus(status, "Baixando...", "");
+    var track = { url: url, lang: "direta" };
+    var isSrt = /\.srt(\?|#|$)/i.test(url);
+
+    fetch(url)
+      .then(function (res) {
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        return res.text();
+      })
+      .then(function (text) {
+        downloadBlob(text, "legenda-direta." + (isSrt ? "srt" : "vtt"), isSrt ? "application/x-subrip" : "text/vtt");
+        setStatus(status, "Download concluído.", "ok");
+      })
+      .catch(function (err) {
+        setStatus(status, "Falha ao baixar (" + err.message + "). Abrindo em nova aba...", "error");
+        window.open(url, "_blank", "noopener");
+      });
+  }
+
+  $("searchBtn").addEventListener("click", searchByUrl);
+  $("tweetUrl").addEventListener("keydown", function (e) { if (e.key === "Enter") searchByUrl(); });
+  $("parseJsonBtn").addEventListener("click", parseJsonManually);
+  $("directBtn").addEventListener("click", downloadDirect);
+  $("directUrl").addEventListener("keydown", function (e) { if (e.key === "Enter") downloadDirect(); });
+})();
+</script>
+</body>
+</html>
