@@ -38,6 +38,16 @@ function render_property_wizard(): void
             <h1 class="mb-2 text-3xl font-extrabold leading-tight">Qual é o endereço do imóvel?</h1>
             <p class="mb-6 text-brand-text-secondary">Busque o endereço, ou clique/arraste o pino no mapa — cidade, bairro, rua e CEP são preenchidos automaticamente. Você também pode preencher tudo manualmente.</p>
 
+            <div class="mb-6 rounded-xl border border-dashed border-brand-border bg-brand-bg-subtle p-4">
+              <p class="mb-1 text-sm font-semibold">Já tem esse imóvel anunciado no Facebook Marketplace?</p>
+              <p class="mb-3 text-xs text-brand-text-secondary">Cole o link do anúncio — tentamos importar título, descrição, preço e fotos automaticamente. Nem sempre funciona (o Facebook às vezes exige login para mostrar o anúncio), e você sempre pode revisar e completar tudo antes de publicar.</p>
+              <div class="flex gap-2">
+                <input type="url" id="wz-fb-import-url" placeholder="https://www.facebook.com/marketplace/item/..." class="w-full rounded-lg border border-brand-border px-3 py-2.5 text-sm">
+                <button type="button" id="wz-fb-import-btn" class="shrink-0 rounded-lg bg-brand-text px-4 py-2.5 text-sm font-semibold text-white hover:opacity-90">Importar</button>
+              </div>
+              <p id="wz-fb-import-status" class="mt-2 text-xs text-brand-text-secondary"></p>
+            </div>
+
             <div class="mb-4 flex gap-2">
               <input type="text" id="wz-address-search" placeholder="Buscar endereço (rua, bairro, cidade)..." class="w-full rounded-xl border border-brand-border px-4 py-3 text-sm">
               <button type="button" id="wz-address-search-btn" class="shrink-0 rounded-xl border border-brand-border px-4 text-sm font-semibold hover:border-brand-primary">Buscar</button>

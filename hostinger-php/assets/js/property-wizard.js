@@ -26,6 +26,7 @@
   var stepIndex = 0;
   var busy = false;
   var mapPollTimer = null;
+  var pendingImportPhotoUrls = [];
 
   var stepEls = {};
   document.querySelectorAll('.wizard-step').forEach(function (el) { stepEls[el.dataset.step] = el; });
@@ -244,6 +245,72 @@
     });
   }
 
+  // --- Importar do Facebook Marketplace (melhor esforço, opcional) -----------
+  // Só preenche título/descrição/preço/transação no estado local e guarda as
+  // URLs das fotos pra anexar depois — a criação do imóvel de verdade só
+  // acontece ao sair de "comodidades" (ver syncCore), porque exige cidade e
+  // bairro que o Facebook não dá pra gente com confiança.
+  var fbImportBtn = document.getElementById('wz-fb-import-btn');
+  var fbImportInput = document.getElementById('wz-fb-import-url');
+  var fbImportStatus = document.getElementById('wz-fb-import-status');
+  if (fbImportBtn) {
+    fbImportBtn.addEventListener('click', function () {
+      var url = (fbImportInput.value || '').trim();
+      if (!url) return;
+      fbImportBtn.disabled = true;
+      fbImportStatus.textContent = 'Importando...';
+      fetch(APP_BASE + 'actions/import_facebook_listing.php', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ csrf: csrf, url: url }),
+      }).then(function (r) { return r.json(); }).then(function (data) {
+        fbImportBtn.disabled = false;
+        if (!data.ok) {
+          fbImportStatus.textContent = data.error || 'Não foi possível importar esse anúncio.';
+          return;
+        }
+        var imported = [];
+        if (data.title) {
+          state.title = data.title.slice(0, 120);
+          document.getElementById('wz-title').value = state.title;
+          if (titleCountEl) titleCountEl.textContent = state.title.length;
+          imported.push('título');
+        }
+        if (data.description) {
+          state.description = data.description;
+          document.getElementById('wz-description').value = state.description;
+          imported.push('descrição');
+        }
+        if (data.listingTypeGuess) {
+          state.listingType = data.listingTypeGuess;
+          var radio = document.querySelector('input[name="wz-transacao"][value="' + data.listingTypeGuess + '"]');
+          if (radio) radio.checked = true;
+        }
+        if (data.priceGuess) {
+          if (state.listingType === 'RENT') {
+            state.priceRent = data.priceGuess;
+            document.getElementById('wz-priceRent').value = data.priceGuess;
+          } else {
+            state.priceSale = data.priceGuess;
+            document.getElementById('wz-priceSale').value = data.priceGuess;
+          }
+          imported.push('preço estimado');
+        }
+        if (data.photoUrls && data.photoUrls.length) {
+          pendingImportPhotoUrls = data.photoUrls;
+          imported.push(data.photoUrls.length + ' foto(s)');
+        }
+        fbImportStatus.textContent = imported.length
+          ? ('Importamos ' + imported.join(', ') + ' — revise e complete o restante (endereço, tipo, características) antes de publicar.')
+          : 'Não encontramos dados suficientes nesse anúncio. Preencha manualmente.';
+        clearError();
+        updateNextEnabled();
+      }).catch(function () {
+        fbImportBtn.disabled = false;
+        fbImportStatus.textContent = 'Não foi possível importar agora. Tente novamente ou preencha manualmente.';
+      });
+    });
+  }
+
   // --- Fotos (etapa 7) --------------------------------------------------------
   var photoInput = document.getElementById('wz-photo-input');
   var photoDrop = document.getElementById('wz-photo-drop');
@@ -369,7 +436,32 @@
     if (propertyId) payload.id = propertyId;
     return apiCall(action, payload).then(function (data) {
       if (!data.ok) throw new Error(data.error || 'Erro ao salvar o imóvel.');
-      if (!propertyId) propertyId = data.id;
+      var justCreated = !propertyId;
+      if (justCreated) propertyId = data.id;
+      if (justCreated && pendingImportPhotoUrls.length) {
+        return attachPendingImportPhotos();
+      }
+    });
+  }
+
+  // Anexa ao imóvel recém-criado as fotos que vieram do importador do
+  // Facebook Marketplace (etapa "endereço") — nunca trava a criação do
+  // imóvel se a importação de alguma foto falhar, só avisa.
+  function attachPendingImportPhotos() {
+    var urls = pendingImportPhotoUrls;
+    pendingImportPhotoUrls = [];
+    return fetch(APP_BASE + 'actions/import_facebook_photos.php', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ csrf: csrf, property_id: propertyId, urls: urls }),
+    }).then(function (r) { return r.json(); }).then(function (data) {
+      if (data.images) data.images.forEach(function (img) { photos.push(img); });
+      renderPhotoGrid();
+      if (data.errors && data.errors.length) {
+        photoStatus.textContent = data.errors.join(' ');
+      }
+    }).catch(function () {
+      // Falha ao importar as fotos não deve travar a criação do imóvel —
+      // o usuário ainda pode enviar fotos manualmente na próxima etapa.
     });
   }
 
