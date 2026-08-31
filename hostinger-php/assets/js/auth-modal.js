@@ -22,6 +22,7 @@
   var titleEl = document.getElementById('authm-title');
   var errorEl = document.getElementById('authm-error');
   var redirectInput = document.getElementById('authm-redirect');
+  var oauthLinks = document.querySelectorAll('.authm-oauth-link');
   var passwordSync = document.getElementById('authm-password-sync');
   var siteHeader = document.querySelector('header');
   var captchaWidget = document.getElementById('authm-captcha-widget');
@@ -280,6 +281,10 @@
     opts = opts || {};
     resetModal();
     redirectInput.value = opts.noRedirect ? '' : (window.location.pathname + window.location.search);
+    oauthLinks.forEach(function (link) {
+      var base = link.getAttribute('href').split('&redirect=')[0];
+      link.setAttribute('href', redirectInput.value ? (base + '&redirect=' + encodeURIComponent(redirectInput.value)) : base);
+    });
     overlay.classList.remove('hidden');
     overlay.classList.add('flex');
     document.body.classList.add('authm-open');

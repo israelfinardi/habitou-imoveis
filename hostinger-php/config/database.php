@@ -182,6 +182,20 @@ function run_pending_migrations(PDO $pdo): void
             $pdo->exec("ALTER TABLE properties ADD COLUMN $def");
         }
     }
+
+    // Login social (Google/Facebook) — ver includes/oauth.php. Sem UNIQUE
+    // aqui: ALTER TABLE do SQLite não cria constraint nova numa coluna
+    // existente, então a unicidade é garantida na consulta de
+    // oauth_login_or_register() (busca por valor antes de gravar).
+    $userColumns = $columns('users');
+    foreach (['google_id VARCHAR(64) NULL', 'facebook_id VARCHAR(64) NULL'] as $def) {
+        $col = strtok($def, ' ');
+        if (!in_array($col, $userColumns, true)) {
+            $pdo->exec("ALTER TABLE users ADD COLUMN $def");
+        }
+    }
+    $pdo->exec('CREATE UNIQUE INDEX IF NOT EXISTS idx_users_google_id ON users (google_id) WHERE google_id IS NOT NULL');
+    $pdo->exec('CREATE UNIQUE INDEX IF NOT EXISTS idx_users_facebook_id ON users (facebook_id) WHERE facebook_id IS NOT NULL');
 }
 
 /**

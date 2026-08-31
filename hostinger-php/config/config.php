@@ -82,6 +82,22 @@ define('MP_WEBHOOK_SECRET', '');
 define('TURNSTILE_SITE_KEY', '');
 define('TURNSTILE_SECRET_KEY', '');
 
+// --- Login social (opcional): "Continuar com Google" e "Continuar com
+// Facebook" no modal de entrar/cadastrar. Em branco, o botão do respectivo
+// provedor simplesmente não aparece — login por e-mail/senha continua
+// funcionando normalmente.
+//
+// Google: crie um "OAuth client ID" (tipo "Web application") em
+// https://console.cloud.google.com/apis/credentials e cadastre esta URI de
+// redirecionamento autorizada: SEUDOMINIO/actions/oauth_callback.php?provider=google
+define('GOOGLE_OAUTH_CLIENT_ID', '');
+define('GOOGLE_OAUTH_CLIENT_SECRET', '');
+// Facebook: crie um app em https://developers.facebook.com/apps, adicione o
+// produto "Facebook Login" e cadastre esta URI de redirecionamento válida:
+// SEUDOMINIO/actions/oauth_callback.php?provider=facebook
+define('FACEBOOK_OAUTH_APP_ID', '');
+define('FACEBOOK_OAUTH_APP_SECRET', '');
+
 define('UPLOAD_MAX_BYTES', 8 * 1024 * 1024);
 
 date_default_timezone_set('America/Sao_Paulo');
