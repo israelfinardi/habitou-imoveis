@@ -87,16 +87,28 @@ define('TURNSTILE_SECRET_KEY', '');
 // provedor simplesmente não aparece — login por e-mail/senha continua
 // funcionando normalmente.
 //
+// Diferente das outras chaves deste arquivo, o Client ID/Secret do Google e
+// o App ID/Secret do Facebook são bloqueados pelo GitHub Push Protection se
+// colados aqui direto (o formato deles é reconhecido automaticamente) — por
+// isso ficam num arquivo separado, config/oauth.local.php, que NÃO é
+// versionado (está no .gitignore). Copie config/oauth.local.example.php
+// para config/oauth.local.php e preencha lá; no servidor de produção, crie
+// esse arquivo direto por FTP/gerenciador de arquivos, nunca via git.
+//
 // Google: crie um "OAuth client ID" (tipo "Web application") em
 // https://console.cloud.google.com/apis/credentials e cadastre esta URI de
 // redirecionamento autorizada: SEUDOMINIO/actions/oauth_callback.php?provider=google
-define('GOOGLE_OAUTH_CLIENT_ID', '');
-define('GOOGLE_OAUTH_CLIENT_SECRET', '');
 // Facebook: crie um app em https://developers.facebook.com/apps, adicione o
 // produto "Facebook Login" e cadastre esta URI de redirecionamento válida:
 // SEUDOMINIO/actions/oauth_callback.php?provider=facebook
-define('FACEBOOK_OAUTH_APP_ID', '');
-define('FACEBOOK_OAUTH_APP_SECRET', '');
+if (is_file(__DIR__ . '/oauth.local.php')) {
+    require __DIR__ . '/oauth.local.php';
+} else {
+    define('GOOGLE_OAUTH_CLIENT_ID', '');
+    define('GOOGLE_OAUTH_CLIENT_SECRET', '');
+    define('FACEBOOK_OAUTH_APP_ID', '');
+    define('FACEBOOK_OAUTH_APP_SECRET', '');
+}
 
 define('UPLOAD_MAX_BYTES', 8 * 1024 * 1024);
 

@@ -56,3 +56,8 @@ hostinger-php/data/database.sqlite
 hostinger-php/data/database.sqlite-*
 hostinger-php/data/.secrets.php
 hostinger-php/data/.provisioning.lock
+
+# Login social (Google/Facebook): credenciais reais ficam só neste arquivo
+# local, nunca no git — o GitHub bloqueia push com esse formato de segredo.
+# Ver hostinger-php/config/oauth.local.example.php.
+hostinger-php/config/oauth.local.php
