@@ -222,7 +222,7 @@ if ($price) {
   </div>
   </div>
 
-  <div class="fixed inset-x-0 bottom-0 z-40 flex items-center justify-between gap-3 border-t border-brand-border bg-white px-4 py-3 shadow-[0_-4px_16px_rgba(0,0,0,0.08)] lg:hidden">
+  <div class="hb-fixed-bottom-bar fixed inset-x-0 z-40 flex items-center justify-between gap-3 border-t border-brand-border bg-white px-4 py-3 shadow-[0_-4px_16px_rgba(0,0,0,0.08)] lg:hidden">
     <div>
       <p class="text-base font-bold text-brand-text"><?= format_currency_brl($price) ?><?= $property['listing_type'] === 'RENT' ? '<span class="text-xs font-normal text-brand-text-secondary">/mês</span>' : '' ?></p>
       <a href="#anunciante" class="text-xs text-brand-text-secondary underline">Ver contato</a>

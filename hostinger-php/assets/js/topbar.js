@@ -78,8 +78,9 @@ window.initCidadePicker = function (root, opts) {
   return { getSelected: function () { return selectedCity; } };
 };
 
-// Barra superior: pílula de cidade (com sugestões), segmentado
-// Todos/Comprar/Alugar, menu da conta e menu mobile.
+// Barra superior (desktop): pílula de cidade (com sugestões), segmentado
+// Todos/Comprar/Alugar e menu da conta. No mobile, essa barra fica oculta —
+// a navegação vira a barra inferior fixa (includes/bottom_nav.php).
 (function () {
   // --- Pílula de cidade ------------------------------------------------
   var pill = document.getElementById('cidade-pill');
@@ -91,13 +92,6 @@ window.initCidadePicker = function (root, opts) {
   // preenchido via o hidden input renderizado pelo PHP.
   var heroPill = document.getElementById('hero-cidade-pill');
   if (heroPill) window.initCidadePicker(heroPill);
-
-  // Mesmo componente no menu mobile (hambúrguer) — cidade e transação
-  // ficavam disponíveis só na barra de busca desktop; no mobile essa barra
-  // é escondida (não cabe no cabeçalho compacto), então essa cópia dentro
-  // do menu garante a mesma capacidade de busca em qualquer tamanho de tela.
-  var mobileMenuPill = document.getElementById('mobile-menu-cidade-pill');
-  if (mobileMenuPill) window.initCidadePicker(mobileMenuPill);
 
   // --- Segmentado Todos / Comprar / Alugar + botão de busca -----------------
   var activeTransacao = current.transacao || '';
@@ -145,15 +139,6 @@ window.initCidadePicker = function (root, opts) {
     });
     document.addEventListener('click', function () {
       userMenu.classList.remove('on');
-    });
-  }
-
-  // --- Menu mobile -----------------------------------------------------
-  var mobileBtn = document.getElementById('mobile-menu-btn');
-  var mobileMenu = document.getElementById('mobile-menu');
-  if (mobileBtn && mobileMenu) {
-    mobileBtn.addEventListener('click', function () {
-      mobileMenu.classList.toggle('hidden');
     });
   }
 })();

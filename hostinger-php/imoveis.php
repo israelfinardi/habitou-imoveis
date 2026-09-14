@@ -25,9 +25,15 @@ require __DIR__ . '/includes/header.php';
     <div id="results-list-col">
       <div id="sheet-handle-wrap" class="sticky top-0 z-10 -mx-4 mb-3 bg-white px-4 pb-2 pt-1 lg:hidden">
         <button type="button" id="sheet-drag-handle" class="mx-auto block h-1.5 w-10 rounded-full bg-brand-border" aria-label="Arrastar lista"></button>
-        <p id="sheet-count-text" class="mt-2 text-center text-sm font-semibold text-brand-text">
-          <?= count($result['items']) ?> imóve<?= count($result['items']) === 1 ? 'l' : 'is' ?> nesta área
-        </p>
+        <div class="mt-2 flex items-center justify-between gap-2">
+          <p id="sheet-count-text" class="text-sm font-semibold text-brand-text">
+            <?= count($result['items']) ?> imóve<?= count($result['items']) === 1 ? 'l' : 'is' ?> nesta área
+          </p>
+          <a href="<?= base_url('imoveis.php') ?>" class="filtros-pill-btn shrink-0 !px-3 !py-1.5" id="filtros-toggle-btn-mobile">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
+            <span>Filtros</span>
+          </a>
+        </div>
       </div>
       <?php render_property_list($result['items'], $favoriteIds); ?>
       <?php

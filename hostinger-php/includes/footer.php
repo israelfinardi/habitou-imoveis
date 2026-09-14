@@ -1,6 +1,7 @@
 </main>
 
 <?php
+require_once __DIR__ . '/bottom_nav.php';
 $__newsletterSuccess = $_SESSION['newsletter_success'] ?? null;
 $__newsletterError = $_SESSION['newsletter_error'] ?? null;
 unset($_SESSION['newsletter_success'], $_SESSION['newsletter_error']);
@@ -75,13 +76,15 @@ unset($_SESSION['newsletter_success'], $_SESSION['newsletter_error']);
   </div>
 </footer>
 
-<div id="compare-bar" class="fixed inset-x-0 bottom-0 z-40 hidden border-t border-brand-border bg-white shadow-[0_-4px_12px_rgba(0,0,0,0.08)]">
+<div id="compare-bar" class="hb-fixed-bottom-bar fixed inset-x-0 z-40 hidden border-t border-brand-border bg-white shadow-[0_-4px_12px_rgba(0,0,0,0.08)]">
   <div class="mx-auto flex max-w-[1800px] items-center gap-4 px-4 py-3 sm:px-6 lg:px-8">
     <div id="compare-items" class="flex flex-1 items-center gap-2 overflow-x-auto"></div>
     <button id="compare-clear" class="text-xs text-brand-text-secondary hover:underline">Limpar</button>
     <a id="compare-link" href="<?= base_url('comparar.php') ?>" class="rounded-full bg-brand-primary px-5 py-2 text-sm font-semibold text-white hover:bg-brand-primary-hover">Comparar</a>
   </div>
 </div>
+
+<?php render_mobile_bottom_nav(); ?>
 
 <script>
 const APP_BASE = <?= json_encode(rtrim(base_url('/'), '/') . '/') ?>;
@@ -95,6 +98,7 @@ window.__CURRENT_FILTERS = {
 <script src="<?= asset_url('assets/js/cidades.js') ?>"></script>
 <script src="<?= asset_url('assets/js/location-picker.js') ?>"></script>
 <script src="<?= asset_url('assets/js/topbar.js') ?>"></script>
+<script src="<?= asset_url('assets/js/bottom-nav.js') ?>"></script>
 <script src="<?= asset_url('assets/js/home-blocks.js') ?>"></script>
 <script src="<?= asset_url('assets/js/property-view-tracker.js') ?>"></script>
 <script src="<?= asset_url('assets/js/auth-modal.js') ?>"></script>

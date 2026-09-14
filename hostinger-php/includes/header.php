@@ -148,6 +148,29 @@ body{font-family:'Plus Jakarta Sans',Arial,sans-serif}
 .hero-transacao-tab input{position:absolute;opacity:0;width:0;height:0}
 .hero-transacao-tab span{display:block;width:100%;text-align:center;border-radius:10px;padding:8px 12px;font-size:13.5px;font-weight:600;color:#717171;cursor:pointer;transition:.15s}
 .hero-transacao-tab input:checked + span{background:#F7F7F7;color:#222222}
+
+/* --- Navegação mobile estilo Airbnb: header só com a logo (o resto vira a
+   barra inferior fixa, includes/bottom_nav.php) — ambos escondem/mostram
+   ao rolar a tela (assets/js/bottom-nav.js). --- */
+:root{--hb-bn-h:64px}
+@media (min-width:1024px){:root{--hb-bn-h:0px}}
+header{transition:transform .25s ease}
+header.hb-hidden{transform:translateY(-100%)}
+@media (min-width:1024px){header.hb-hidden{transform:none}}
+#hb-bottom-nav{position:fixed;left:0;right:0;bottom:0;z-index:50;display:flex;align-items:stretch;background:#fff;border-top:1px solid #DDDDDD;box-shadow:0 -2px 10px rgba(0,0,0,.06);padding-bottom:env(safe-area-inset-bottom);transition:transform .25s ease}
+#hb-bottom-nav.hb-hidden{transform:translateY(100%)}
+.hb-bn-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:8px 4px 6px;font-size:11px;font-weight:600;color:#717171;background:0 0;border:0;cursor:pointer;text-decoration:none;-webkit-tap-highlight-color:transparent}
+.hb-bn-item svg{width:24px;height:24px}
+.hb-bn-item.is-active{color:#C1502E}
+.hb-bn-avatar{width:24px;height:24px;border-radius:50%;object-fit:cover}
+/* Barras fixas inferiores de outras páginas (CTA de contato do imóvel,
+   barra de comparação) sobem pra cima da barra de navegação no mobile, em
+   vez de sobrepor os botões dela. */
+.hb-fixed-bottom-bar{bottom:0}
+@media (max-width:1023.98px){
+  .hb-fixed-bottom-bar{bottom:var(--hb-bn-h)}
+  body{padding-bottom:var(--hb-bn-h)}
+}
 </style>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 </head>
@@ -233,82 +256,6 @@ body{font-family:'Plus Jakarta Sans',Arial,sans-serif}
       <?php endif; ?>
     </div>
 
-    <a href="<?= base_url('imoveis.php') ?>" class="filtros-pill-btn lg:!hidden" id="filtros-toggle-btn-mobile">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
-      <span>Filtros</span>
-    </a>
-    <?php if ($__user): ?>
-      <span class="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-brand-primary text-sm font-semibold text-white lg:hidden">
-        <?php if (!empty($__user['avatar_url'])): ?>
-          <img src="<?= e($__user['avatar_url']) ?>" class="h-full w-full object-cover" alt="">
-        <?php else: ?>
-          <?= e(mb_strtoupper(mb_substr($__user['first_name'], 0, 1))) ?>
-        <?php endif; ?>
-      </span>
-    <?php endif; ?>
-    <button id="mobile-menu-btn" class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-bg-subtle lg:hidden" aria-label="Abrir menu">
-      <svg width="18" height="14" viewBox="0 0 18 14" fill="none"><path d="M0 1h18M0 7h18M0 13h18" stroke="currentColor" stroke-width="1.5"/></svg>
-    </button>
-  </div>
-
-  <div id="mobile-menu" class="hidden lg:hidden border-t border-brand-border bg-white p-4">
-    <form method="get" action="<?= base_url('imoveis.php') ?>" class="mb-4 border-b border-brand-border pb-4">
-      <label class="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-brand-text-secondary">Cidade</label>
-      <div class="cidade-pill cidade-pill--field mb-3" id="mobile-menu-cidade-pill">
-        <button type="button" class="cidade-pill-btn">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.1-7-11a7 7 0 0 1 14 0c0 4.9-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
-          <span class="cidade-pill-label">Todas as cidades</span>
-        </button>
-        <input type="hidden" name="cidade_nome" class="cidade-hidden-input" value="">
-        <div class="cidade-dropdown">
-          <input type="text" class="cidade-busca-input" placeholder="Digite o nome da cidade..." autocomplete="off">
-          <div class="cidade-sugestoes"></div>
-        </div>
-      </div>
-      <div class="mb-3 flex gap-1 rounded-xl border border-brand-border p-1">
-        <label class="hero-transacao-tab">
-          <input type="radio" name="transacao" value="" checked>
-          <span>Todos</span>
-        </label>
-        <label class="hero-transacao-tab">
-          <input type="radio" name="transacao" value="comprar">
-          <span>Comprar</span>
-        </label>
-        <label class="hero-transacao-tab">
-          <input type="radio" name="transacao" value="alugar">
-          <span>Alugar</span>
-        </label>
-      </div>
-      <button type="submit" class="w-full rounded-full bg-brand-primary py-2.5 text-center text-sm font-semibold text-white hover:bg-brand-primary-hover">Buscar imóveis</button>
-    </form>
-    <?php if ($__user): ?>
-      <div class="mb-3 rounded-lg bg-brand-bg-subtle p-3 text-sm">
-        <p class="font-semibold"><?= e($__user['first_name'] . ' ' . $__user['last_name']) ?></p>
-        <p class="text-brand-text-secondary"><?= e($__user['email']) ?></p>
-      </div>
-      <div class="mb-3 flex flex-col gap-1 border-b border-brand-border pb-3">
-        <?php foreach (account_nav_items() as [$href, $label, $icon]): ?>
-          <a href="<?= base_url($href) ?>" class="flex items-center gap-3 py-1.5 text-sm"><?= render_nav_icon($icon) ?><?= e($label) ?></a>
-        <?php endforeach; ?>
-        <?php if ($__user['role'] === 'ADMIN'): ?>
-          <p class="mb-1 mt-2 text-xs font-semibold uppercase text-brand-text-secondary">Administração</p>
-          <?php foreach (admin_nav_items() as [$href, $label, $icon]): ?>
-            <a href="<?= base_url($href) ?>" class="flex items-center gap-3 py-1.5 text-sm"><?= render_nav_icon($icon) ?><?= e($label) ?></a>
-          <?php endforeach; ?>
-        <?php endif; ?>
-      </div>
-    <?php else: ?>
-      <div class="mb-3">
-        <button type="button" data-open-auth class="w-full rounded-full bg-brand-primary py-2 text-center text-sm font-medium text-white">Entrar ou cadastrar-se</button>
-      </div>
-    <?php endif; ?>
-    <div class="flex flex-col gap-1">
-      <a href="<?= base_url('imobiliarias.php') ?>" class="py-1.5 text-sm">Imobiliárias e corretores</a>
-      <a href="<?= base_url('como-anunciar.php') ?>" class="py-1.5 text-sm">Como anunciar</a>
-      <a href="<?= base_url('quem-somos.php') ?>" class="py-1.5 text-sm">Sobre nós</a>
-      <a href="<?= base_url('anunciante/novo.php') ?>" class="mt-2 rounded-full border border-brand-border px-4 py-2 text-center text-sm font-semibold text-brand-text">Anunciar imóvel</a>
-      <?php if ($__user): ?><a href="<?= base_url('logout.php') ?>" class="py-1.5 text-sm text-brand-text-secondary">Sair</a><?php endif; ?>
-    </div>
   </div>
 </header>
 <?php if (!$__user) { render_auth_modal(); } ?>
