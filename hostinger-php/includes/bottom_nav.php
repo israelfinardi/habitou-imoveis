@@ -15,7 +15,7 @@ function render_mobile_bottom_nav(): void
     $onFavoritos = $current === 'minha-conta-favoritos.php';
     $onConta = $user && str_starts_with($current, 'minha-conta') && !$onFavoritos;
     ?>
-    <nav id="hb-bottom-nav" class="lg:hidden" aria-label="Navegação principal">
+    <nav id="hb-bottom-nav" class="flex lg:hidden" aria-label="Navegação principal">
       <a href="<?= base_url('imoveis.php') ?>" class="hb-bn-item<?= $onBuscar ? ' is-active' : '' ?>">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>
         <span>Buscar</span>

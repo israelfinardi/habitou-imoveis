@@ -43,33 +43,24 @@ if (!empty($city['name']) && !empty($city['state_code'])) {
 <meta name="twitter:title" content="<?= e($__fullTitle) ?>">
 <meta name="twitter:description" content="<?= e($__pageDescription) ?>">
 <meta name="twitter:image" content="<?= e($__ogImage) ?>">
-<script src="https://cdn.tailwindcss.com"></script>
-<script>
-  tailwind.config = {
-    theme: {
-      extend: {
-        colors: {
-          brand: {
-            primary: '#C1502E',
-            'primary-hover': '#D45F3A',
-            dark: '#7A2E12',
-            light: '#DE6B46',
-            text: '#222222',
-            'text-secondary': '#717171',
-            border: '#DDDDDD',
-            'bg-subtle': '#F8F6F4',
-            green: '#25D366',
-            'green-hover': '#1DA851',
-            navy: '#3D1D10',
-          },
-        },
-        fontFamily: {
-          sans: ['Plus Jakarta Sans', 'system-ui', 'sans-serif'],
-        },
-      },
-    },
-  };
-</script>
+<?php
+/**
+ * CSS do Tailwind pré-compilado como arquivo estático (assets/css/tailwind.css)
+ * — em vez do script "Play CDN" (cdn.tailwindcss.com), que compila as
+ * classes NO NAVEGADOR do visitante, a cada carregamento de página. Em
+ * rede móvel mais lenta/instável, esse script podia demorar ou falhar
+ * pra carregar, e nesses momentos NENHUMA classe (inclusive as
+ * responsivas, tipo lg:hidden e sm:flex) funcionava — foi a causa real de
+ * bugs como a barra inferior aparecendo no desktop e a CTA de contato do
+ * imóvel "flutuando" sem posição fixa no mobile.
+ *
+ * Pra recompilar depois de adicionar/mudar classes Tailwind em qualquer
+ * .php do projeto: tailwindcss -i input.css -o assets/css/tailwind.css
+ * --minify, com o mesmo tailwind.config.js (cores/fontes abaixo) e
+ * content apontando pra hostinger-php/**\/*.php.
+ */
+?>
+<link rel="stylesheet" href="<?= asset_url('assets/css/tailwind.css') ?>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -166,7 +157,13 @@ body{font-family:'Plus Jakarta Sans',Arial,sans-serif}
 header{transition:transform .25s ease}
 header.hb-hidden{transform:translateY(-100%)}
 @media (min-width:1024px){header.hb-hidden{transform:none}}
-#hb-bottom-nav{position:fixed;left:0;right:0;bottom:0;z-index:50;display:flex;align-items:stretch;background:#fff;border-top:1px solid #DDDDDD;box-shadow:0 -2px 10px rgba(0,0,0,.06);padding-bottom:env(safe-area-inset-bottom);transition:transform .25s ease}
+/* display fica de fora daqui de propósito — vira classe Tailwind (flex
+   lg:hidden) no próprio elemento (includes/bottom_nav.php), porque um
+   seletor de ID como este tem mais especificidade que .lg\:hidden (classe)
+   e venceria ele em qualquer largura de tela, escondendo a barra sempre
+   no mobile e nunca no desktop (ou o oposto) — foi exatamente esse bug
+   que fazia a barra aparecer também no navegador de PC. */
+#hb-bottom-nav{position:fixed;left:0;right:0;bottom:0;z-index:50;align-items:stretch;background:#fff;border-top:1px solid #DDDDDD;box-shadow:0 -2px 10px rgba(0,0,0,.06);padding-bottom:env(safe-area-inset-bottom);transition:transform .25s ease}
 #hb-bottom-nav.hb-hidden{transform:translateY(100%)}
 .hb-bn-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:8px 4px 6px;font-size:11px;font-weight:600;color:#717171;background:0 0;border:0;cursor:pointer;text-decoration:none;-webkit-tap-highlight-color:transparent}
 .hb-bn-item svg{width:24px;height:24px}
