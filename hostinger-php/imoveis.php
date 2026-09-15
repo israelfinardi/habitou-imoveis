@@ -34,6 +34,12 @@ require __DIR__ . '/includes/header.php';
             <span>Filtros</span>
           </a>
         </div>
+        <div class="hb-chip-row -mx-4 mt-2 flex gap-2 overflow-x-auto px-4 pb-1">
+          <?php $__selectedFeatures = (array) ($_GET['caracteristicas'] ?? []); ?>
+          <?php foreach (QUICK_FILTER_FEATURES as $__feature): $__active = in_array($__feature, $__selectedFeatures, true); ?>
+            <a href="<?= e(toggle_array_param_url('imoveis.php', $_GET, 'caracteristicas', $__feature)) ?>" class="hb-chip<?= $__active ? ' is-active' : '' ?>"><?= e($__feature) ?></a>
+          <?php endforeach; ?>
+        </div>
       </div>
       <?php render_property_list($result['items'], $favoriteIds); ?>
       <?php

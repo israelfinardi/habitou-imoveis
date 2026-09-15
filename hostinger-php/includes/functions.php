@@ -116,6 +116,30 @@ function current_url_with(array $overrides): string
     return $_SERVER['PHP_SELF'] . ($qs ? '?' . $qs : '');
 }
 
+/**
+ * Alterna um valor dentro de um parâmetro de array da querystring (ex.:
+ * caracteristicas[]) preservando os demais filtros já aplicados — usado
+ * pelos chips de filtro rápido (estilo Airbnb) de imoveis.php.
+ */
+function toggle_array_param_url(string $path, array $get, string $param, string $value): string
+{
+    $current = (array) ($get[$param] ?? []);
+    if (in_array($value, $current, true)) {
+        $current = array_values(array_diff($current, [$value]));
+    } else {
+        $current[] = $value;
+    }
+    $params = $get;
+    if ($current) {
+        $params[$param] = $current;
+    } else {
+        unset($params[$param]);
+    }
+    unset($params['pagina']);
+    $qs = http_build_query($params);
+    return base_url($path . ($qs ? '?' . $qs : ''));
+}
+
 function json_decode_safe(?string $value, $default = [])
 {
     if (!$value) {

@@ -130,9 +130,10 @@
   var countText = document.getElementById('sheet-count-text');
   var isMobileLayout = false;
 
-  // Estados da bandeja: recolhida (só o cabeçalho + topo do 1º card),
-  // metade da tela, e quase tela cheia (cobrindo o mapa).
-  var SHEET_STATES = { collapsed: 132, half: null, full: null };
+  // Estados da bandeja: recolhida (só o cabeçalho — contador/Filtros + chips
+  // de filtro rápido — sem nenhum card), metade da tela, e quase tela cheia
+  // (cobrindo o mapa).
+  var SHEET_STATES = { collapsed: 176, half: null, full: null };
 
   function headerHeight() {
     var header = document.querySelector('header');
@@ -261,6 +262,21 @@
   }
 
   map.on('moveend', updateVisibleByBounds);
+
+  // --- Botão "Mapa" no card (estilo Airbnb): recolhe a bandeja pra revelar
+  // o mapa e centraliza/abre o popup do imóvel clicado. -----------------
+  document.addEventListener('click', function (e) {
+    var btn = e.target.closest('.js-map-toggle-btn');
+    if (!btn) return;
+    e.preventDefault();
+    var marker = markers[parseInt(btn.dataset.propertyId, 10)];
+    if (!marker) return;
+    map.setView(marker.getLatLng(), Math.max(map.getZoom(), 15));
+    marker.openPopup();
+    if (isMobileLayout) {
+      setState('collapsed');
+    }
+  });
 
   function syncLayout() {
     if (window.innerWidth < 1024) {

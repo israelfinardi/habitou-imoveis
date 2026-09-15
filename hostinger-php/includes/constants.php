@@ -59,6 +59,15 @@ const COMMON_FEATURES = [
     'Estuda permuta', 'Perto de transporte público',
 ];
 
+// Subconjunto de COMMON_FEATURES usado na barra de chips de filtro rápido
+// (estilo Airbnb) da página de resultados — rolável, embaixo do cabeçalho
+// da bandeja no mobile (imoveis.php). O modal de filtros completo continua
+// com a lista inteira.
+const QUICK_FILTER_FEATURES = [
+    'Piscina', 'Churrasqueira', 'Aceita animais', 'Mobiliado',
+    'Elevador', 'Portaria 24h', 'Ar condicionado', 'Academia',
+];
+
 // Agrupamento de COMMON_FEATURES por categoria, usado só na exibição do
 // wizard de anúncio (includes/property_wizard.php) — o filtro de busca
 // (filters_modal.php) continua com a lista plana.

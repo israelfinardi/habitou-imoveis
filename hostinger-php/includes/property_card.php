@@ -1,5 +1,5 @@
 <?php
-function render_property_card(array $p, bool $isFavorite = false): void
+function render_property_card(array $p, bool $isFavorite = false, bool $showMapToggle = false): void
 {
     $price = $p['listing_type'] === 'RENT' ? ($p['price_rent'] ?? null) : ($p['price_sale'] ?? null);
     $href = property_href($p);
@@ -42,6 +42,12 @@ function render_property_card(array $p, bool $isFavorite = false): void
         <button type="button" class="js-favorite-btn js-favorite-overlay <?= $isFavorite ? 'is-favorite' : '' ?> absolute right-3 top-3 flex h-8 w-8 items-center justify-center" data-property-id="<?= (int) $p['id'] ?>" aria-label="Favoritar">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="<?= $isFavorite ? '#C1502E' : 'rgba(0,0,0,.5)' ?>" stroke="#fff" stroke-width="1.5" style="filter:drop-shadow(0 1px 2px rgba(0,0,0,.3))"><path d="M12 21s-7.5-4.6-10-9.3C.4 8.1 2 4.5 5.6 4c2-.3 3.8.6 6.4 3 2.6-2.4 4.4-3.3 6.4-3 3.6.5 5.2 4.1 3.6 7.7C19.5 16.4 12 21 12 21z"/></svg>
         </button>
+        <?php if ($showMapToggle): ?>
+          <button type="button" class="js-map-toggle-btn absolute bottom-3 left-3 z-10 flex items-center gap-1.5 rounded-lg bg-white px-3 py-1.5 text-xs font-semibold text-brand-text shadow lg:!hidden" data-property-id="<?= (int) $p['id'] ?>">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+            Mapa
+          </button>
+        <?php endif; ?>
       </a>
       <div class="pt-3">
         <a href="<?= e($href) ?>" class="block truncate text-[15px] font-semibold text-brand-text"><?= $cardTitle ?></a>
@@ -195,7 +201,7 @@ function render_property_list(array $items, array $favoriteIds = [], string $emp
     }
     echo '<div id="results-grid" class="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">';
     foreach ($items as $p) {
-        render_property_card($p, in_array((int) $p['id'], $favoriteIds, true));
+        render_property_card($p, in_array((int) $p['id'], $favoriteIds, true), true);
     }
     echo '</div>';
 }

@@ -171,6 +171,15 @@ header.hb-hidden{transform:translateY(-100%)}
   .hb-fixed-bottom-bar{bottom:var(--hb-bn-h)}
   body{padding-bottom:var(--hb-bn-h)}
 }
+
+/* Chips de filtro rápido (estilo Airbnb), roláveis, embaixo do cabeçalho da
+   bandeja de resultados no mobile (imoveis.php) — ver includes/constants.php
+   QUICK_FILTER_FEATURES e includes/functions.php toggle_array_param_url(). */
+.hb-chip-row{scrollbar-width:none}
+.hb-chip-row::-webkit-scrollbar{display:none}
+.hb-chip{display:inline-flex;align-items:center;flex:none;white-space:nowrap;border:1px solid #DDDDDD;border-radius:999px;padding:8px 14px;font-size:13px;font-weight:600;color:#222222;text-decoration:none;background:#fff;transition:.15s}
+.hb-chip:hover{border-color:#222222}
+.hb-chip.is-active{border-color:#222222;background:#222222;color:#fff}
 </style>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 </head>
