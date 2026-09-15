@@ -152,8 +152,17 @@ body{font-family:'Plus Jakarta Sans',Arial,sans-serif}
 /* --- Navegação mobile estilo Airbnb: header só com a logo (o resto vira a
    barra inferior fixa, includes/bottom_nav.php) — ambos escondem/mostram
    ao rolar a tela (assets/js/bottom-nav.js). --- */
-:root{--hb-bn-h:64px}
-@media (min-width:1024px){:root{--hb-bn-h:0px}}
+/* Altura do CONTEÚDO da barra (ícone+rótulo+padding), sem a faixa de
+   gesto do aparelho — constante, medida uma vez. O espaço da faixa de
+   gesto (env(safe-area-inset-bottom)) é somado via CSS puro em cada regra
+   que precisa dele (nunca via JS): esse valor pode mudar durante a
+   rolagem, quando o navegador esconde/mostra a barra de endereço, e um
+   valor "fotografado" uma vez via JS fica desatualizado nesse momento —
+   fazendo a CTA de contato do imóvel (e a barra de comparação) flutuarem
+   com um vão sem fundo por trás bem na hora de rolar a tela. Em CSS puro,
+   os dois lados sempre recalculam com o mesmo valor a cada quadro. */
+:root{--hb-bn-content-h:59px}
+@media (min-width:1024px){:root{--hb-bn-content-h:0px}}
 header{transition:transform .25s ease}
 header.hb-hidden{transform:translateY(-100%)}
 @media (min-width:1024px){header.hb-hidden{transform:none}}
@@ -168,8 +177,8 @@ header.hb-hidden{transform:translateY(-100%)}
    vez de sobrepor os botões dela. */
 .hb-fixed-bottom-bar{bottom:0}
 @media (max-width:1023.98px){
-  .hb-fixed-bottom-bar{bottom:var(--hb-bn-h)}
-  body{padding-bottom:var(--hb-bn-h)}
+  .hb-fixed-bottom-bar{bottom:calc(var(--hb-bn-content-h) + env(safe-area-inset-bottom))}
+  body{padding-bottom:calc(var(--hb-bn-content-h) + env(safe-area-inset-bottom))}
 }
 
 /* Chips de filtro rápido (estilo Airbnb), roláveis, embaixo do cabeçalho da

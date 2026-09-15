@@ -20,19 +20,6 @@
   // dispara e essa página precisa de outro gatilho pra mostrar/esconder.
   window.__hbBottomNav = { show: show, hide: hide };
 
-  // Altura real da barra (varia por aparelho — iPhone com faixa de gesto
-  // soma env(safe-area-inset-bottom) por cima do conteúdo) — outras barras
-  // fixas (CTA de contato do imóvel, comparador) encostam nela por essa
-  // variável; sem medir de verdade, um valor fixo no CSS abre um vão
-  // transparente entre as duas em aparelhos com safe-area maior.
-  function measureHeight() {
-    if (nav) {
-      document.documentElement.style.setProperty('--hb-bn-h', nav.offsetHeight + 'px');
-    }
-  }
-  measureHeight();
-  window.addEventListener('resize', measureHeight);
-
   function bindScroll(target, isWindow) {
     var lastY = isWindow ? window.scrollY : target.scrollTop;
     var ticking = false;
