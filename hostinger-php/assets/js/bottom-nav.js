@@ -9,10 +9,19 @@
   function show() {
     if (nav) nav.classList.remove('hb-hidden');
     if (header) header.classList.remove('hb-hidden');
+    // Avisa outras barras fixas (CTA de contato do imóvel, comparador —
+    // ver includes/header.php, .hb-fixed-bottom-bar) que a navegação
+    // voltou a ocupar espaço lá embaixo, então elas sobem de novo pra
+    // cima dela em vez de ficar coladas na borda da tela.
+    document.body.classList.remove('hb-nav-hidden');
   }
   function hide() {
     if (nav) nav.classList.add('hb-hidden');
     if (header) header.classList.add('hb-hidden');
+    // Sem isso, essas barras continuariam reservando o espaço da
+    // navegação mesmo com ela fora da tela (transform), sobrando um vão
+    // vazio — a barra "flutuando" sem nada atrás.
+    document.body.classList.add('hb-nav-hidden');
   }
   // assets/js/results-map.js chama isso direto ao trocar o estado da
   // bandeja de resultados (recolhida/metade/cheia) — nesse modo o scroll da
