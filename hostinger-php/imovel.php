@@ -222,15 +222,11 @@ if ($price) {
   </div>
   </div>
 
-  <div class="hb-fixed-bottom-bar fixed inset-x-0 z-40 flex items-center justify-between gap-3 border-t border-brand-border bg-white px-4 py-3 shadow-[0_-4px_16px_rgba(0,0,0,0.08)] lg:hidden">
-    <div>
-      <p class="text-base font-bold text-brand-text"><?= format_currency_brl($price) ?><?= $property['listing_type'] === 'RENT' ? '<span class="text-xs font-normal text-brand-text-secondary">/mês</span>' : '' ?></p>
-      <a href="#anunciante" class="text-xs text-brand-text-secondary underline">Ver contato</a>
-    </div>
+  <div class="hb-floating-cta lg:hidden">
     <?php if ($whatsapp): ?>
-      <a href="https://wa.me/55<?= e($whatsapp) ?>?text=<?= urlencode('Olá! Tenho interesse no imóvel "' . $property['title'] . '" (código ' . $property['code'] . ').') ?>" target="_blank" rel="noopener noreferrer" class="shrink-0 rounded-full bg-brand-primary px-6 py-3 text-sm font-semibold text-white hover:bg-brand-primary-hover">Conversar no WhatsApp</a>
+      <a href="https://wa.me/55<?= e($whatsapp) ?>?text=<?= urlencode('Olá! Tenho interesse no imóvel "' . $property['title'] . '" (código ' . $property['code'] . ').') ?>" target="_blank" rel="noopener noreferrer" class="rounded-full bg-brand-primary px-8 py-3.5 text-sm font-semibold text-white shadow-[0_6px_20px_rgba(0,0,0,.25)] hover:bg-brand-primary-hover">Conversar no WhatsApp</a>
     <?php else: ?>
-      <a href="#anunciante" class="shrink-0 rounded-full bg-brand-primary px-6 py-3 text-sm font-semibold text-white hover:bg-brand-primary-hover">Entrar em contato</a>
+      <a href="#anunciante" class="rounded-full bg-brand-primary px-8 py-3.5 text-sm font-semibold text-white shadow-[0_6px_20px_rgba(0,0,0,.25)] hover:bg-brand-primary-hover">Entrar em contato</a>
     <?php endif; ?>
   </div>
 

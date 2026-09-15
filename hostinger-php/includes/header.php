@@ -169,14 +169,21 @@ header.hb-hidden{transform:translateY(-100%)}
 .hb-bn-item svg{width:24px;height:24px}
 .hb-bn-item.is-active{color:#C1502E}
 .hb-bn-avatar{width:24px;height:24px;border-radius:50%;object-fit:cover}
-/* Barras fixas inferiores de outras páginas (CTA de contato do imóvel,
-   barra de comparação) sobem pra cima da barra de navegação no mobile, em
-   vez de sobrepor os botões dela. */
+/* Barra de comparação (footer.php) sobe pra cima da navegação no mobile,
+   em vez de sobrepor os botões dela. */
 .hb-fixed-bottom-bar{bottom:0}
 @media (max-width:1023.98px){
   .hb-fixed-bottom-bar{bottom:calc(var(--hb-bn-content-h) + env(safe-area-inset-bottom))}
   body{padding-bottom:calc(var(--hb-bn-content-h) + env(safe-area-inset-bottom))}
 }
+
+/* Botão de contato do imóvel (imovel.php), estilo Airbnb: só o botão
+   flutuando por cima do conteúdo, sem barra/fundo por trás — flutua acima
+   da navegação inferior, sem precisar encostar nela pixel a pixel (por
+   isso não usa .hb-fixed-bottom-bar: como não tem nada colado atrás, uma
+   folga aproximada não chama atenção). */
+.hb-floating-cta{position:fixed;left:0;right:0;z-index:40;display:flex;justify-content:center;padding:0 16px;bottom:calc(var(--hb-bn-content-h) + env(safe-area-inset-bottom) + 14px)}
+@media (min-width:1024px){.hb-floating-cta{display:none}}
 
 /* Chips de filtro rápido (estilo Airbnb), roláveis, embaixo do cabeçalho da
    bandeja de resultados no mobile (imoveis.php) — ver includes/constants.php
