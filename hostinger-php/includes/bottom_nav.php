@@ -3,9 +3,9 @@
  * Barra de navegação inferior fixa, só no mobile (estilo Airbnb: Buscar /
  * Favoritos / Entrar-Perfil) — substitui o antigo menu hambúrguer do header
  * (includes/header.php), que no mobile agora mostra só a logo. Esconde/
- * mostra ao rolar a tela (assets/js/bottom-nav.js) e some por completo
- * enquanto o mapa em tela cheia da busca está ativo (results-map.js marca
- * `document.body.classList.add('hb-map-fullscreen')`).
+ * mostra ao rolar a tela (assets/js/bottom-nav.js); na página de
+ * resultados/mapa, quem manda é o estado da bandeja arrastável (recolhida
+ * esconde, metade/cheia mostra — ver assets/js/results-map.js).
  */
 function render_mobile_bottom_nav(): void
 {

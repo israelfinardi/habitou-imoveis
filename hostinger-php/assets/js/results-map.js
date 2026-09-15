@@ -154,6 +154,13 @@
 
   function setState(state) {
     applySheetHeight(SHEET_STATES[state], true);
+    // Com a bandeja recolhida (mapa em quase tela cheia), a barra inferior
+    // (includes/bottom_nav.php) some — igual ao Airbnb; ao expandir de
+    // novo (metade/cheia), ela volta (assets/js/bottom-nav.js).
+    if (window.__hbBottomNav) {
+      if (state === 'collapsed') window.__hbBottomNav.hide();
+      else window.__hbBottomNav.show();
+    }
   }
 
   function enableMobileLayout() {
@@ -185,10 +192,6 @@
     sheet.style.padding = '0 16px 16px';
 
     document.body.style.overflow = 'hidden';
-    // A barra inferior (includes/bottom_nav.php) some por completo aqui —
-    // ver assets/js/bottom-nav.js — pra dar a tela toda pro mapa, igual ao
-    // comportamento do Airbnb ao entrar no modo de mapa no celular.
-    document.body.classList.add('hb-map-fullscreen');
     setState('half');
     setTimeout(function () { map.invalidateSize(); }, 60);
   }
@@ -200,7 +203,7 @@
     ['position', 'left', 'right', 'bottom', 'zIndex', 'background', 'borderTopLeftRadius', 'borderTopRightRadius', 'boxShadow', 'overflowY', 'overscrollBehavior', 'padding', 'transition', 'height'].forEach(function (k) { sheet.style[k] = ''; });
     grid && Array.prototype.forEach.call(grid.children, function (card) { card.style.display = ''; });
     document.body.style.overflow = '';
-    document.body.classList.remove('hb-map-fullscreen');
+    if (window.__hbBottomNav) window.__hbBottomNav.show();
     setTimeout(function () { map.invalidateSize(); }, 60);
   }
 
