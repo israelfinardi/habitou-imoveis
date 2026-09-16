@@ -18,12 +18,12 @@
 
 <link rel="icon" href="favicon.svg" type="image/svg+xml" />
 
-<!-- Fontes: Archivo (display), Inter (corpo), JetBrains Mono (rótulos) -->
+<!-- Fontes: Lexend (display) e Roboto (corpo) — as mesmas do site atual -->
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link
   rel="stylesheet"
-  href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,400..900;1,62..125,400..900&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap"
+  href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700;800;900&family=Roboto:wght@400;500;700&family=Roboto+Mono:wght@500&display=swap"
 />
 
 <link rel="stylesheet" href="styles.css" />
@@ -35,19 +35,26 @@
 <!-- ========================================================= -->
 <!-- CABEÇALHO                                                  -->
 <!-- ========================================================= -->
-<header class="topbar" id="topbar" data-solid="false">
+<header class="topbar on-light" id="topbar" data-solid="false">
   <div class="container topbar__inner">
     <a class="wordmark" href="#top" aria-label="CuboNET — início">
-      <img class="wordmark__logo" src="https://cubonet.net.br/wp-content/uploads/2023/05/logo.png" alt="CuboNET" width="120" height="40" />
+      <svg class="wordmark__cube" viewBox="0 0 100 100" aria-hidden="true">
+        <polygon points="50,6 90,28 50,50 10,28" fill="#f0502a" />
+        <polygon points="10,28 50,50 50,94 10,72" fill="#33b24b" />
+        <polygon points="90,28 50,50 50,94 90,72" fill="#2a63e8" />
+      </svg>
+      <span class="wordmark__text">
+        <span class="wordmark__name display"><span class="wordmark__cubo">CUBO</span><span class="wordmark__net">NET</span></span>
+        <span class="wordmark__tag">CONECTANDO VOCÊ</span>
+      </span>
     </a>
 
     <nav class="topbar__nav" aria-label="Ações">
       <a class="topbar__link" href="#" data-speedtest target="_blank" rel="noopener">Teste de Conexão</a>
-      <a class="topbar__link" href="#" data-area-cliente target="_blank" rel="noopener">Área do Cliente</a>
-      <a class="btn btn--outline-accent" href="#" data-whatsapp target="_blank" rel="noopener">
-        Falar no WhatsApp
+      <a class="btn btn--primary btn--pill" href="#" data-area-cliente target="_blank" rel="noopener">
+        <svg class="btn__icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.4" /><path d="M5 20c1.3-3.6 4.3-5.5 7-5.5s5.7 1.9 7 5.5" /></svg>
+        Área do Cliente
       </a>
-      <a class="btn btn--primary" href="#planos" data-tab-target="contratar">Contratar agora</a>
     </nav>
   </div>
 </header>
@@ -56,7 +63,7 @@
   <!-- ======================================================= -->
   <!-- HERÓI                                                    -->
   <!-- ======================================================= -->
-  <section class="hero on-dark" id="hero">
+  <section class="hero" id="hero">
     <div class="container hero__inner">
       <div class="hero__text">
         <p class="badge reveal">
@@ -82,15 +89,11 @@
       </div>
 
       <div class="hero__media reveal">
-        <span class="hero__panel" aria-hidden="true"></span>
-        <span class="hero__icon-wrap" aria-hidden="true">
-          <svg class="hero__icon" viewBox="0 0 24 24">
-            <path d="M12 20.5h.01" stroke-width="2.4" stroke-linecap="round" />
-            <path d="M8.5 16.8a5 5 0 0 1 7 0" />
-            <path d="M5 13.2a10 10 0 0 1 14 0" />
-            <path d="M1.5 9.6a15 15 0 0 1 21 0" />
-          </svg>
-        </span>
+        <svg class="hero__cube" viewBox="0 0 100 100" aria-hidden="true">
+          <polygon points="50,6 90,28 50,50 10,28" fill="#f0502a" />
+          <polygon points="10,28 50,50 50,94 10,72" fill="#33b24b" />
+          <polygon points="90,28 50,50 50,94 90,72" fill="#2a63e8" />
+        </svg>
         <span class="hero__seal">100% FIBRA · SALETE-SC</span>
       </div>
     </div>
@@ -213,130 +216,90 @@
   <!-- ======================================================= -->
   <section class="section planos" id="planos">
     <div class="container">
-      <p class="kicker reveal">PLANOS</p>
+      <p class="kicker reveal">PLANOS DE INTERNET 100% FIBRA</p>
       <h2 class="section__title display reveal">
-        VELOCIDADE PARA CADA <span class="accent">NECESSIDADE</span>
+        CLIQUE E SAIBA MAIS SOBRE O <span class="accent">MELHOR PLANO</span> PARA VOCÊ!
       </h2>
-      <p class="hero__sub reveal">
-        Instalação grátis e fidelidade de 12 meses em todos os planos. Confirme a disponibilidade
-        para o seu endereço em Salete pelo WhatsApp.
-      </p>
 
       <div class="planos__grid">
-        <article class="plano reveal" data-accordion>
-          <button class="plano__head accordion__head" aria-expanded="false" type="button">
-            <span class="plano__label">
-              <svg class="plano__icon" viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M4 18h3M4 13h6M4 8h9M4 3h13" />
-              </svg>
-              <span>
-                <span class="plano__title display">400 MEGA</span>
-                <span class="plano__price display">R$ 99<small>,90/mês</small></span>
-                <span class="plano__resumo">Ideal para uso residencial do dia a dia.</span>
-              </span>
-            </span>
-            <span class="plus" aria-hidden="true"></span>
-          </button>
-          <div class="accordion__panel">
-            <div class="accordion__panel-inner">
-              <ul class="plano__features">
-                <li>Instalação grátis</li>
-                <li>Fidelidade de 12 meses</li>
-                <li>400 Mb/s de download e upload</li>
-                <li>Tecnologia FTTH · roteador incluso</li>
-              </ul>
-              <a class="linklike plano__cta" href="#" data-whatsapp data-whatsapp-msg="Olá, gostaria de assinar o plano de 400 mega" target="_blank" rel="noopener">
-                Assinar pelo WhatsApp →
-              </a>
-            </div>
+        <article class="plano plano--red reveal on-light">
+          <header class="plano__band">
+            <span class="plano__title display">400 mega</span>
+            <span class="plano__band-sub">400 MB/s</span>
+          </header>
+          <div class="plano__body">
+            <p class="plano__price display"><small>R$</small>99<sup>,90</sup></p>
+            <p class="plano__period label">Mensais</p>
+            <ul class="plano__features">
+              <li>Instalação grátis</li>
+              <li>Fidelidade de 12 meses</li>
+              <li>400 Mb/s de download</li>
+              <li>400 Mb/s de upload</li>
+              <li>Tecnologia FTTH</li>
+              <li>Roteador incluso</li>
+            </ul>
+            <a class="btn btn--dark plano__cta" href="#" data-whatsapp data-whatsapp-msg="Olá, gostaria de assinar o plano de 400 mega" target="_blank" rel="noopener">Assinar</a>
           </div>
         </article>
 
-        <article class="plano reveal" data-accordion>
-          <button class="plano__head accordion__head" aria-expanded="false" type="button">
-            <span class="plano__label">
-              <svg class="plano__icon" viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M4 18h3M4 13h8M4 8h11M4 3h15" />
-              </svg>
-              <span>
-                <span class="plano__title display">500 MEGA</span>
-                <span class="plano__price display">R$ 119<small>,90/mês</small></span>
-                <span class="plano__resumo">Para famílias com mais dispositivos conectados.</span>
-              </span>
-            </span>
-            <span class="plus" aria-hidden="true"></span>
-          </button>
-          <div class="accordion__panel">
-            <div class="accordion__panel-inner">
-              <ul class="plano__features">
-                <li>Instalação grátis</li>
-                <li>Fidelidade de 12 meses</li>
-                <li>500 Mb/s de download e upload</li>
-                <li>Tecnologia FTTH · roteador incluso</li>
-              </ul>
-              <a class="linklike plano__cta" href="#" data-whatsapp data-whatsapp-msg="Olá, gostaria de assinar o plano de 500 mega" target="_blank" rel="noopener">
-                Assinar pelo WhatsApp →
-              </a>
-            </div>
+        <article class="plano plano--blue reveal on-light">
+          <header class="plano__band">
+            <span class="plano__title display">500 mega</span>
+            <span class="plano__band-sub">500 MB/s</span>
+          </header>
+          <div class="plano__body">
+            <p class="plano__price display"><small>R$</small>119<sup>,90</sup></p>
+            <p class="plano__period label">Mensais</p>
+            <ul class="plano__features">
+              <li>Instalação grátis</li>
+              <li>Fidelidade de 12 meses</li>
+              <li>500 Mb/s de download</li>
+              <li>500 Mb/s de upload</li>
+              <li>Tecnologia FTTH</li>
+              <li>Roteador incluso</li>
+            </ul>
+            <a class="btn btn--dark plano__cta" href="#" data-whatsapp data-whatsapp-msg="Olá, gostaria de assinar o plano de 500 mega" target="_blank" rel="noopener">Assinar</a>
           </div>
         </article>
 
-        <article class="plano reveal" data-accordion>
-          <button class="plano__head accordion__head" aria-expanded="false" type="button">
-            <span class="plano__label">
-              <svg class="plano__icon" viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M3 21 21 3M13 3h8v8" />
-              </svg>
-              <span>
-                <span class="plano__title display">750 MEGA</span>
-                <span class="plano__price display">R$ 139<small>,90/mês</small></span>
-                <span class="plano__resumo">Para quem trabalha em casa ou joga on-line.</span>
-              </span>
-            </span>
-            <span class="plus" aria-hidden="true"></span>
-          </button>
-          <div class="accordion__panel">
-            <div class="accordion__panel-inner">
-              <ul class="plano__features">
-                <li>Instalação grátis</li>
-                <li>Fidelidade de 12 meses</li>
-                <li>750 Mb/s de download e upload</li>
-                <li>Tecnologia FTTH · roteador incluso</li>
-              </ul>
-              <a class="linklike plano__cta" href="#" data-whatsapp data-whatsapp-msg="Olá, gostaria de assinar o plano de 750 mega" target="_blank" rel="noopener">
-                Assinar pelo WhatsApp →
-              </a>
-            </div>
+        <article class="plano plano--green reveal on-light">
+          <header class="plano__band">
+            <span class="plano__title display">750 mega</span>
+            <span class="plano__band-sub">750 MB/s</span>
+          </header>
+          <div class="plano__body">
+            <p class="plano__price display"><small>R$</small>139<sup>,90</sup></p>
+            <p class="plano__period label">Mensais</p>
+            <ul class="plano__features">
+              <li>Instalação grátis</li>
+              <li>Fidelidade de 12 meses</li>
+              <li>750 Mb/s de download</li>
+              <li>750 Mb/s de upload</li>
+              <li>Tecnologia FTTH</li>
+              <li>Roteador incluso</li>
+            </ul>
+            <a class="btn btn--dark plano__cta" href="#" data-whatsapp data-whatsapp-msg="Olá, gostaria de assinar o plano de 750 mega" target="_blank" rel="noopener">Assinar</a>
           </div>
         </article>
 
-        <article class="plano plano--popular reveal" data-accordion>
-          <span class="plano__badge">MAIS PROCURADO</span>
-          <button class="plano__head accordion__head" aria-expanded="false" type="button">
-            <span class="plano__label">
-              <svg class="plano__icon" viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M13 2 4 14h7l-1 8 9-12h-7l1-8Z" />
-              </svg>
-              <span>
-                <span class="plano__title display">1 GIGA</span>
-                <span class="plano__price display">R$ 199<small>,90/mês</small></span>
-                <span class="plano__resumo">Para empresas e eventos com alta demanda.</span>
-              </span>
-            </span>
-            <span class="plus" aria-hidden="true"></span>
-          </button>
-          <div class="accordion__panel">
-            <div class="accordion__panel-inner">
-              <ul class="plano__features">
-                <li>Instalação grátis</li>
-                <li>Fidelidade de 12 meses</li>
-                <li>1 Gb/s de download e upload</li>
-                <li>Tecnologia FTTH · roteador incluso</li>
-              </ul>
-              <a class="linklike plano__cta" href="#" data-whatsapp data-whatsapp-msg="Olá, gostaria de assinar o plano de 1 giga" target="_blank" rel="noopener">
-                Assinar pelo WhatsApp →
-              </a>
-            </div>
+        <article class="plano plano--dark reveal on-light">
+          <span class="plano__badge">POPULAR</span>
+          <header class="plano__band">
+            <span class="plano__title display">1 gigabyte</span>
+            <span class="plano__band-sub">1GB/s</span>
+          </header>
+          <div class="plano__body">
+            <p class="plano__price display"><small>R$</small>199<sup>,90</sup></p>
+            <p class="plano__period label">Mensais</p>
+            <ul class="plano__features">
+              <li>Instalação grátis</li>
+              <li>Fidelidade de 12 meses</li>
+              <li>1 Gb/s de download</li>
+              <li>1 Gb/s de upload</li>
+              <li>Tecnologia FTTH</li>
+              <li>Roteador incluso</li>
+            </ul>
+            <a class="btn btn--dark plano__cta" href="#" data-whatsapp data-whatsapp-msg="Olá, gostaria de assinar o plano de 1 giga" target="_blank" rel="noopener">Assinar</a>
           </div>
         </article>
       </div>
@@ -416,7 +379,7 @@
   <!-- ======================================================= -->
   <!-- CITAÇÃO                                                  -->
   <!-- ======================================================= -->
-  <section class="section quote-block on-dark" aria-label="Missão">
+  <section class="section quote-block" aria-label="Missão">
     <div class="container quote-block__inner">
       <span class="quote-block__mark" aria-hidden="true">“</span>
       <blockquote class="quote-block__text display display--italic reveal">
@@ -430,7 +393,7 @@
   <!-- ======================================================= -->
   <!-- CONTATO                                                  -->
   <!-- ======================================================= -->
-  <section class="section conversion on-dark" id="contato">
+  <section class="section conversion" id="contato">
     <div class="container conversion__inner">
       <h2 class="section__title section__title--center display reveal">
         QUER FIBRA <span class="accent">CUBONET</span> NA SUA CASA?
@@ -440,7 +403,7 @@
         disponibilidade, plano e valor.
       </p>
 
-      <div class="panel reveal" id="tabs">
+      <div class="panel on-light reveal" id="tabs">
         <div class="tablist" role="tablist" aria-label="Tipo de contato" data-active="0">
           <button class="tab" role="tab" id="tab-contratar" data-tab="contratar" aria-selected="true" aria-controls="panel-contratar">CONTRATAR</button>
           <button class="tab" role="tab" id="tab-suporte" data-tab="suporte" aria-selected="false" aria-controls="panel-suporte" tabindex="-1">SUPORTE</button>
@@ -544,18 +507,71 @@
       </div>
 
       <p class="conversion__proof reveal">
-        Prefere resolver direto? <a class="linklike" href="#" data-whatsapp target="_blank" rel="noopener" style="color:#ffb27a">Chame no WhatsApp</a>.
+        Prefere resolver direto? <a class="linklike" href="#" data-whatsapp target="_blank" rel="noopener">Chame no WhatsApp</a>.
       </p>
+    </div>
+  </section>
+
+  <!-- ======================================================= -->
+  <!-- PRECISA DE AJUDA PARA CONTRATAR?                         -->
+  <!-- ======================================================= -->
+  <section class="section" id="ajuda">
+    <div class="container">
+      <h2 class="section__title display reveal">Precisa de ajuda para <span class="accent">contratar?</span></h2>
+
+      <div class="social__grid">
+        <a class="social__btn reveal" href="#" data-telefone target="_blank" rel="noopener">
+          <span class="social__meta">
+            <span class="label">LIGAR AGORA</span>
+            <span class="social__handle display">Fale com um especialista</span>
+          </span>
+          <svg class="social__icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M5 4h3l2 5-2.2 1.6a11 11 0 0 0 5.6 5.6L15 14l5 2v3a2 2 0 0 1-2.2 2A16 16 0 0 1 3 5.2 2 2 0 0 1 5 4Z" />
+          </svg>
+        </a>
+
+        <a class="social__btn reveal" href="#" data-whatsapp target="_blank" rel="noopener">
+          <span class="social__meta">
+            <span class="label">NOSSO WHATSAPP</span>
+            <span class="social__handle display">Nosso time responde</span>
+          </span>
+          <svg class="social__icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M20 11.6a8 8 0 0 1-11.9 7L4 20l1.5-4A8 8 0 1 1 20 11.6Z" />
+            <path d="M9 9.5c0 3 2.5 5.5 5.5 5.5l1-1.4-2-1-.9.9c-1-.4-1.9-1.3-2.3-2.3l.9-.9-1-2-1.2 1.2Z" class="filled" />
+          </svg>
+        </a>
+
+        <a class="social__btn reveal" data-key="telegram" href="#" target="_blank" rel="noopener">
+          <span class="social__meta">
+            <span class="label">NOSSO TELEGRAM</span>
+            <span class="social__handle display">Resolva no aplicativo</span>
+          </span>
+          <svg class="social__icon" viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="9" />
+            <path d="m7 12 3.2 1.2L18 8l-5.5 6-4.5 3v-3.5Z" class="filled" />
+          </svg>
+        </a>
+
+        <a class="social__btn reveal" href="#" data-mapa target="_blank" rel="noopener">
+          <span class="social__meta">
+            <span class="label">ENCONTRAR LOJA</span>
+            <span class="social__handle display">Visite a loja mais perto</span>
+          </span>
+          <svg class="social__icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21Z" />
+            <circle cx="12" cy="9.5" r="2.4" />
+          </svg>
+        </a>
+      </div>
     </div>
   </section>
 
   <!-- ======================================================= -->
   <!-- AUTOATENDIMENTO                                          -->
   <!-- ======================================================= -->
-  <section class="section tinted" id="autoatendimento">
+  <section class="section" id="autoatendimento">
     <div class="container">
-      <p class="kicker reveal">AUTOATENDIMENTO</p>
-      <h2 class="section__title display reveal">RESOLVA SEM SAIR DE <span class="accent">CASA</span></h2>
+      <h2 class="section__title display reveal">Autoatendimento para clientes <span class="accent">CuboNET</span></h2>
 
       <div class="social__grid">
         <a class="social__btn reveal" href="#" data-area-cliente target="_blank" rel="noopener">
@@ -666,10 +682,35 @@
 <!-- ========================================================= -->
 <!-- RODAPÉ                                                     -->
 <!-- ========================================================= -->
-<footer class="footer on-dark">
+<footer class="footer">
   <div class="container footer__inner">
-    <div class="footer__brand">
-      <img class="wordmark__logo" src="https://cubonet.net.br/wp-content/uploads/2023/05/logo.png" alt="CuboNET" width="120" height="40" />
+    <div class="footer__brand wordmark">
+      <svg class="wordmark__cube" viewBox="0 0 100 100" aria-hidden="true">
+        <polygon points="50,6 90,28 50,50 10,28" fill="#f0502a" />
+        <polygon points="10,28 50,50 50,94 10,72" fill="#33b24b" />
+        <polygon points="90,28 50,50 50,94 90,72" fill="#2a63e8" />
+      </svg>
+      <span class="wordmark__text">
+        <span class="wordmark__name display"><span class="wordmark__cubo">CUBO</span><span class="wordmark__net">NET</span></span>
+        <span class="wordmark__tag">CONECTANDO VOCÊ</span>
+      </span>
+    </div>
+    <div class="footer__social" aria-label="Redes sociais">
+      <a class="icon-btn" data-key="facebook" href="#" target="_blank" rel="noopener" aria-label="Facebook">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path class="filled" d="M14 8.5h-1.6c-.7 0-1.1.5-1.1 1.2V11h2.5l-.4 2.4h-2.1V20h-2.5v-6.6H9V11h1.8V9.3c0-1.9 1.1-3.1 3-3.1H14v2.3Z" /></svg>
+      </a>
+      <a class="icon-btn" data-key="twitter" href="#" target="_blank" rel="noopener" aria-label="Twitter/X">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path class="filled" d="M4 4l7 8.5L4.5 20H7l5-5.7 4 5.7h4l-7.3-8.9L19 4h-2.5l-4.6 5.3L8 4H4Z" /></svg>
+      </a>
+      <a class="icon-btn" data-key="instagram" href="#" target="_blank" rel="noopener" aria-label="Instagram">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5" /><circle cx="12" cy="12" r="4" /><circle cx="17.2" cy="6.8" r="1.2" /></svg>
+      </a>
+      <a class="icon-btn" href="#" data-email target="_blank" rel="noopener" aria-label="E-mail">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2" /><path d="m4 6 8 6 8-6" /></svg>
+      </a>
+      <a class="icon-btn" href="#" data-mapa target="_blank" rel="noopener" aria-label="Localização">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21Z" /><circle cx="12" cy="9.5" r="2.4" /></svg>
+      </a>
     </div>
     <nav class="footer__links" aria-label="Navegação do rodapé">
       <a href="#sobre">Sobre</a>
@@ -689,7 +730,7 @@
 </footer>
 
 <!-- Barra inferior fixa (mobile) -->
-<nav class="mobilebar" aria-label="Ações">
+<nav class="mobilebar on-light" aria-label="Ações">
   <a class="btn btn--primary" href="#planos" data-tab-target="contratar">Contratar agora</a>
   <a class="btn btn--outline-accent" href="#" data-whatsapp target="_blank" rel="noopener">WhatsApp</a>
 </nav>

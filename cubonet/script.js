@@ -18,6 +18,7 @@ const DATA = {
   instagram: "https://www.instagram.com/cubonet/",
   facebook: "https://www.facebook.com/cubonetworks",
   telegram: "https://t.me/cubonetworks",
+  twitter: "https://twitter.com/cubonet",
 
   /* ---- E-mail ---- */
   email: "contato@cubonet.net.br",
@@ -85,11 +86,12 @@ function hydrate() {
     ["instagram", DATA.instagram],
     ["facebook", DATA.facebook],
     ["telegram", DATA.telegram],
+    ["twitter", DATA.twitter],
   ].forEach(([key, url]) => {
-    const el = document.querySelector(`.social__btn[data-key="${key}"]`);
-    if (!el) return;
-    if (url) el.setAttribute("href", url);
-    else el.remove();
+    document.querySelectorAll(`[data-key="${key}"]`).forEach((el) => {
+      if (url) el.setAttribute("href", url);
+      else el.remove();
+    });
   });
 
   const grid = document.getElementById("social-grid");
