@@ -1,31 +1,39 @@
 /* =========================================================
-   CUBONET · site institucional — v1
-
-   >>> PREENCHA ANTES DE PUBLICAR <<<
-   Os campos abaixo estão com valores de exemplo/placeholder.
-   Troque pelos dados reais antes de colocar o site no ar.
+   CUBONET · site institucional — v2
+   Dados de contato, redes e preços copiados do site atual
+   (cubonet.net.br). Reconfira antes de publicar, pois provedores
+   costumam reajustar preços e fidelidade com frequência.
    ========================================================= */
 const DATA = {
-  /* ---- WhatsApp ----
-     Somente dígitos, com código do país (55) e DDD.
-     Ex.: "5547999998888". Enquanto for o placeholder abaixo,
-     os botões abrem um número inválido. */
-  whatsappNumber: "55XXXXXXXXXXX",
+  /* ---- WhatsApp ---- */
+  whatsappNumber: "554792573822",
   whatsappMsgPadrao: "Olá! Vim pelo site e quero saber mais sobre os planos de internet da CuboNET.",
+
+  /* ---- Telefone ---- */
+  telefone: "+554792573822",
 
   /* ---- Redes sociais ----
      null = o botão sai da grade (regra do template original:
      nunca mostrar link morto nem dado inventado). */
-  instagram: null, // ex.: "https://instagram.com/cubonet.sc"
-  facebook: null, // ex.: "https://facebook.com/cubonet"
+  instagram: "https://www.instagram.com/cubonet/",
+  facebook: "https://www.facebook.com/cubonetworks",
+  telegram: "https://t.me/cubonetworks",
+
+  /* ---- E-mail ---- */
+  email: "contato@cubonet.net.br",
+
+  /* ---- Área do cliente (portal de boletos e suporte) ---- */
+  areaClienteUrl: "http://186.233.53.238:1006/central/login.hhvm",
+
+  /* ---- Teste de velocidade ---- */
+  speedtestUrl: "https://www.speedtest.net/",
 
   /* ---- Endereço / mapa ---- */
   enderecoMapaUrl:
     "https://www.google.com/maps/search/?api=1&query=Rua+Germano+Niehues%2C+628%2C+Schreiber%2C+Salete+-+SC",
 
-  /* ---- Rodapé ----
-     Identificação legal da empresa (razão social e CNPJ). */
-  rodapeLegal: "CUBONET TELECOMUNICAÇÕES · RAZÃO SOCIAL E CNPJ A CONFIRMAR",
+  /* ---- Rodapé ---- */
+  rodapeLegal: "CUBONET TELECOMUNICAÇÕES · CNPJ 07.478.184/0001-49 · © 2026 CuboNET — Todos os direitos reservados.",
 };
 
 /* =========================================================
@@ -57,9 +65,26 @@ function hydrate() {
     el.setAttribute("href", DATA.enderecoMapaUrl);
   });
 
+  document.querySelectorAll("[data-area-cliente]").forEach((el) => {
+    el.setAttribute("href", DATA.areaClienteUrl);
+  });
+
+  document.querySelectorAll("[data-speedtest]").forEach((el) => {
+    el.setAttribute("href", DATA.speedtestUrl);
+  });
+
+  document.querySelectorAll("[data-telefone]").forEach((el) => {
+    el.setAttribute("href", `tel:${DATA.telefone}`);
+  });
+
+  document.querySelectorAll("[data-email]").forEach((el) => {
+    el.setAttribute("href", `mailto:${DATA.email}`);
+  });
+
   [
     ["instagram", DATA.instagram],
     ["facebook", DATA.facebook],
+    ["telegram", DATA.telegram],
   ].forEach(([key, url]) => {
     const el = document.querySelector(`.social__btn[data-key="${key}"]`);
     if (!el) return;
