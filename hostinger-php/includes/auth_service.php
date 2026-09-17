@@ -83,6 +83,19 @@ function create_pending_agency(string $name, string $cnpj, string $phone, string
     return (int) $pdo->lastInsertId();
 }
 
+/**
+ * Usado por login.php pra decidir, antes de tentar autenticar, se o
+ * e-mail digitado já tem conta — se não tiver, manda direto pro cadastro
+ * em vez de só dizer "e-mail ou senha inválidos", que não ajuda quem
+ * simplesmente ainda não criou conta.
+ */
+function email_has_account(string $email): bool
+{
+    $stmt = db()->prepare('SELECT 1 FROM users WHERE email = ?');
+    $stmt->execute([$email]);
+    return (bool) $stmt->fetchColumn();
+}
+
 function authenticate_user(string $email, string $password): array
 {
     $pdo = db();

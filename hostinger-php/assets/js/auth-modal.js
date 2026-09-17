@@ -277,6 +277,28 @@
   var isFallbackFlow = !!fallbackPage;
   if (fallbackPage) fallbackPage.classList.add('hidden');
 
+  // Aplica um aviso/erro que o servidor gerou numa resposta de página
+  // inteira (login.php ou cadastro.php processaram um POST normal, sem
+  // AJAX) — sem isso, resetModal() sempre reabre na etapa "entry" vazia e
+  // esse aviso nunca chegaria a aparecer pra quem tem JS.
+  function applyServerState(s) {
+    emailInput.value = s.email || '';
+    state.flow = s.flow;
+    form.action = APP_BASE + (s.flow === 'login' ? 'login.php' : 'cadastro.php');
+    if (s.flow === 'login') {
+      goToStep('login-password');
+      // Senha errada: não repreenche, pra pessoa digitar de novo com
+      // atenção — o link "Esqueci minha senha" já fica logo abaixo.
+    } else {
+      goToStep('signup-name');
+      if (s.password) {
+        signupPasswordInput.value = s.password;
+        passwordConfirmationInput.value = s.password;
+      }
+    }
+    showError(s.error || s.notice);
+  }
+
   function openModal(opts) {
     opts = opts || {};
     resetModal();
@@ -289,7 +311,11 @@
     overlay.classList.add('flex');
     document.body.classList.add('authm-open');
     if (siteHeader) siteHeader.classList.add('authm-header-flat');
-    setTimeout(function () { emailInput.focus(); }, 50);
+    if (opts.serverState) {
+      applyServerState(opts.serverState);
+    } else {
+      setTimeout(function () { emailInput.focus(); }, 50);
+    }
   }
 
   function closeModal() {
@@ -315,5 +341,5 @@
   panel.addEventListener('click', function (e) { e.stopPropagation(); });
 
   updateStepChrome();
-  if (isFallbackFlow) openModal({ noRedirect: true });
+  if (isFallbackFlow) openModal({ noRedirect: true, serverState: window.__AUTH_MODAL_STATE || null });
 })();

@@ -5,6 +5,7 @@ require_once __DIR__ . '/includes/auth_service.php';
 $error = $_SESSION['login_error'] ?? null;
 unset($_SESSION['login_error']);
 $redirect = $_GET['redirect'] ?? $_POST['redirect'] ?? '';
+$showRecoveryHint = false;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     verify_csrf();
@@ -18,6 +19,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = 'Não foi possível confirmar que você não é um robô. Tente novamente.';
     } elseif (($wait = login_lockout_seconds_remaining($email)) > 0) {
         $error = 'Muitas tentativas de login com este e-mail. Tente novamente em ' . ceil($wait / 60) . ' minuto(s).';
+    } elseif (!email_has_account($email)) {
+        // Sem conta com esse e-mail: em vez de só dizer "inválido", já
+        // manda pro cadastro com e-mail/senha preenchidos — falta só o
+        // nome pra criar a conta de verdade.
+        rate_limit_hit('login_ip', client_ip());
+        $_SESSION['signup_prefill'] = ['email' => $email, 'password' => $password];
+        $_SESSION['signup_notice'] = 'Não encontramos uma conta com o e-mail ' . $email . '. Só falta seu nome pra criar a sua agora.';
+        redirect(base_url('cadastro.php'));
     } else {
         rate_limit_hit('login_ip', client_ip());
         try {
@@ -28,9 +37,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } catch (AuthServiceError $e) {
             record_login_attempt($email, false);
             $error = $e->getMessage();
+            // A conta existe (já checamos acima) — se caiu aqui com essa
+            // mensagem genérica, só pode ser senha errada. Destaca a
+            // recuperação de senha em vez de deixar a pessoa travada.
+            $showRecoveryHint = $error === 'E-mail ou senha inválidos.';
         }
     }
 }
+
+// O modal (assets/js/auth-modal.js) esconde este fallback e reabre do
+// zero quando o JS carrega — sem isso, o aviso gerado pelo servidor (essa
+// mensagem de erro, ou o redirecionamento pro cadastro acima) nunca
+// chegaria a aparecer pra quem tem JS, que é a maioria.
+$__authModalState = $error ? ['flow' => 'login', 'email' => $email ?? '', 'error' => $error] : null;
 
 $pageTitle = 'Entrar';
 require __DIR__ . '/includes/header.php';
@@ -48,8 +67,13 @@ require __DIR__ . '/includes/header.php';
     <?php if (!empty($_GET['redefinida'])): ?>
       <p class="mb-4 rounded-lg bg-brand-green/10 px-3 py-2 text-sm text-brand-green-hover">Senha redefinida com sucesso. Faça login com sua nova senha.</p>
     <?php endif; ?>
-    <?php if ($error): ?>
+    <?php if ($error && !$showRecoveryHint): ?>
       <p class="mb-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700"><?= e($error) ?></p>
+    <?php elseif ($showRecoveryHint): ?>
+      <div class="mb-4 rounded-lg bg-red-50 px-3 py-3 text-sm text-red-700">
+        <p class="mb-1.5">Senha incorreta para <?= e($email) ?>.</p>
+        <a href="<?= base_url('esqueci-senha.php?email=' . urlencode($email)) ?>" class="font-semibold underline">Esqueci minha senha, quero recuperar o acesso</a>
+      </div>
     <?php endif; ?>
 
     <?php if (oauth_configured('google') || oauth_configured('facebook')): ?>
@@ -77,7 +101,7 @@ require __DIR__ . '/includes/header.php';
       <input type="hidden" name="redirect" value="<?= e($redirect) ?>">
       <div class="mb-4">
         <label class="mb-1 block text-sm font-medium">E-mail</label>
-        <input type="email" name="email" required class="w-full rounded-lg border border-brand-border px-3 py-2 text-sm focus:border-brand-primary focus:outline-none">
+        <input type="email" name="email" required value="<?= e($email ?? '') ?>" class="w-full rounded-lg border border-brand-border px-3 py-2 text-sm focus:border-brand-primary focus:outline-none">
       </div>
       <div class="mb-4">
         <label class="mb-1 block text-sm font-medium">Senha</label>
@@ -92,4 +116,7 @@ require __DIR__ . '/includes/header.php';
     </form>
   </div>
 </div>
+<?php if ($__authModalState): ?>
+<script>window.__AUTH_MODAL_STATE = <?= json_encode($__authModalState, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;</script>
+<?php endif; ?>
 <?php require __DIR__ . '/includes/footer.php'; ?>

@@ -29,7 +29,7 @@ require __DIR__ . '/includes/header.php';
         <?= csrf_field() ?>
         <div class="mb-4">
           <label class="mb-1 block text-sm font-medium">E-mail cadastrado</label>
-          <input type="email" name="email" required class="w-full rounded-lg border border-brand-border px-3 py-2 text-sm">
+          <input type="email" name="email" required value="<?= e($_GET['email'] ?? '') ?>" class="w-full rounded-lg border border-brand-border px-3 py-2 text-sm">
         </div>
         <button type="submit" class="w-full rounded-full bg-brand-primary py-2.5 text-sm font-semibold text-white hover:bg-brand-primary-hover">Enviar link de recuperação</button>
         <p class="mt-4 text-center text-sm"><a href="<?= base_url('login.php') ?>" class="font-medium text-brand-primary hover:underline">Voltar para o login</a></p>

@@ -7,6 +7,12 @@ $error = null;
 $fieldErrors = [];
 $accountType = in_array($_GET['tipo'] ?? '', ['corretor', 'imobiliaria'], true) ? $_GET['tipo'] : '';
 
+// Vindo do login.php: tentou entrar com um e-mail sem conta — já chega
+// aqui com e-mail/senha preenchidos, falta só o nome pra criar a conta.
+$signupNotice = $_SESSION['signup_notice'] ?? null;
+$signupPrefill = $_SESSION['signup_prefill'] ?? null;
+unset($_SESSION['signup_notice'], $_SESSION['signup_prefill']);
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     verify_csrf();
     rate_limit_enforce('cadastro_ip', client_ip(), 10, 3600); // 10 cadastros / hora por IP
@@ -74,6 +80,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
+// O modal (assets/js/auth-modal.js) esconde este fallback e reabre do
+// zero quando o JS carrega — sem isso, o aviso vindo do login.php (e-mail
+// sem conta) ou o erro de cadastro (ex.: e-mail já cadastrado) nunca
+// chegariam a aparecer pra quem tem JS, que é a maioria.
+if ($signupNotice) {
+    $__authModalState = ['flow' => 'signup', 'email' => $signupPrefill['email'] ?? '', 'password' => $signupPrefill['password'] ?? '', 'notice' => $signupNotice];
+} elseif ($error) {
+    $__authModalState = ['flow' => 'signup', 'email' => $_POST['email'] ?? '', 'error' => $error];
+} else {
+    $__authModalState = null;
+}
+
 $pageTitle = 'Criar conta';
 require __DIR__ . '/includes/header.php';
 ?>
@@ -88,6 +106,7 @@ require __DIR__ . '/includes/header.php';
     <p class="mb-6 text-sm text-brand-text-secondary">Cadastre-se para favoritar imóveis, anunciar ou representar sua imobiliária.</p>
 
     <?php if ($error): ?><p class="mb-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700"><?= e($error) ?></p><?php endif; ?>
+    <?php if ($signupNotice): ?><p class="mb-4 rounded-lg bg-brand-primary/10 px-3 py-2 text-sm text-brand-primary"><?= e($signupNotice) ?></p><?php endif; ?>
 
     <form method="post" id="cadastro-form" enctype="multipart/form-data">
       <?= csrf_field() ?>
@@ -132,7 +151,7 @@ require __DIR__ . '/includes/header.php';
       </div>
       <div class="mb-4">
         <label class="mb-1 block text-sm font-medium">E-mail</label>
-        <input type="email" name="email" required value="<?= e($_POST['email'] ?? '') ?>" class="w-full rounded-lg border border-brand-border px-3 py-2 text-sm">
+        <input type="email" name="email" required value="<?= e($_POST['email'] ?? $signupPrefill['email'] ?? '') ?>" class="w-full rounded-lg border border-brand-border px-3 py-2 text-sm">
         <?php if (!empty($fieldErrors['email'])): ?><p class="mt-1 text-xs text-red-600"><?= e($fieldErrors['email']) ?></p><?php endif; ?>
       </div>
       <div class="mb-4">
@@ -207,12 +226,12 @@ require __DIR__ . '/includes/header.php';
 
       <div class="mb-4">
         <label class="mb-1 block text-sm font-medium">Senha</label>
-        <input type="password" name="password" required class="w-full rounded-lg border border-brand-border px-3 py-2 text-sm">
+        <input type="password" name="password" required value="<?= e($signupPrefill['password'] ?? '') ?>" class="w-full rounded-lg border border-brand-border px-3 py-2 text-sm">
         <?php if (!empty($fieldErrors['password'])): ?><p class="mt-1 text-xs text-red-600"><?= e($fieldErrors['password']) ?></p><?php endif; ?>
       </div>
       <div class="mb-4">
         <label class="mb-1 block text-sm font-medium">Confirmar senha</label>
-        <input type="password" name="passwordConfirmation" required class="w-full rounded-lg border border-brand-border px-3 py-2 text-sm">
+        <input type="password" name="passwordConfirmation" required value="<?= e($signupPrefill['password'] ?? '') ?>" class="w-full rounded-lg border border-brand-border px-3 py-2 text-sm">
         <?php if (!empty($fieldErrors['passwordConfirmation'])): ?><p class="mt-1 text-xs text-red-600"><?= e($fieldErrors['passwordConfirmation']) ?></p><?php endif; ?>
       </div>
       <div class="mb-4">
@@ -264,4 +283,7 @@ require __DIR__ . '/includes/header.php';
   });
 })();
 </script>
+<?php if ($__authModalState): ?>
+<script>window.__AUTH_MODAL_STATE = <?= json_encode($__authModalState, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;</script>
+<?php endif; ?>
 <?php require __DIR__ . '/includes/footer.php'; ?>
