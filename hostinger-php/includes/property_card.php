@@ -248,6 +248,10 @@ function render_results_map(array $items, array $favoriteIds = []): void
     <div id="results-map-wrap" class="h-[60vh] overflow-hidden rounded-xl border border-brand-border lg:sticky lg:top-24 lg:h-[calc(100vh-7rem)]">
       <div id="results-map" class="w-full" style="height:100%"></div>
     </div>
+    <!-- Card do imóvel ao tocar num pino, centralizado embaixo (estilo
+         Airbnb) — só no mobile; no desktop o clique no pino abre o popup
+         normal do Leaflet. Ver assets/js/results-map.js. -->
+    <div id="hb-map-card-mobile" class="fixed inset-x-0 z-40 hidden justify-center px-4 lg:hidden"></div>
     <script>window.__RESULTS_MAP_PINS = <?= json_encode($pins, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;</script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="<?= asset_url('assets/js/results-map.js') ?>"></script>
